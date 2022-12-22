@@ -1,0 +1,6 @@
+{
+    "reactAppEnv": "local",
+    "backend": {
+        "url": "http://localhost:8080"
+    }
+}

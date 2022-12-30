@@ -8,12 +8,9 @@ type AddPlayerProps = {
     player: Player | null
     mode: 'add' | 'edit'
     cancelButtonHandler: (e: any) => void
-    // saveButtonHandler: (data: Player) => void
 }
 
 export const AddPlayer = ({ cancelButtonHandler, player, mode }: AddPlayerProps) => {
-    console.log(mode);
-
     const [id, setId] = useState<string>(`${player?.id}`);
     const [firstName, setFirstName] = useState(`${player?.firstName}`);
     const [lastName, setLastName] = useState(`${player?.lastName}`);

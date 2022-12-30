@@ -9,6 +9,8 @@ import { compose } from './utils/ComposeUtils';
 import withConfiguration, {
   isConfigured,
 } from './services/context/ConfigurationContext';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
 function App() {
   // define theme
@@ -31,24 +33,26 @@ function App() {
 
   return (
     <div>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Box height="100vh" display="flex" flexDirection="column">
-          <Router>
-            <Navbar />
-            <Routes>
-              {appRoutes.map((route) => (
-                <Route
-                  key={route.key}
-                  path={route.path}
-                  element={<route.component />}
-                />
-              ))}
-            </Routes>
-            <Footer />
-          </Router>
-        </Box>
-      </ThemeProvider>
+      <LocalizationProvider dateAdapter={AdapterMoment}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <Box height="100vh" display="flex" flexDirection="column">
+            <Router>
+              <Navbar />
+              <Routes>
+                {appRoutes.map((route) => (
+                  <Route
+                    key={route.key}
+                    path={route.path}
+                    element={<route.component />}
+                  />
+                ))}
+              </Routes>
+              <Footer />
+            </Router>
+          </Box>
+        </ThemeProvider>
+      </LocalizationProvider>
 
     </div>
   );

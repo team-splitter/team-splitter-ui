@@ -74,6 +74,7 @@ export const PollVotesPage = ({ pollId }: Props) => {
                         setSelectedPlayer(newValue);
                       }}
                     sx={{ width: 300 }}
+                    size="small"
                     renderInput={(params) => <TextField {...params} label="Player"/>}
                 />
             </FormControl>

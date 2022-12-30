@@ -1,0 +1,31 @@
+.form-container {
+    text-align: center;
+}
+
+input[type="text"] {
+    height: 20px;
+    margin: 5px;
+}
+
+.form-container button {
+    margin: 5px;
+}
+
+.center {
+    margin: auto;
+    width: 50%;
+
+}
+
+.form-container td label {
+    display: block;
+    text-align: right;
+}
+
+.form-container td input {
+    display: block;
+}
+
+.form-container table {
+    table-layout: fixed; 
+}

@@ -48,10 +48,12 @@ pipeline {
         }
 
         stage ("promote") {
-            sh '''
-                version=$(cat artifacts/version)
-                echo "Promoting version ${version}"
-            '''
+            steps {
+                sh '''
+                    version=$(cat artifacts/version)
+                    echo "Promoting version ${version}"
+                '''
+            }
         }
     }
 

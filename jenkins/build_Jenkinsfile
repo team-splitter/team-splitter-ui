@@ -6,9 +6,6 @@ pipeline {
         jdk 'OpenJDK11'
     }
 
-    environment {
-    }
-
     triggers {
         pollSCM "* * * * *"
     }

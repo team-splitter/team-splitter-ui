@@ -19,6 +19,7 @@ export const PollVotesPage = ({ pollId }: Props) => {
 
     const [selectedPlayer, setSelectedPlayer] = useState<Player | null> (null);
     const [addPlayerEnabled, setAddPlayerButtonEnabled] = useState(false);
+    const [selectedVote, setSelectedVote] = useState<PollVote>({} as PollVote);
 
     const handleAddPlayer = async (e: any) => {
         e.preventDefault();
@@ -27,14 +28,6 @@ export const PollVotesPage = ({ pollId }: Props) => {
             setVotes([...votes, vote]);
         }
     }
-
-    const handleClickOpen = () => {
-        setOpen(true);
-    };
-
-    const handleClose = () => {
-        setOpen(false);
-    };
 
     const onDeletePlayerVote = async (voteToRemove: PollVote) => {
         await deletePollVote(pollId, voteToRemove.id);
@@ -91,21 +84,25 @@ export const PollVotesPage = ({ pollId }: Props) => {
                     return (
                         <li key={vote.id}>{vote.player.firstName} {vote.player.lastName}
                             <Tooltip title="Delete">
-                                <IconButton onClick={(e) => { setOpen(true) }}>
+                                <IconButton onClick={(e) => { 
+                                    setOpen(true); 
+                                    setSelectedVote(vote);
+                                    }}>
                                     <DeleteIcon />
                                 </IconButton>
                             </Tooltip>
-                            <ConfirmDialog
-                                title="Delete Vote?"
-                                open={open}
-                                setOpen={setOpen}
-                                onConfirm={()=> onDeletePlayerVote(vote)}
-                            >
-                                Are you sure you want to delete this player vote?
-                            </ConfirmDialog>
+                            
                         </li>
                     )
                 })}
+                <ConfirmDialog
+                        title="Delete Vote?"
+                        open={open}
+                        setOpen={setOpen}
+                        onConfirm={()=> onDeletePlayerVote(selectedVote)}
+                    >
+                        Are you sure you want to delete this player vote?
+                    </ConfirmDialog>
             </ol>
 
         </div>

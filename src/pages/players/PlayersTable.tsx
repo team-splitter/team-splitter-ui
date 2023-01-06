@@ -21,6 +21,7 @@ const PlayersTable: FC<any> = ({showEditPage, showAddPlayerPage}: Props): ReactE
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [rowId, setRowId] = useState<GridRowId>({} as GridRowId);
+    const [pageSize, setPageSize] = useState<number>(100);
 
     const onRemovePlayer = (playerId: number) => {
         setPlayers(players.filter((item) => item.id !== playerId));
@@ -95,8 +96,9 @@ const PlayersTable: FC<any> = ({showEditPage, showAddPlayerPage}: Props): ReactE
                     autoHeight
                         rows={players}
                         columns={columns}
-                        pageSize={20}
-                        rowsPerPageOptions={[20]}
+                        pageSize={pageSize}
+                        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+                        rowsPerPageOptions={[10, 20, 50, 100]}
                         disableSelectionOnClick
                         showCellRightBorder
                         showColumnRightBorder

@@ -8,5 +8,6 @@ export type Team = {
 export type Game = {
     id: number,
     pollId: string,
-    teams: Team[]
+    teams: Team[],
+    creationTime: Date
 }

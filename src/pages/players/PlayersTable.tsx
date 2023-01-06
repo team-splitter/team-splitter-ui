@@ -1,5 +1,4 @@
 import React, { ReactElement, FC, useState, useEffect } from "react";
-import { useSelector, useDispatch } from 'react-redux'
 import { Box, Typography, Button } from "@mui/material";
 import { Player } from "../../api/Player.types";
 import moment from "moment";

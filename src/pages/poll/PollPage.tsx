@@ -46,6 +46,7 @@ const PollPage = () => {
             }
             <PollVotesPage pollId={pollId}/>
             <TeamSplitPage pollId={pollId}/> 
+            <GamesPage pollId={pollId}/>
         </>
         
     )

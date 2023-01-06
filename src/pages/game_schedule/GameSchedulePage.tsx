@@ -8,7 +8,7 @@ import moment from "moment";
 import DeleteIcon from '@mui/icons-material/Delete';
 
 function formatDateTime(date: Date): string {
-    let formattedDate = (moment(date)).format('YYYY-MM-DD dddd HH:mm');
+    let formattedDate = (moment(date)).format('YYYY-MM-DD dddd hh:mm A');
     return formattedDate;
 }
 

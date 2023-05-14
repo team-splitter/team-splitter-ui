@@ -34,14 +34,21 @@ export const GameSchedulePage = () => {
     useEffect(() => {
         getAllSchedules()
             .then((data) => {
-                data = data.sort((a, b) => {
-                    if (a == b) return 0;
-                    else if(a > b) return 1;
-                    else return -1;
-                })
                 const now  = new Date();
-                const past = data.filter((i) => i.date < now)
-                const future =  data.filter((i) => i.date >= now)
+                const past = data
+                    .filter((i) => i.date < now)
+                    .sort((a, b) => {
+                        if (a.date == b.date) return 0;
+                        else if (a.date > b.date) return -1;
+                        else return 1;
+                    })
+                const future =  data
+                    .filter((i) => i.date >= now)
+                    .sort((a, b) => {
+                        if (a.date == b.date) return 0;
+                        else if (a.date > b.date) return 1;
+                        else return -1;
+                    })
                 setSchedules(future)
                 setPastSchedules(past)
             })

@@ -22,7 +22,7 @@ export const GameCard = ({game}: GameCardProps) => {
                     alignItems: 'center',
                     justifyContent: 'center'
                 }}>
-                    <TeamCardList teams={game.teams} />
+                    <TeamCardList teams={game.teams} game={game}/>
                 </Box>
         </div>
 

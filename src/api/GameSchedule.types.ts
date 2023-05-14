@@ -3,4 +3,5 @@ export type GameSchedule = {
     date: Date
     location: string
     status: string
+    pollId: string
 }

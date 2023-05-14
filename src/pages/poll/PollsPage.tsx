@@ -3,7 +3,7 @@ import { Box, Typography } from "@mui/material";
 import { Poll } from "api/Poll.types";
 import moment from "moment";
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { getPolls } from "services/PollService";
 
 
@@ -16,6 +16,7 @@ const PollsPage  = () => {
     const [data, setData] = useState<Poll[] | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+
 
     useEffect(() => {
         getPolls()

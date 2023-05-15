@@ -8,5 +8,5 @@ else
   version=$1;
 fi
 
-echo "Pushing image mukhanovmax/team-splitter-ui:${version}"
-docker push mukhanovmax/team-splitter-ui:$version
+echo "Pushing image ghcr.io/maxmukhanov/team-splitter-ui:${version}"
+docker push ghcr.io/maxmukhanov/team-splitter-ui:$version

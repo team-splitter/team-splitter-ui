@@ -10,5 +10,5 @@ fi
 
 echo "Building version "$version
 
-echo "Building image mukhanovmax/team-splitter-ui:${version}"
-docker build -t mukhanovmax/team-splitter-ui:$version .
+echo "Building image ghcr.io/maxmukhanov/team-splitter-ui:${version}"
+docker build -t ghcr.io/maxmukhanov/team-splitter-ui:$version .

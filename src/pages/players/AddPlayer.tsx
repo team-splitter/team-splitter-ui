@@ -15,6 +15,7 @@ export const AddPlayer = ({ cancelButtonHandler, player, mode }: AddPlayerProps)
     const [firstName, setFirstName] = useState(`${player?.firstName}`);
     const [lastName, setLastName] = useState(`${player?.lastName}`);
     const [score, setScore] = useState(`${player?.score}`);
+    const [gameScore, setGameScore] = useState(`${player?.gameScore}`);
 
     const onSubmitButtonHandler = async (e: any) => {
         e.preventDefault();
@@ -24,7 +25,8 @@ export const AddPlayer = ({ cancelButtonHandler, player, mode }: AddPlayerProps)
             firstName: firstName,
             lastName: lastName,
             username: "",
-            score: Number(score)
+            score: Number(score),
+            gameScore: Number(gameScore)
         }
         if (mode === 'add') {
             await createPlayer(data);
@@ -73,6 +75,14 @@ export const AddPlayer = ({ cancelButtonHandler, player, mode }: AddPlayerProps)
                             </td>
                             <td>
                                 <input type="text" value={score} onChange={(e) => setScore(e.target.value)} />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label>Game Score</label>
+                            </td>
+                            <td>
+                                <input type="text" value={gameScore} onChange={(e) => setGameScore(e.target.value)} />
                             </td>
                         </tr>
                     </tbody>

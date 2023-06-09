@@ -4,4 +4,5 @@ export type Player = {
     lastName: string
     username: string
     score: number
+    gameScore: number
 }

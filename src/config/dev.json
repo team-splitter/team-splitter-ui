@@ -1,5 +1,5 @@
 {
-    "reactAppEnv": "local",
+    "reactAppEnv": "dev",
     "backend": {
         "url": "local config"
     },

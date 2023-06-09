@@ -4,6 +4,7 @@ import prodConfigJson from '../config/prod.json';
 
 export const environments = {
     LOCAL: 'local',
+    DEV: 'dev',
     PROD: 'prod',
 };
 
@@ -11,6 +12,10 @@ export interface Config {
     reactAppEnv: string,
     backend: {
         url: string
+    },
+    auth: {
+        domain: string,
+        clientId: string
     }
 }
 

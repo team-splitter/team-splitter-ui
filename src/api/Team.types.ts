@@ -1,6 +1,7 @@
 import { Player } from "./Player.types"
 
 export type Team = {
+    gameId: number
     name: string
     players: Player []
 }

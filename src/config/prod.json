@@ -2,5 +2,9 @@
     "reactAppEnv": "prod",
     "backend": {
         "url": "http://localhost:8080"
+    },
+    "auth": {
+        "domain": "dev-pes8zfo8kxraazha.us.auth0.com",
+        "clientId": "PYFY45kOIcS7jX3UIcSl2zQQ0RRqEucL"
     }
 }

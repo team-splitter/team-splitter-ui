@@ -20,6 +20,8 @@ const TeamCard = ({team, game}: TeamCardProps) => {
         await deleteGamePlayerEntry(gameId, player.id);
     }
 
+    const totalTeamScore = team.players.map(p => p.score).reduce((acc, score) => acc + score, 0);
+
     return (
         <div style={{width: "400px", display:"block", float: "left"}}>
             <h1>{team.name}</h1>
@@ -43,6 +45,7 @@ const TeamCard = ({team, game}: TeamCardProps) => {
                     )
                 })}
             </ol>
+            <div>Team Score:<b>{totalTeamScore}</b></div>
 
             {game &&
                 <ConfirmDialog

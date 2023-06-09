@@ -3,6 +3,7 @@ import {FC} from "react";
 import PlayersPage from './pages/players/PlayersPage';
 import PollPage from './pages/poll/PollPage';
 import GameSchedulePage from 'pages/game_schedule/GameSchedulePage';
+import Profile from 'components/Profile';
 
 interface Route {
     key: string,

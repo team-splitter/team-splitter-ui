@@ -4,6 +4,7 @@ import PlayersPage from './pages/players/PlayersPage';
 import PollPage from './pages/poll/PollPage';
 import GameSchedulePage from 'pages/game_schedule/GameSchedulePage';
 import Profile from 'components/Profile';
+import PlayerStatPage from 'pages/player_stats/PlayerStatsPage';
 
 interface Route {
     key: string,
@@ -46,6 +47,14 @@ export const routes: Array<Route> = [
         enabled: true,
         navDisplay: true,
         component: GameSchedulePage
+    }, 
+    {
+        key: 'player-stats-route',
+        title: 'Player Stats',
+        path: '/player_stats',
+        enabled: true,
+        navDisplay: true,
+        component: PlayerStatPage
     }, 
 
 ]

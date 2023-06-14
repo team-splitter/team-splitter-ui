@@ -13,9 +13,10 @@ const TeamSplitPage = ({ pollId }: TeamSplitPageProps) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [teamsNum, setTeamsNum] = useState(2);
+    const [splitStrategy, setSplitStrategy] = useState("TEAM_SCORE_BALANCE");
 
     useEffect(() => {
-        getPollTeamSplit(pollId, teamsNum)
+        getPollTeamSplit(pollId, teamsNum, splitStrategy)
             .then((response) => {
                 setTeams(response);
                 setError(null);
@@ -26,7 +27,7 @@ const TeamSplitPage = ({ pollId }: TeamSplitPageProps) => {
                 setTeams(null)
             })
             .finally(() => setLoading(false)) 
-    }, [teamsNum])
+    }, [teamsNum, splitStrategy])
 
     return (
         <div>
@@ -51,6 +52,21 @@ const TeamSplitPage = ({ pollId }: TeamSplitPageProps) => {
                     <MenuItem value={4}>4</MenuItem>
                 </Select>
 
+            </FormControl>
+            <FormControl variant="standard" sx={{ m: 1, minWidth: 200 }}>
+                <InputLabel id="split-strategy-label">Split Strategy</InputLabel>
+                <Select
+                    labelId="split-strategy-label"
+                    id="split-strategy-select"
+                    value={splitStrategy}
+                    onChange={(event: SelectChangeEvent) => {
+                        setSplitStrategy(event.target.value);
+                    }}
+                >
+                    <MenuItem value={"TEAM_SCORE_BALANCE"}>TEAM_SCORE_BALANCE</MenuItem>
+                    <MenuItem value={"BACK_AND_FORCE"}>BACK_AND_FORCE</MenuItem>
+                    <MenuItem value={"CIRCULAR"}>CIRCULAR</MenuItem>
+                </Select>
             </FormControl>
             {/* <FormControl variant="filled" sx={{ m: 1, minWidth: 120 }}>
                 <Button onClick={()=> {teamSplit();}} variant="contained">Split</Button>

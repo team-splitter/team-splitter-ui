@@ -12,8 +12,18 @@ import {
 import MenuIcon from "@mui/icons-material/Menu";
 import { routes } from "../routes";
 import { NavLink } from "react-router-dom";
+import { useAuth0 } from "@auth0/auth0-react";
+import LoginButton from "./LoginButton";
+import LogoutButton from "./LogoutButton";
 
 const Navbar: FC = (): ReactElement => {
+  const {
+    user,
+    isAuthenticated,
+    loginWithRedirect,
+    logout,
+  } = useAuth0();
+  
     const [anchorElNav, setAnchorElNav] = React.useState(null);
   
     const handleOpenNavMenu = (event: any) => {
@@ -74,7 +84,7 @@ const Navbar: FC = (): ReactElement => {
                 }}
               >
                 {routes.map((page) => (
-                  page.navDisplay &&
+                  page.navDisplay && isAuthenticated &&
                   <Link
                     key={page.key}
                     component={NavLink}
@@ -87,7 +97,7 @@ const Navbar: FC = (): ReactElement => {
                       <Typography textAlign="center">{page.title}</Typography>
                     </MenuItem>
                   </Link>
-                ))}
+                ))}  
               </Menu>
             </Box>
             <Typography
@@ -109,7 +119,7 @@ const Navbar: FC = (): ReactElement => {
                 }}
               >
                 {routes.map((page) => (
-                  page.navDisplay && 
+                  page.navDisplay && isAuthenticated && 
                   <Link
                     key={page.key}
                     component={NavLink}
@@ -122,7 +132,16 @@ const Navbar: FC = (): ReactElement => {
                     {page.title}
                   </Link>
                 ))}
+                
               </Box>
+            </Box>
+            <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "flex" } }}>
+            {!isAuthenticated  && (
+                  <LoginButton/>
+                )}
+                {isAuthenticated  && (
+                  <LogoutButton/>
+                )}
             </Box>
           </Toolbar>
         </Container>

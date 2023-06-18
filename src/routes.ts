@@ -5,6 +5,7 @@ import PollPage from './pages/poll/PollPage';
 import GameSchedulePage from 'pages/game_schedule/GameSchedulePage';
 import Profile from 'components/Profile';
 import PlayerStatPage from 'pages/player_stats/PlayerStatsPage';
+import HomePage from 'pages/HomePage';
 
 interface Route {
     key: string,
@@ -17,9 +18,17 @@ interface Route {
 
 export const routes: Array<Route> = [
     {
+        key: 'home-route',
+        title: 'Home',
+        path: '/',
+        enabled: true,
+        navDisplay: false,
+        component: HomePage
+    },
+    {
         key: 'polls-route',
         title: 'Polls',
-        path: '/',
+        path: '/poll',
         enabled: true,
         navDisplay: true,
         component: PollsPage

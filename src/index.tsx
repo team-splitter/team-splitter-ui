@@ -15,18 +15,19 @@ const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-  // <Auth0Provider
-  //   domain={`${config?.auth.domain}`}
-  //   clientId={`${config?.auth.clientId}`}
-  //   authorizationParams={{
-  //     redirect_uri: window.location.origin
-  //   }}
-  // >
+  // <React.StrictMode>
   //   <App />
-  // </Auth0Provider>
+  // </React.StrictMode>
+  <Auth0Provider
+    domain={`${config?.auth.domain}`}
+    clientId={`${config?.auth.clientId}`}
+    authorizationParams={{
+      redirect_uri: window.location.origin
+    }}
+    
+  >
+    <App />
+  </Auth0Provider>
   
 );
 

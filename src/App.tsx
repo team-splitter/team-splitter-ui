@@ -11,8 +11,29 @@ import withConfiguration, {
 } from './services/context/ConfigurationContext';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { useAuth0 } from '@auth0/auth0-react';
+import Loading from 'components/Loading';
+
+// styles
+import "./App.css";
 
 function App() {
+  const { 
+    isLoading,
+    error,
+    user,
+    isAuthenticated,
+    loginWithRedirect,
+    logout} = useAuth0();
+
+  if (error) {
+    return <div>Oops... {error.message}</div>;
+  }
+
+  if (isLoading) {
+    return <Loading/>;
+  }
+  
   // define theme
   const theme = createTheme({
     palette: {
@@ -53,7 +74,6 @@ function App() {
           </Box>
         </ThemeProvider>
       </LocalizationProvider>
-
     </div>
   );
 }

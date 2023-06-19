@@ -17,12 +17,12 @@ import LoginButton from "./LoginButton";
 import LogoutButton from "./LogoutButton";
 
 const Navbar: FC = (): ReactElement => {
-  const {
-    user,
-    isAuthenticated,
-    loginWithRedirect,
-    logout,
-  } = useAuth0();
+  // const {
+  //   user,
+  //   isAuthenticated,
+  //   loginWithRedirect,
+  //   logout,
+  // } = useAuth0();
   
     const [anchorElNav, setAnchorElNav] = React.useState(null);
   
@@ -84,7 +84,8 @@ const Navbar: FC = (): ReactElement => {
                 }}
               >
                 {routes.map((page) => (
-                  page.navDisplay && isAuthenticated &&
+                  // page.navDisplay && isAuthenticated &&
+                  page.navDisplay &&
                   <Link
                     key={page.key}
                     component={NavLink}
@@ -119,7 +120,8 @@ const Navbar: FC = (): ReactElement => {
                 }}
               >
                 {routes.map((page) => (
-                  page.navDisplay && isAuthenticated && 
+                  // page.navDisplay && isAuthenticated && 
+                  page.navDisplay && 
                   <Link
                     key={page.key}
                     component={NavLink}
@@ -136,12 +138,12 @@ const Navbar: FC = (): ReactElement => {
               </Box>
             </Box>
             <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "flex" } }}>
-            {!isAuthenticated  && (
+            {/* {!isAuthenticated  && (
                   <LoginButton/>
                 )}
                 {isAuthenticated  && (
                   <LogoutButton/>
-                )}
+                )} */}
             </Box>
           </Toolbar>
         </Container>

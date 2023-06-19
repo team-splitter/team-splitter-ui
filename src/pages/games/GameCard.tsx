@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
-import { Game } from "../api/Team.types";
-import TeamCardList from "./teams/TeamCardList";
-import TeamSplitPage from "./teams/TeamSplitPage";
+import { Game } from "../../api/Team.types";
+import TeamCardList from "../teams/TeamCardList";
+import TeamSplitPage from "../teams/TeamSplitPage";
 import moment from "moment";
 
 function formatDateTime(date: Date): string {
@@ -15,7 +15,7 @@ type GameCardProps = {
 export const GameCard = ({game}: GameCardProps) => {
     return (
         <div>
-            <h1>Game {formatDateTime(game.creationTime)}</h1>
+            <h1>Game ({game.id}) {formatDateTime(game.creationTime)}. Score (Red) {game.redScored}:{game.blueScored} (Blue)</h1>
             <Box sx={{
                     width: '100%',
                     display: 'flex',

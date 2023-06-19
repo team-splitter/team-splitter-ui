@@ -1,20 +1,20 @@
 import { useEffect, useState } from "react";
-import { Game } from "../api/Team.types";
-import { getGames } from "../services/GameService";
-import GameListCard from "./GameListCard";
+import { Game } from "../../api/Team.types";
+import { getGamesByPollId } from "../../services/GameService";
+import GameListCard from "../games/GameListCard";
 
 type GamesPageProps = {
     pollId: string
 }
 
-export const GamesPage = ({ pollId }: GamesPageProps) => {
+export const PollGamesPage = ({ pollId }: GamesPageProps) => {
 
     const [games, setGames] = useState<Game[] | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        getGames(pollId)
+        getGamesByPollId(pollId)
             .then((data) => {
                 setGames(data);
                 setError(null);
@@ -39,4 +39,4 @@ export const GamesPage = ({ pollId }: GamesPageProps) => {
     )
 }
 
-export default GamesPage;
+export default PollGamesPage;

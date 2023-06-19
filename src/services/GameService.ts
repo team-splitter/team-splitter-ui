@@ -1,11 +1,19 @@
 
 import { backendUrl } from "../globalConfig";
-import { get, del } from "../commons/client/http";
+import { get, del, put } from "../commons/client/http";
 import { Game } from "../api/Team.types";
 
-export const getGames = async (pollId: string): Promise<Game[]> => {
+export const getGamesByPollId = async (pollId: string): Promise<Game[]> => {
     const response = (await get(
         `${backendUrl}/game/poll/${pollId}`
+    )) as Game[]
+
+    return response;
+}
+
+export const getGames = async (): Promise<Game[]> => {
+    const response = (await get(
+        `${backendUrl}/game`
     )) as Game[]
 
     return response;
@@ -19,3 +27,22 @@ export const deleteGamePlayerEntry = async (gameId: number, playerId: number): P
 
     return response;
 }
+
+export const deleteGameById = async (gameId: number): Promise<boolean> => {
+
+    const response = (await del(
+        `${backendUrl}/game/${gameId}`
+    )) as boolean
+
+    return response;
+}
+
+export const setGameScore = async (gameId: number, redScored: number, blueScored: number): Promise<string> => {
+
+    const response = (await put(
+        `${backendUrl}/game/${gameId}/score?red=${redScored}&blue=${blueScored}`, {}
+    )) as string
+
+    return response;
+}
+

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import {useParams} from 'react-router-dom';
 import { Poll } from 'api/Poll.types';
 import { getPollById } from 'services/PollService';
-import GamesPage from 'pages/GamesPage';
+import PollGamesPage from 'pages/poll/PollGamesPage';
 import { PollVotesPage } from './PollVotesPage';
 import TeamSplitPage from 'pages/teams/TeamSplitPage';
 
@@ -46,7 +46,7 @@ const PollPage = () => {
             }
             <PollVotesPage pollId={pollId}/>
             <TeamSplitPage pollId={pollId}/> 
-            <GamesPage pollId={pollId}/>
+            <PollGamesPage pollId={pollId}/>
         </>
         
     )

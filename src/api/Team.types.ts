@@ -9,6 +9,9 @@ export type Team = {
 export type Game = {
     id: number,
     pollId: string,
+    teamSize: number,
+    redScored: number,
+    blueScored: number,
     teams: Team[],
     creationTime: Date
 }

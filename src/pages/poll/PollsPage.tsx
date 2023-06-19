@@ -5,6 +5,7 @@ import moment from "moment";
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 import { Link, useParams } from "react-router-dom";
 import { getPolls } from "services/PollService";
+import Loading from "components/Loading";
 
 
 function format(date: Date): string {
@@ -61,18 +62,19 @@ const PollsPage  = () => {
     return (
         <div>
             <h1>Polls</h1>
-            {loading && <div> A moment please...</div>}
+            {loading && <Loading/>}
             {error && (
                 <div>{`There is a problem fetching the poll data - ${error}`}</div>
             )}
 
             {data &&
-                <Box sx={{ height: 400, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                <Box sx={{width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
                     <DataGrid
+                        autoHeight
                         rows={data}
                         columns={columns}
-                        pageSize={5}
-                        rowsPerPageOptions={[5]}
+                        pageSize={20}
+                        rowsPerPageOptions={[10, 20, 50, 100]}
                         disableSelectionOnClick
                         showCellRightBorder
                         showColumnRightBorder

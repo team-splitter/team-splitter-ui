@@ -18,21 +18,21 @@ import Loading from 'components/Loading';
 import "./App.css";
 
 function App() {
-  const { 
-    isLoading,
-    error,
-    user,
-    isAuthenticated,
-    loginWithRedirect,
-    logout} = useAuth0();
+  // const { 
+  //   isLoading,
+  //   error,
+  //   user,
+  //   isAuthenticated,
+  //   loginWithRedirect,
+  //   logout} = useAuth0();
 
-  if (error) {
-    return <div>Oops... {error.message}</div>;
-  }
+  // if (error) {
+  //   return <div>Oops... {error.message}</div>;
+  // }
 
-  if (isLoading) {
-    return <Loading/>;
-  }
+  // if (isLoading) {
+  //   return <Loading/>;
+  // }
   
   // define theme
   const theme = createTheme({

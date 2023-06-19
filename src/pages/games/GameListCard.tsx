@@ -1,4 +1,4 @@
-import { Game } from "../api/Team.types";
+import { Game } from "../../api/Team.types";
 import GameCard from "./GameCard";
 
 type GameListProps = {

@@ -31,7 +31,8 @@ jobs:
     - name: Get tag version
       id: TAG
       run: |
-        release_version=$(npm version patch --no-git-tag-version --no-push | sed 's/v//g')
+        release_version=$(npm pkg get version | sed 's/\"//g')
+        npm version patch --no-git-tag-version --no-push
         echo "Version is ${release_version}"
         echo "release_version=$release_version" >> $GITHUB_OUTPUT
 

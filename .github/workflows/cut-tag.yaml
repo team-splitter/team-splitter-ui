@@ -6,7 +6,7 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
-run-name: Tag and release ${{ steps.TAG.outputs.release_version }}
+run-name: Tag and release
 
 permissions:
   contents: write

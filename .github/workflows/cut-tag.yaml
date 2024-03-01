@@ -29,9 +29,10 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
     
     - name: Get tag version
+      id: TAG
       run: |
         release_version=$(npm version patch --no-git-tag-version --no-push)
-        echo "Version is ${version}"
+        echo "Version is ${release_version}"
         echo "release_version=$release_version" >> $GITHUB_OUTPUT
 
     - name: Push changes

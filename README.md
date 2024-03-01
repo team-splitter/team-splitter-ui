@@ -1,16 +1,15 @@
 # Team Splitter Admin UI
 
-In the project directory, you can run:
+## Install dependencies
+```sh
+npm install 
+```
 
-### `npm start`
+## Start app
+```sh
+npm start 
+```
+
 
 Runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-
-### Build and publish docker image
-```
-sh dockerBuild.sh <version>
-
-sh docerPublish.sh <version>
-```

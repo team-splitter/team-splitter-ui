@@ -15,6 +15,8 @@ ENV NODE_ENV production
 COPY --from=builder /app/build /usr/share/nginx/html
 # Add your nginx.conf
 COPY core/nginx/nginx.conf /etc/nginx/conf.d/default.conf
+COPY core/nginx/nginx-selfsigned.crt /etc/nginx/ssl/nginx-selfsigned.crt
+COPY core/nginx/nginx-selfsigned.key /etc/nginx/ssl/nginx-selfsigned.key
 
 # Expose port
 EXPOSE 80

@@ -14,6 +14,7 @@ interface Route {
     path: string,
     enabled: boolean,
     navDisplay: boolean,
+    authRequired: boolean,
     component: FC<{}>
 }
 
@@ -24,6 +25,7 @@ export const routes: Array<Route> = [
         path: '/',
         enabled: true,
         navDisplay: false,
+        authRequired: false,
         component: HomePage
     },
     {
@@ -32,6 +34,7 @@ export const routes: Array<Route> = [
         path: '/poll',
         enabled: true,
         navDisplay: true,
+        authRequired: true,
         component: PollsPage
     },
     {
@@ -40,6 +43,7 @@ export const routes: Array<Route> = [
         path: '/poll/:id',
         enabled: true,
         navDisplay: false,
+        authRequired: true,
         component: PollPage
     },
     {
@@ -48,6 +52,7 @@ export const routes: Array<Route> = [
         path: '/players',
         enabled: true,
         navDisplay: true,
+        authRequired: true,
         component: PlayersPage
     }, 
     {
@@ -56,6 +61,7 @@ export const routes: Array<Route> = [
         path: '/schedule',
         enabled: true,
         navDisplay: true,
+        authRequired: true,
         component: GameSchedulePage
     }, 
     {
@@ -64,6 +70,7 @@ export const routes: Array<Route> = [
         path: '/player_stats',
         enabled: true,
         navDisplay: true,
+        authRequired: true,
         component: PlayerStatPage
     }, 
     {
@@ -72,8 +79,7 @@ export const routes: Array<Route> = [
         path: '/games',
         enabled: true,
         navDisplay: true,
+        authRequired: true,
         component: GamesPage
     }, 
-
-
 ]

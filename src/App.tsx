@@ -16,6 +16,7 @@ import Loading from 'components/Loading';
 
 // styles
 import "./App.css";
+import PrivateRoute from 'auth/PrivateRoute';
 
 function App() {
   const { 
@@ -65,7 +66,7 @@ function App() {
                   <Route
                     key={route.key}
                     path={route.path}
-                    element={<route.component />}
+                    element={<PrivateRoute><route.component /></PrivateRoute>}
                   />
                 ))}
               </Routes>

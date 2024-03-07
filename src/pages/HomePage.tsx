@@ -4,23 +4,9 @@ import PollsPage from "./poll/PollsPage";
 
 
 export const HomePage = () => {
-
-    const {
-        user,
-        isAuthenticated,
-        loginWithRedirect,
-        logout,
-      } = useAuth0();
-      
     return (
         <div>
-            {isAuthenticated && (
-                <PollsPage/>
-            )}
-
-            {!isAuthenticated && (
-                <h1>Your are not logged in</h1>
-            )}
+            <PollsPage/>
         </div>
     )
 }

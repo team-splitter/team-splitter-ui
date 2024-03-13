@@ -1,17 +1,17 @@
-import { Team, Game } from "../../api/Team.types";
+import { Team, GameSplit } from "../../api/Team.types";
 import TeamCard from "./TeamCard";
 
 type TeamCardListProps = {
     teams: Team []
-    game?: Game
+    gameSplit?: GameSplit
 }
 
-export const TeamCardList = ({teams, game}: TeamCardListProps) => {
+export const TeamCardList = ({teams, gameSplit}: TeamCardListProps) => {
     return (
         <div>
             {teams.map((team) => {
                 return (
-                    <TeamCard key={team.name} team={team} game={game}/>
+                    <TeamCard key={team.name} team={team} gameSplit={gameSplit}/>
                 )
             })}
         </div>

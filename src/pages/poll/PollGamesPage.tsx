@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { Game } from "../../api/Team.types";
-import { getGamesByPollId } from "../../services/GameService";
-import GameListCard from "../games/GameListCard";
+import { GameSplit } from "../../api/Team.types";
+import { getGameSplitsByPollId } from "../../services/GameSplitService";
+import GameSplitListCard from "../games/GameSplitListCard";
 
 type GamesPageProps = {
     pollId: string
@@ -9,19 +9,19 @@ type GamesPageProps = {
 
 export const PollGamesPage = ({ pollId }: GamesPageProps) => {
 
-    const [games, setGames] = useState<Game[] | null>(null);
+    const [gameSplits, setGameSplits] = useState<GameSplit[] | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        getGamesByPollId(pollId)
+        getGameSplitsByPollId(pollId)
             .then((data) => {
-                setGames(data);
+                setGameSplits(data);
                 setError(null);
             })
             .catch((err) => {
                 setError(err.message);
-                setGames(null);
+                setGameSplits(null);
             })
             .finally(() => {
                 setLoading(false)
@@ -30,9 +30,9 @@ export const PollGamesPage = ({ pollId }: GamesPageProps) => {
 
     return (
         <div>
-            <h1>Games</h1>
-            {games &&
-                <GameListCard games={games} />
+            <h1>Games Splits</h1>
+            {gameSplits &&
+                <GameSplitListCard gameSplits={gameSplits} />
             }
         </div>
 

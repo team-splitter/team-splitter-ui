@@ -1,23 +1,23 @@
-import { Team, Game } from "../../api/Team.types";
+import { Team, GameSplit } from "../../api/Team.types";
 import { Button, IconButton, Tooltip } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Player } from "api/Player.types";
 import { useEffect } from "react";
 import { useState } from "react";
 import ConfirmDialog from 'components/ConfirmDialog';
-import { deleteGamePlayerEntry } from "services/GameService";
+import { deleteGameSplitPlayerEntry } from "services/GameSplitService";
 
 type TeamCardProps = {
     team: Team
-    game?: Game
+    gameSplit?: GameSplit
 }
 
-const TeamCard = ({team, game}: TeamCardProps) => {
+const TeamCard = ({team, gameSplit}: TeamCardProps) => {
     const [open, setOpen] = useState(false);
     const [selectedPlayer, setSelectedPlayer] = useState<Player>({} as Player);
 
     const onDeletePlayerEntry = async (gameId:number , player: Player) => {
-        await deleteGamePlayerEntry(gameId, player.id);
+        await deleteGameSplitPlayerEntry(gameId, player.id);
     }
 
     const totalTeamScore = team.players.map(p => p.score).reduce((acc, score) => acc + score, 0);
@@ -30,7 +30,7 @@ const TeamCard = ({team, game}: TeamCardProps) => {
                     return (
                         <li key={player.id}>
                             {player.firstName} {player.lastName} {player.score}
-                            {game &&
+                            {gameSplit &&
                                 <Tooltip title="Delete">
                                     <IconButton onClick={async (e) => {
                                         setOpen(true); 
@@ -47,12 +47,12 @@ const TeamCard = ({team, game}: TeamCardProps) => {
             </ol>
             <div>Team Score:<b>{totalTeamScore}</b></div>
 
-            {game &&
+            {gameSplit &&
                 <ConfirmDialog
                             title="Delete Player from Game?"
                             open={open}
                             setOpen={setOpen}
-                            onConfirm={()=> onDeletePlayerEntry(game.id, selectedPlayer)}
+                            onConfirm={()=> onDeletePlayerEntry(gameSplit.id, selectedPlayer)}
                         >
                             Are you sure you want to delete this player?
                         </ConfirmDialog>

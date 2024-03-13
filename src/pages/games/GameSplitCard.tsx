@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-import { Game } from "../../api/Team.types";
+import { GameSplit } from "../../api/Team.types";
 import TeamCardList from "../teams/TeamCardList";
 import TeamSplitPage from "../teams/TeamSplitPage";
 import moment from "moment";
@@ -9,20 +9,20 @@ function formatDateTime(date: Date): string {
     return formattedDate;
 }
 type GameCardProps = {
-    game: Game
+    gameSplit: GameSplit
 }
 
-export const GameCard = ({game}: GameCardProps) => {
+export const GameSplitCard = ({gameSplit}: GameCardProps) => {
     return (
         <div>
-            <h1>Game ({game.id}) {formatDateTime(game.creationTime)}. Score (Red) {game.redScored}:{game.blueScored} (Blue)</h1>
+            <h1>Game ({gameSplit.id}) {formatDateTime(gameSplit.creationTime)}</h1>
             <Box sx={{
                     width: '100%',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center'
                 }}>
-                    <TeamCardList teams={game.teams} game={game}/>
+                    <TeamCardList teams={gameSplit.teams} gameSplit={gameSplit}/>
                 </Box>
         </div>
 
@@ -30,4 +30,4 @@ export const GameCard = ({game}: GameCardProps) => {
 }
 
 
-export default GameCard;
+export default GameSplitCard;

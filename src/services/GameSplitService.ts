@@ -2,6 +2,7 @@
 import { backendUrl } from "../globalConfig";
 import { get, del, put, post } from "../commons/client/http";
 import { GameScore, GameSplit } from "../api/Team.types";
+import { Page } from "api/Pagination.types";
 
 export const getGameSplitsByPollId = async (pollId: string): Promise<GameSplit[]> => {
     const response = (await get(
@@ -11,10 +12,10 @@ export const getGameSplitsByPollId = async (pollId: string): Promise<GameSplit[]
     return response;
 }
 
-export const getGameSplits = async (): Promise<GameSplit[]> => {
+export const getGameSplits = async (page: number = 0, pageSize: number = 20): Promise<Page<GameSplit>> => {
     const response = (await get(
-        `${backendUrl}/game_split`
-    )) as GameSplit[]
+        `${backendUrl}/game_split?page=${page}&size=${pageSize}`
+    )) as Page<GameSplit>
 
     return response;
 }

@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 import { deleteGameSplitById, getGameSplits, setGameSplitScores } from "services/GameSplitService";
 import DeleteIcon from '@mui/icons-material/Delete';
 import SportsScoreRoundedIcon from '@mui/icons-material/SportsScoreRounded';
+import { Page } from "api/Pagination.types";
 
 function format(date: Date): string {
     let formattedDate = (moment(date)).format('YYYY-MM-DD HH:mm:ss');
@@ -28,6 +29,7 @@ const fourTeamScores = [
 
 const GamesPage  = () => {
     const [gameSplits, setGameSplits] = useState<GameSplit[]>([]);
+    const [gameSplitsCount, setGameSplitsCount] = useState<number>(0);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState(null);
 
@@ -35,7 +37,10 @@ const GamesPage  = () => {
     const [selectedGameId, setSelectedGameId] = useState<number>(0);
     const [openScore, setOpenScore] = useState(false);
 
-    const [gameScores, setGameScores] = useState<GameScore[]>([{"teamOneName": "Red", "teamTwoName": "Blue", teamOneScored: 0, teamTwoScored: 0}]);
+    const [gameScores, setGameScores] = useState<GameScore[]>(twoTeamsScores);
+
+    const [page, setPage] = useState<number>(0);
+    const [pageSize, setPageSize] = useState<number>(20);
 
     const onDeleteGame = async (gameId:number) => {
         await deleteGameSplitById(gameId);
@@ -68,30 +73,37 @@ const GamesPage  = () => {
     }
     
     useEffect(() => {
-        getGameSplits()
+        getGameSplits(page, pageSize)
             .then((data) => {
-                setGameSplits(data);
+                setGameSplits(data.content);
+                setGameSplitsCount(data.totalElements)
                 setError(null);
             })
             .catch((err) => {
                 setError(err.message);
                 setGameSplits([]);
+                setGameSplitsCount(0);
             })
             .finally(() => {
                 setLoading(false)
             });
-    }, []);
+    }, [page, pageSize]);
 
     const columns: GridColDef[] = [
         { 
             field: 'id', 
             headerName: 'Split ID', 
-            width: 100 },
+            width: 100,
+            sortable: false,
+            filterable: false,
+        },
         {
             field: 'teamSize',
             headerName: 'Teams Size',
             width: 100,
             editable: false,
+            sortable: false,
+            filterable: false,
         },
         {
             field: 'gameScore',
@@ -117,12 +129,17 @@ const GamesPage  = () => {
                     
                 </div>
             ),
+            sortable: false,
+            filterable: false,
+            editable: false,
         },
         {
             field: 'creationTime',
             headerName: 'Creation Time',
             width: 200,
             editable: false,
+            sortable: false,
+            filterable: false,
             valueGetter: (params: GridValueGetterParams) =>
                 `${format(params.row.creationTime)}`,
         },
@@ -130,6 +147,8 @@ const GamesPage  = () => {
             field: 'actions',
             headerName: 'Actions',
             width: 400,
+            sortable: false,
+            filterable: false,
             renderCell: (params: GridRenderCellParams<any, GameSplit>) => (
                 <div>
                     <Link to={`/poll/${params.row.pollId}`}>Poll</Link>
@@ -174,7 +193,12 @@ const GamesPage  = () => {
                         getRowHeight={() => 'auto'}
                         rows={gameSplits}
                         columns={columns}
-                        pageSize={20}
+                        paginationMode="server"
+                        pageSize={pageSize}
+                        onPageSizeChange={setPageSize}
+                        page={page}
+                        onPageChange={setPage}
+                        rowCount={gameSplitsCount}
                         rowsPerPageOptions={[10, 20, 50, 100]}
                         disableSelectionOnClick
                         showCellRightBorder

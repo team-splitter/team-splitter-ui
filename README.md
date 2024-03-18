@@ -28,3 +28,7 @@ kubectl create secret tls nginx-secret-cert --cert=nginx-selfsigned.crt --key=ng
 ```
 
 3. Restart the pod/deployment so new cert/key is applied in ArgoCD
+
+
+## Real certificates
+https://www.ssls.com/

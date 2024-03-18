@@ -1,6 +1,7 @@
 import React, { ReactElement, FC, useState, useEffect } from "react";
 import { Box, Typography } from "@mui/material";
 import { Poll } from "api/Poll.types";
+import { Page } from "api/Pagination.types";
 import moment from "moment";
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 import { Link, useParams } from "react-router-dom";
@@ -14,13 +15,17 @@ function format(date: Date): string {
 }
 
 const PollsPage  = () => {
-    const [data, setData] = useState<Poll[] | null>(null);
+    const [data, setData] = useState<Page<Poll> | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    const [page, setPage] = useState<number>(0);
+    const [pageSize, setPageSize] = useState<number>(20);
+
+
 
     useEffect(() => {
-        getPolls()
+        getPolls(page, pageSize)
             .then((actualData) => {
                 setData(actualData);
                 setError(null);
@@ -32,7 +37,7 @@ const PollsPage  = () => {
             .finally(() => {
                 setLoading(false)
             });
-    }, []);
+    }, [page, pageSize]);
 
     const columns: GridColDef[] = [
         { field: 'id', headerName: 'ID', width: 200 },
@@ -41,18 +46,25 @@ const PollsPage  = () => {
             headerName: 'Question',
             width: 600,
             editable: true,
+            sortable: false,
+            filterable: false,
         },
         {
             field: 'creationTime',
             headerName: 'Creation Time',
             width: 200,
             editable: false,
-            valueGetter: (params: GridValueGetterParams) =>
-                `${format(params.row.creationTime)}`,
+            sortable: false,
+            filterable: false,
+            valueGetter: (params: GridValueGetterParams) => {
+                return `${format(params.row.creationTime)}`
+            }
         },
         {
             field: 'actions',
             headerName: 'Actions',
+            sortable: false,
+            filterable: false,
             renderCell: (params) => (
                 <Link to={`/poll/${params.row.id}`}>View</Link>
             ),
@@ -71,9 +83,14 @@ const PollsPage  = () => {
                 <Box sx={{width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
                     <DataGrid
                         autoHeight
-                        rows={data}
+                        rows={data.content}
                         columns={columns}
-                        pageSize={20}
+                        paginationMode="server"
+                        pageSize={pageSize}
+                        onPageSizeChange={setPageSize}
+                        page={page}
+                        onPageChange={setPage}
+                        rowCount={data.totalElements}
                         rowsPerPageOptions={[10, 20, 50, 100]}
                         disableSelectionOnClick
                         showCellRightBorder

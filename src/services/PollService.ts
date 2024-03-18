@@ -2,11 +2,15 @@
 import {backendUrl} from "../globalConfig";
 import {get, post, del} from "../commons/client/http";
 import { Poll, PollVote } from "../api/Poll.types";
+import { Page } from "../api/Pagination.types";
 
-export const getPolls = async (): Promise<Poll[]> => {
+
+
+
+export const getPolls = async (page: number = 0, size: number = 10): Promise<Page<Poll>> => {
     const response = (await get(
-        `${backendUrl}/poll`
-    )) as Poll[] 
+        `${backendUrl}/poll?page=${page}&size=${size}`
+    )) as Page<Poll>
 
     return response;
 }

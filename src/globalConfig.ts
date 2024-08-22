@@ -1,3 +1,3 @@
-export const backendUrl = `${window.location.protocol}//${window.location.host}/api`;
+export const backendUrl = `https://teamsplitter.com/api`;
 
 export default backendUrl;

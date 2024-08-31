@@ -62,13 +62,6 @@ const PlayersTable: FC<any> = ({showEditPage, showAddPlayerPage}: Props): ReactE
             
         },
         {
-            field: 'gameScore',
-            headerName: 'Game Score',
-            width: 100,
-            editable: true,
-            
-        },
-        {
             field: 'actions',
             headerName: 'Actions',
             width: 100,

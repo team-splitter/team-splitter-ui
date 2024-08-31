@@ -10,9 +10,7 @@ const PlayersPage: FC<any> = (): ReactElement => {
         'id': 0,
         'firstName': "",
         'lastName': "",
-        'username': "",
-        'score': 50,
-        'gameScore': 50
+        'score': 50
     } as Player;
     const [shownPage, setShownPage] =  useState('table');
     const [player, setPlayer] = useState<Player>(defaultPlayer);

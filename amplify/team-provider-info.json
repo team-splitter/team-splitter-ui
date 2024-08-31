@@ -10,14 +10,6 @@
       "StackName": "amplify-teamsplitter-dev-b6e06",
       "StackId": "arn:aws:cloudformation:us-east-1:249398769869:stack/amplify-teamsplitter-dev-b6e06/71377e40-649d-11ef-9224-125891ce1df1",
       "AmplifyAppId": "dqd7rnsjv0u6s"
-    },
-    "categories": {
-      "hosting": {
-        "amplifyhosting": {
-          "appId": "dqd7rnsjv0u6s",
-          "type": "manual"
-        }
-      }
     }
   }
 }

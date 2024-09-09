@@ -16,7 +16,7 @@ const TeamCard = ({team, gameSplit}: TeamCardProps) => {
     const [open, setOpen] = useState(false);
     const [selectedPlayer, setSelectedPlayer] = useState<Player>({} as Player);
 
-    const onDeletePlayerEntry = async (gameId:number , player: Player) => {
+    const onDeletePlayerEntry = async (gameId:string , player: Player) => {
         await deleteGameSplitPlayerEntry(gameId, player.id);
     }
 

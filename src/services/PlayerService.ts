@@ -28,7 +28,7 @@ export const createPlayer = async (player: Player): Promise<Player> => {
     return response;
 }
 
-export const updatePlayer = async (id: number, player: Player): Promise<Player> => {
+export const updatePlayer = async (id: string, player: Player): Promise<Player> => {
     const response = (await put(
         `${backendUrl}/player/${id}`,
         player

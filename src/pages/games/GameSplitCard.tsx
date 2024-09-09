@@ -15,7 +15,7 @@ type GameCardProps = {
 export const GameSplitCard = ({gameSplit}: GameCardProps) => {
     return (
         <div>
-            <h1>Game ({gameSplit.id}) {formatDateTime(gameSplit.creationTime)}</h1>
+            <h1>Game ({gameSplit.id}) {formatDateTime(gameSplit.createdAt)}</h1>
             <Box sx={{
                     width: '100%',
                     display: 'flex',

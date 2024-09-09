@@ -1,18 +1,19 @@
 import { Autocomplete, Button, FormControl, IconButton, InputLabel, MenuItem, Select, SelectChangeEvent, TextField, Tooltip } from "@mui/material"
 import { useEffect, useState } from "react"
 import { Player } from "api/Player.types"
-import { PollVote } from "api/Poll.types"
+import { Poll, PollVote } from "api/Poll.types"
 import { getPlayers } from "services/PlayerService"
 import { addPollVote, getVotesForPoll, deletePollVote } from "services/PollService"
 import DeleteIcon from '@mui/icons-material/Delete';
 import ConfirmDialog from 'components/ConfirmDialog';
 
 type Props = {
+    poll: Poll
     pollId: string
 }
 
-export const PollVotesPage = ({ pollId }: Props) => {
-    const [votes, setVotes] = useState([] as PollVote[]);
+export const PollVotesPage = ({ pollId, poll }: Props) => {
+    const [votes, setVotes] = useState(poll.answers as PollVote[]);
     const [players, setPlayers] = useState([] as Player[]);
     const [error, setError] = useState(null);
     const [open, setOpen] = useState(false);
@@ -36,13 +37,6 @@ export const PollVotesPage = ({ pollId }: Props) => {
     }
 
     useEffect(() => {
-        getVotesForPoll(pollId)
-            .then((data) => {
-                setVotes(data);
-            })
-    }, []);
-
-    useEffect(() => {
         getPlayers()
             .then(data => {
                 setPlayers(data);
@@ -56,7 +50,14 @@ export const PollVotesPage = ({ pollId }: Props) => {
             <FormControl variant="standard" sx={{ m: 1, minWidth: 200}}>             
                <Autocomplete
                     options={players}
-                    getOptionLabel={option=> option.firstName + ' ' + option.lastName}
+                    getOptionLabel={option=> `${option.firstName || ''} ${option.lastName || ''}`}
+                    renderOption={(props, option) => {
+                        return (
+                          <li {...props} key={option.id}>
+                            {`${option.firstName || ''} ${option.lastName || ''}`}
+                          </li>
+                        );
+                      }}
                     value={selectedPlayer}
                     onChange={(event: any, newValue: Player | null) => {
                         if (newValue !== null) {
@@ -82,7 +83,7 @@ export const PollVotesPage = ({ pollId }: Props) => {
             <ol>
                 {votes.map((vote) => {
                     return (
-                        <li key={vote.id}>{vote.player.firstName} {vote.player.lastName}
+                        <li key={vote.id}>{vote.player ? `${vote.player.firstName || ''} ${vote.player.lastName || ''}`: `deleted user`}
                             <Tooltip title="Delete">
                                 <IconButton onClick={(e) => { 
                                     setOpen(true); 

@@ -1,5 +1,5 @@
 export type GameSchedule = {
-    id: number
+    id: string
     date: Date
     location: string
     status: string

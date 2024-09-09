@@ -7,10 +7,10 @@ import { Page } from "../api/Pagination.types";
 
 
 
-export const getPolls = async (page: number = 0, size: number = 10): Promise<Page<Poll>> => {
+export const getPolls = async (): Promise<Poll[]> => {
     const response = (await get(
-        `${backendUrl}/poll?page=${page}&size=${size}`
-    )) as Page<Poll>
+        `${backendUrl}/poll`
+    )) as Poll[];
 
     return response;
 }
@@ -31,7 +31,7 @@ export const getVotesForPoll = async (pollId: string): Promise<PollVote[]> => {
     return response;   
 }
 
-export const deletePollVote = async (pollId: string, voteId: number): Promise<boolean> => {
+export const deletePollVote = async (pollId: string, voteId: string): Promise<boolean> => {
     const response = (await del(
         `${backendUrl}/poll/${pollId}/vote/${voteId}`
     )) as boolean 

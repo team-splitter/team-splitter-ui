@@ -2,12 +2,12 @@ import { Player } from "./Player.types"
 
 export type Poll = {
     id: string
-    creationTime: Date
+    createdAt: Date
     question: string
-
+    answers: [PollVote]
 }
 
 export type PollVote = {
-    id: number,
+    id: string,
     player: Player
 }

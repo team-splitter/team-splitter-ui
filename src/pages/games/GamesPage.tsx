@@ -34,7 +34,7 @@ const GamesPage  = () => {
     const [error, setError] = useState(null);
 
     const [open, setOpen] = useState(false);
-    const [selectedGameId, setSelectedGameId] = useState<number>(0);
+    const [selectedGameId, setSelectedGameId] = useState<string>('');
     const [openScore, setOpenScore] = useState(false);
 
     const [gameScores, setGameScores] = useState<GameScore[]>(twoTeamsScores);
@@ -42,16 +42,16 @@ const GamesPage  = () => {
     const [page, setPage] = useState<number>(0);
     const [pageSize, setPageSize] = useState<number>(20);
 
-    const onDeleteGame = async (gameId:number) => {
+    const onDeleteGame = async (gameId:string) => {
         await deleteGameSplitById(gameId);
         setGameSplits(gameSplits.filter(i => i.id !== gameId));
     }
 
-    const onSaveGameScores = async (gameSplitId: number, gameScores: GameScore[] ) => {
-        const savedGameSplit = await setGameSplitScores(gameSplitId, gameScores);
+    const onSaveGameScores = async (gameSplitId: string, gameScores: GameScore[] ) => {
+        const games = await setGameSplitScores(gameSplitId, gameScores);
         const updatedGameSplits = gameSplits.map(i => {
             if (i.id === gameSplitId) {
-                i.games = savedGameSplit.games;
+                i.games = games;
             } 
             return i;
         });
@@ -73,7 +73,7 @@ const GamesPage  = () => {
     }
     
     useEffect(() => {
-        getGameSplits(page, pageSize)
+        getGameSplits()
             .then((data) => {
                 setGameSplits(data.content);
                 setGameSplitsCount(data.totalElements)
@@ -87,13 +87,13 @@ const GamesPage  = () => {
             .finally(() => {
                 setLoading(false)
             });
-    }, [page, pageSize]);
+    }, []);
 
     const columns: GridColDef[] = [
         { 
             field: 'id', 
             headerName: 'Split ID', 
-            width: 100,
+            width: 300,
             sortable: false,
             filterable: false,
         },
@@ -111,11 +111,11 @@ const GamesPage  = () => {
             width: 300,
             renderCell: (params: GridRenderCellParams<any, GameSplit>) => (
                 <div>
-                    {(params.row.games.length == 0 || params.row.games[0].teamTwoName == null) &&
+                    {(!params.row.games || params.row.games.length == 0 || params.row.games[0].teamTwoName == null) &&
                         <span>N/A</span>
                     }
 
-                    {params.row.games.length >0 && params.row.games[0].teamOneName != null &&
+                    {params.row.games && params.row.games.length >0 && params.row.games[0].teamOneName != null &&
                         <ol>
                             {params.row.games.map((game) => {
                                 return (
@@ -134,14 +134,14 @@ const GamesPage  = () => {
             editable: false,
         },
         {
-            field: 'creationTime',
+            field: 'createdAt',
             headerName: 'Creation Time',
             width: 200,
             editable: false,
             sortable: false,
             filterable: false,
             valueGetter: (params: GridValueGetterParams) =>
-                `${format(params.row.creationTime)}`,
+                `${format(params.row.createdAt)}`,
         },
         {
             field: 'actions',
@@ -161,7 +161,7 @@ const GamesPage  = () => {
                         </IconButton>
                     </Tooltip>
 
-                    {(params.row.games.length == 0) &&
+                    {(!params.row.games || params.row.games.length == 0) &&
                         <Tooltip title="Set Score">
                             <IconButton onClick={async (e) => {
                                 setOpenScore(true); 
@@ -193,7 +193,7 @@ const GamesPage  = () => {
                         getRowHeight={() => 'auto'}
                         rows={gameSplits}
                         columns={columns}
-                        paginationMode="server"
+                        // paginationMode="server"
                         pageSize={pageSize}
                         onPageSizeChange={setPageSize}
                         page={page}
@@ -205,7 +205,7 @@ const GamesPage  = () => {
                         showColumnRightBorder
                         initialState={{
                             sorting: {
-                                sortModel: [{field: 'creationTime', sort: 'desc'}]
+                                sortModel: [{field: 'createdAt', sort: 'desc'}]
                             }
                         }}
                     />

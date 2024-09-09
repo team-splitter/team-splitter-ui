@@ -28,7 +28,7 @@ export const AddPlayer = ({ cancelButtonHandler, player, mode }: AddPlayerProps)
         if (mode === 'add') {
             await createPlayer(data);
         } else {
-            await updatePlayer(playerId, data);
+            await updatePlayer(id, data);
         }
 
         cancelButtonHandler(e);
@@ -46,7 +46,7 @@ export const AddPlayer = ({ cancelButtonHandler, player, mode }: AddPlayerProps)
                                 <label>ID</label>
                             </td>
                             <td>
-                                <input disabled={mode === 'edit'} type="text" value={id} onChange={(e) => setId(e.target.value)} />
+                                <input disabled={true} type="text" value={id} onChange={(e) => setId(e.target.value)} />
                             </td>
                         </tr>
                         <tr>

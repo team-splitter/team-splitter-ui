@@ -16,7 +16,7 @@ export const PollGamesPage = ({ pollId }: GamesPageProps) => {
     useEffect(() => {
         getGameSplitsByPollId(pollId)
             .then((data) => {
-                setGameSplits(data);
+                setGameSplits(data.content);
                 setError(null);
             })
             .catch((err) => {

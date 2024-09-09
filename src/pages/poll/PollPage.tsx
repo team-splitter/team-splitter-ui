@@ -42,9 +42,12 @@ const PollPage = () => {
                 <div>{`There is a problem fetching the poll data - ${error}`}</div>
             )}
             {poll && 
-                <h1>{poll.question}</h1>
+                <div>
+                    <h1>{poll.question}</h1>
+                    <PollVotesPage pollId={pollId} poll={poll}/>
+                </div>
             }
-            <PollVotesPage pollId={pollId}/>
+            
             <TeamSplitPage pollId={pollId}/> 
             <PollGamesPage pollId={pollId}/>
         </>

@@ -11,7 +11,7 @@ export const GameSplitListCard = ({gameSplits}: GameListProps) => {
         <div>
             {gameSplits.map((gameSplit) => {
                 return (
-                    <GameSplitCard gameSplit={gameSplit} key={`${gameSplit.id}`}/>
+                    <GameSplitCard gameSplit={gameSplit} key={gameSplit.id}/>
                 )
             })}
         </div>

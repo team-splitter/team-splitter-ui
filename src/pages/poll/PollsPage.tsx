@@ -15,7 +15,7 @@ function format(date: Date): string {
 }
 
 const PollsPage  = () => {
-    const [data, setData] = useState<Page<Poll> | null>(null);
+    const [data, setData] = useState<Poll[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -25,22 +25,22 @@ const PollsPage  = () => {
 
 
     useEffect(() => {
-        getPolls(page, pageSize)
+        getPolls()
             .then((actualData) => {
                 setData(actualData);
                 setError(null);
             })
             .catch((err) => {
                 setError(err.message);
-                setData(null);
+                setData([]);
             })
             .finally(() => {
                 setLoading(false)
             });
-    }, [page, pageSize]);
+    }, []);
 
     const columns: GridColDef[] = [
-        { field: 'id', headerName: 'ID', width: 200 },
+        { field: 'id', headerName: 'ID', width: 300 },
         {
             field: 'question',
             headerName: 'Question',
@@ -50,14 +50,14 @@ const PollsPage  = () => {
             filterable: false,
         },
         {
-            field: 'creationTime',
+            field: 'createdAt',
             headerName: 'Creation Time',
             width: 200,
             editable: false,
             sortable: false,
             filterable: false,
             valueGetter: (params: GridValueGetterParams) => {
-                return `${format(params.row.creationTime)}`
+                return `${format(params.row.createdAt)}`
             }
         },
         {
@@ -83,14 +83,13 @@ const PollsPage  = () => {
                 <Box sx={{width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
                     <DataGrid
                         autoHeight
-                        rows={data.content}
+                        rows={data}
                         columns={columns}
-                        paginationMode="server"
                         pageSize={pageSize}
                         onPageSizeChange={setPageSize}
                         page={page}
                         onPageChange={setPage}
-                        rowCount={data.totalElements}
+                        rowCount={data.length}
                         rowsPerPageOptions={[10, 20, 50, 100]}
                         disableSelectionOnClick
                         showCellRightBorder
@@ -98,7 +97,7 @@ const PollsPage  = () => {
                         experimentalFeatures={{ newEditingApi: true }}
                         initialState={{
                             sorting: {
-                                sortModel: [{field: 'creationTime', sort: 'desc'}]
+                                sortModel: [{field: 'createdAt', sort: 'desc'}]
                             }
                         }}
                     />

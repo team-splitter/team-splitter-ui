@@ -5,6 +5,7 @@ import moment from "moment";
 import { DataGrid, GridColDef, GridRowId,GridCellEditCommitParams, GridRenderCellParams, GridValueGetterParams, renderActionsCell } from '@mui/x-data-grid';
 import PlayerActions from "./PlayerActions";
 import { getPlayers } from "../../services/PlayerService";
+import Loading from "components/Loading";
 
 
 function format(date: Date): string {
@@ -43,6 +44,12 @@ const PlayersTable: FC<any> = ({showEditPage, showAddPlayerPage}: Props): ReactE
 
     const columns: GridColDef[] = [
         {
+            field: 'id',
+            headerName: 'ID',
+            width: 200,
+            editable: false,
+        },
+        {
             field: 'firstName',
             headerName: 'First Name',
             width: 100,
@@ -78,7 +85,7 @@ const PlayersTable: FC<any> = ({showEditPage, showAddPlayerPage}: Props): ReactE
         <div style={{padding:"10px"}}>
             <h1>Players</h1>
             <Button variant="outlined" style={{margin: "5px"}} onClick={showAddPlayerPage}>Add Player</Button>
-            {loading && <div> A moment please...</div>}
+            {loading && <Loading/>}
             {error && (
                 <div>{`There is a problem fetching the poll data - ${error}`}</div>
             )}

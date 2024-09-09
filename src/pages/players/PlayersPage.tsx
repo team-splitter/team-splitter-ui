@@ -7,7 +7,7 @@ import { Player } from "../../api/Player.types";
 
 const PlayersPage: FC<any> = (): ReactElement => {
     const defaultPlayer = {
-        'id': 0,
+        'id': Math.floor(Math.random() * 1000000000),
         'firstName': "",
         'lastName': "",
         'score': 50

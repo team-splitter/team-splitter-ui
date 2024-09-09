@@ -37,12 +37,3 @@ export const deleteGameById = async (gameId: number): Promise<boolean> => {
     return response;
 }
 
-export const setGameScore = async (gameId: number, redScored: number, blueScored: number): Promise<string> => {
-
-    const response = (await put(
-        `${backendUrl}/game/${gameId}/score?red=${redScored}&blue=${blueScored}`, {}
-    )) as string
-
-    return response;
-}
-

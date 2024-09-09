@@ -1,26 +1,26 @@
 
 import { backendUrl } from "../globalConfig";
 import { get, del, put, post } from "../commons/client/http";
-import { GameScore, GameSplit } from "../api/Team.types";
+import { GameScore, GameSplit, Game } from "../api/Team.types";
 import { Page } from "api/Pagination.types";
 
-export const getGameSplitsByPollId = async (pollId: string): Promise<GameSplit[]> => {
+export const getGameSplitsByPollId = async (pollId: string): Promise<Page<GameSplit>> => {
     const response = (await get(
-        `${backendUrl}/game_split/poll/${pollId}`
-    )) as GameSplit[]
-
-    return response;
-}
-
-export const getGameSplits = async (page: number = 0, pageSize: number = 20): Promise<Page<GameSplit>> => {
-    const response = (await get(
-        `${backendUrl}/game_split?page=${page}&size=${pageSize}`
+        `${backendUrl}/game_split?pollId=${pollId}`
     )) as Page<GameSplit>
 
     return response;
 }
 
-export const deleteGameSplitPlayerEntry = async (gameSplitId: number, playerId: number): Promise<boolean> => {
+export const getGameSplits = async (): Promise<Page<GameSplit>> => {
+    const response = (await get(
+        `${backendUrl}/game_split`
+    )) as Page<GameSplit>
+
+    return response;
+}
+
+export const deleteGameSplitPlayerEntry = async (gameSplitId: string, playerId: number): Promise<boolean> => {
 
     const response = (await del(
         `${backendUrl}/game_split/${gameSplitId}/team_entry/${playerId}`
@@ -29,7 +29,7 @@ export const deleteGameSplitPlayerEntry = async (gameSplitId: number, playerId: 
     return response;
 }
 
-export const deleteGameSplitById = async (gameSplitId: number): Promise<boolean> => {
+export const deleteGameSplitById = async (gameSplitId: string): Promise<boolean> => {
 
     const response = (await del(
         `${backendUrl}/game_split/${gameSplitId}`
@@ -38,11 +38,11 @@ export const deleteGameSplitById = async (gameSplitId: number): Promise<boolean>
     return response;
 }
 
-export const setGameSplitScores = async (gameSplitId: number, gameScores: GameScore[]): Promise<GameSplit> => {
+export const setGameSplitScores = async (gameSplitId: string, gameScores: GameScore[]): Promise<Game []> => {
 
     const response = (await post(
         `${backendUrl}/game_split/${gameSplitId}/score`, gameScores
-    )) as GameSplit
+    )) as Game[];
 
     return response;
 }

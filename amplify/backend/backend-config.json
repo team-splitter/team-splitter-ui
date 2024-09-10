@@ -1,0 +1,82 @@
+{
+  "api": {
+    "teamsplitterapi": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "TeamSplitterAPI"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "API Gateway"
+    }
+  },
+  "function": {
+    "TeamSplitterAPI": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    }
+  },
+  "hosting": {
+    "amplifyhosting": {
+      "providerPlugin": "awscloudformation",
+      "service": "amplifyhosting",
+      "type": "manual"
+    }
+  },
+  "parameters": {
+    "AMPLIFY_function_TeamSplitterAPI_chatId": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "TeamSplitterAPI"
+        }
+      ]
+    },
+    "AMPLIFY_function_TeamSplitterAPI_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "TeamSplitterAPI"
+        }
+      ]
+    },
+    "AMPLIFY_function_TeamSplitterAPI_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "TeamSplitterAPI"
+        }
+      ]
+    },
+    "AMPLIFY_function_TeamSplitterAPI_secretsPathAmplifyAppId": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "TeamSplitterAPI"
+        }
+      ]
+    },
+    "AMPLIFY_hosting_amplifyhosting_appId": {
+      "usedBy": [
+        {
+          "category": "hosting",
+          "resourceName": "amplifyhosting"
+        }
+      ]
+    },
+    "AMPLIFY_hosting_amplifyhosting_type": {
+      "usedBy": [
+        {
+          "category": "hosting",
+          "resourceName": "amplifyhosting"
+        }
+      ]
+    }
+  }
+}

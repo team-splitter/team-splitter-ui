@@ -1,0 +1,13 @@
+{
+  "lambdaLayers": [],
+  "secretNames": [
+    "ABC_SECRET",
+    "TELEGRAM_TOKEN"
+  ],
+  "environmentVariableList": [
+    {
+      "cloudFormationParameterName": "chatId",
+      "environmentVariableName": "CHAT_ID"
+    }
+  ]
+}

@@ -8,7 +8,7 @@ export const getPollTeamSplit = async (pollId: string, teamsNum?: number, splitS
         teamsNum = 2;
     }
         const response = (await get(
-        `${backendUrl}/team/split/${pollId}?teamsNum=${teamsNum}&splitType=${splitStrategy}`
+        `${backendUrl()}/team/split/${pollId}?teamsNum=${teamsNum}&splitType=${splitStrategy}`
     )) as Team[] 
 
     return response;

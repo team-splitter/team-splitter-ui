@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "paths": {
+    "/api/v1/poll": {
+      "name": "/api/v1/poll",
+      "lambdaFunction": "TeamSplitterAPI",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/api/v1/player": {
+      "name": "/api/v1/player",
+      "lambdaFunction": "TeamSplitterAPI",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/api/v1/game-split": {
+      "name": "/api/v1/game-split",
+      "lambdaFunction": "TeamSplitterAPI",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/api/v1/game-schedule": {
+      "name": "/api/v1/game-schedule",
+      "lambdaFunction": "TeamSplitterAPI",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/api/v1/team": {
+      "name": "/api/v1/team",
+      "lambdaFunction": "TeamSplitterAPI",
+      "permissions": {
+        "setting": "open"
+      }
+    },
+    "/api/v1/telegram-callback": {
+      "name": "/api/v1/telegram-callback",
+      "lambdaFunction": "TeamSplitterAPI",
+      "permissions": {
+        "setting": "open"
+      }
+    }
+  }
+}

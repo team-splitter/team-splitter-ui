@@ -6,7 +6,7 @@ import { Page } from "api/Pagination.types";
 
 export const getGameSplitsByPollId = async (pollId: string): Promise<Page<GameSplit>> => {
     const response = (await get(
-        `${backendUrl}/game_split?pollId=${pollId}`
+        `${backendUrl()}/game-split?pollId=${pollId}`
     )) as Page<GameSplit>
 
     return response;
@@ -14,7 +14,7 @@ export const getGameSplitsByPollId = async (pollId: string): Promise<Page<GameSp
 
 export const getGameSplits = async (): Promise<Page<GameSplit>> => {
     const response = (await get(
-        `${backendUrl}/game_split`
+        `${backendUrl()}/game-split`
     )) as Page<GameSplit>
 
     return response;
@@ -23,7 +23,7 @@ export const getGameSplits = async (): Promise<Page<GameSplit>> => {
 export const deleteGameSplitPlayerEntry = async (gameSplitId: string, playerId: number): Promise<boolean> => {
 
     const response = (await del(
-        `${backendUrl}/game_split/${gameSplitId}/team_entry/${playerId}`
+        `${backendUrl()}/game-split/${gameSplitId}/team_entry/${playerId}`
     )) as boolean
 
     return response;
@@ -32,7 +32,7 @@ export const deleteGameSplitPlayerEntry = async (gameSplitId: string, playerId: 
 export const deleteGameSplitById = async (gameSplitId: string): Promise<boolean> => {
 
     const response = (await del(
-        `${backendUrl}/game_split/${gameSplitId}`
+        `${backendUrl()}/game-split/${gameSplitId}`
     )) as boolean
 
     return response;
@@ -41,7 +41,7 @@ export const deleteGameSplitById = async (gameSplitId: string): Promise<boolean>
 export const setGameSplitScores = async (gameSplitId: string, gameScores: GameScore[]): Promise<Game []> => {
 
     const response = (await post(
-        `${backendUrl}/game_split/${gameSplitId}/score`, gameScores
+        `${backendUrl()}/game-split/${gameSplitId}/score`, gameScores
     )) as Game[];
 
     return response;

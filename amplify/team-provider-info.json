@@ -1,0 +1,64 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-teamsplitter-dev-81917-authRole",
+      "UnauthRoleArn": "arn:aws:iam::249398769869:role/amplify-teamsplitter-dev-81917-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::249398769869:role/amplify-teamsplitter-dev-81917-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-teamsplitter-dev-81917-deployment",
+      "UnauthRoleName": "amplify-teamsplitter-dev-81917-unauthRole",
+      "StackName": "amplify-teamsplitter-dev-81917",
+      "StackId": "arn:aws:cloudformation:us-east-1:249398769869:stack/amplify-teamsplitter-dev-81917/2518a4d0-6eb6-11ef-9912-12e79388b8a5",
+      "AmplifyAppId": "d3gnss1xrwtkvn"
+    },
+    "categories": {
+      "function": {
+        "TeamSplitterAPI": {
+          "deploymentBucketName": "amplify-teamsplitter-dev-81917-deployment",
+          "s3Key": "amplify-builds/TeamSplitterAPI-3075696b625468797841-build.zip",
+          "secretsPathAmplifyAppId": "d3gnss1xrwtkvn",
+          "chatId": "-1001517284618"
+        }
+      },
+      "api": {
+        "teamsplitterapi": {}
+      },
+      "hosting": {
+        "amplifyhosting": {
+          "appId": "d3gnss1xrwtkvn",
+          "type": "manual"
+        }
+      }
+    }
+  },
+  "prd": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-teamsplitter-prd-3dc72-authRole",
+      "UnauthRoleArn": "arn:aws:iam::249398769869:role/amplify-teamsplitter-prd-3dc72-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::249398769869:role/amplify-teamsplitter-prd-3dc72-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-teamsplitter-prd-3dc72-deployment",
+      "UnauthRoleName": "amplify-teamsplitter-prd-3dc72-unauthRole",
+      "StackName": "amplify-teamsplitter-prd-3dc72",
+      "StackId": "arn:aws:cloudformation:us-east-1:249398769869:stack/amplify-teamsplitter-prd-3dc72/7acee400-6ee5-11ef-8bb4-0affebf21007",
+      "AmplifyAppId": "d3gnss1xrwtkvn"
+    },
+    "categories": {
+      "function": {
+        "TeamSplitterAPI": {
+          "deploymentBucketName": "amplify-teamsplitter-prd-3dc72-deployment",
+          "s3Key": "amplify-builds/TeamSplitterAPI-2f594255464546463747-build.zip"
+        }
+      },
+      "hosting": {
+        "amplifyhosting": {
+          "appId": "d3gnss1xrwtkvn",
+          "type": "manual"
+        }
+      },
+      "api": {
+        "teamsplitterapi": {}
+      }
+    }
+  }
+}

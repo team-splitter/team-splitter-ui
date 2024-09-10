@@ -5,7 +5,7 @@ import { GameSchedule } from "api/GameSchedule.types";
 
 export const getAllSchedules = async (): Promise<GameSchedule[]> => {
     const response = (await get(
-        `${backendUrl}/game-schedule`
+        `${backendUrl()}/game-schedule`
     )) as GameSchedule[]
 
     return response;
@@ -13,7 +13,7 @@ export const getAllSchedules = async (): Promise<GameSchedule[]> => {
 
 export const getScheduleById = async (id: string): Promise<GameSchedule> => {
     const response = (await get(
-        `${backendUrl}/game-schedule/${id}`
+        `${backendUrl()}/game-schedule/${id}`
     )) as GameSchedule
 
     return response;
@@ -21,7 +21,7 @@ export const getScheduleById = async (id: string): Promise<GameSchedule> => {
 
 export const createSchedule = async (schedule: GameSchedule): Promise<GameSchedule> => {
     const response = (await post(
-        `${backendUrl}/game-schedule`,
+        `${backendUrl()}/game-schedule`,
         schedule
     )) as GameSchedule
 
@@ -30,7 +30,7 @@ export const createSchedule = async (schedule: GameSchedule): Promise<GameSchedu
 
 export const deleteScheduleById = async (id: string): Promise<boolean> => {
     const response = (await del(
-        `${backendUrl}/game-schedule/${id}`
+        `${backendUrl()}/game-schedule/${id}`
     )) as boolean
 
     return response;

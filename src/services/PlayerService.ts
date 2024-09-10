@@ -5,7 +5,7 @@ import { Player } from "../api/Player.types";
 
 export const getPlayers = async (): Promise<Player[]> => {
     const response = (await get(
-        `${backendUrl}/player`
+        `${backendUrl()}/player`
     )) as Player[]
 
     return response;
@@ -13,7 +13,7 @@ export const getPlayers = async (): Promise<Player[]> => {
 
 export const getPlayerById = async (playerId: number): Promise<Player> => {
     const response = (await get(
-        `${backendUrl}/player/${playerId}`
+        `${backendUrl()}/player/${playerId}`
     )) as Player
 
     return response;
@@ -21,7 +21,7 @@ export const getPlayerById = async (playerId: number): Promise<Player> => {
 
 export const createPlayer = async (player: Player): Promise<Player> => {
     const response = (await post(
-        `${backendUrl}/player`,
+        `${backendUrl()}/player`,
         player
     )) as Player
 
@@ -30,7 +30,7 @@ export const createPlayer = async (player: Player): Promise<Player> => {
 
 export const updatePlayer = async (id: string, player: Player): Promise<Player> => {
     const response = (await put(
-        `${backendUrl}/player/${id}`,
+        `${backendUrl()}/player/${id}`,
         player
     )) as Player
 
@@ -40,7 +40,7 @@ export const updatePlayer = async (id: string, player: Player): Promise<Player> 
 export const deletePlayer = async (playerId: number): Promise<boolean> => {
 
     const response = (await del(
-        `${backendUrl}/player/${playerId}`
+        `${backendUrl()}/player/${playerId}`
     )) as boolean
 
     return response;

@@ -1,0 +1,4 @@
+{
+  "httpMethod": "GET",
+  "resource": "/api/v1/poll"
+}

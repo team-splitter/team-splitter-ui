@@ -1,3 +1,8 @@
-export const backendUrl = `https://ssb3us43s7.execute-api.us-east-1.amazonaws.com/dev/api/v1`;
+import { Amplify } from "aws-amplify";
+
+//workaround to get API endpoint dynamicaly based on the environment
+export const backendUrl = () => {
+   return `${Amplify.getConfig().API?.REST?.teamsplitterapi.endpoint}/api/v1`; 
+};
 
 export default backendUrl;

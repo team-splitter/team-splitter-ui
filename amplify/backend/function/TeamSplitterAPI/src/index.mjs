@@ -4,6 +4,7 @@ import {deleteGameSplit, getGameSplit, getGameSplitsByPoll, updateGameSplitWithG
 import {deleteGameSchedule, getGameSchedule, getAllGameSchedules, saveGameSchedule} from './repo/game_schedule_repo.mjs';
 import {handleTelegramUpdate} from "./service/telegram_webhook_handler.mjs";
 import {splitTeams} from "./service/team_splitter_service.mjs";
+import { handleGameSchedule } from './service/game_scheduler_service.mjs';
 
 
 
@@ -15,17 +16,15 @@ export const handler = async (event, context) => {
   let statusCode = 200;
   let response;
   
-  
-  const routeKey = `${event.httpMethod} ${event.path}`;
-
   try {
+    if (event.source && event.source === "aws.events") {
+      return await handleGameSchedule();
+    }
+    
+    const routeKey = `${event.httpMethod} ${event.path}`;
+
     switch (routeKey) {
-      case routeKey.match("DELETE /api/v1/poll/.*$")?.input: {
-        const id = event.path.split('/')[4];
-        await deletePoll(id);
-        body = id;
-        break;
-      }
+      
       case routeKey.match("GET /api/v1/poll/.*$")?.input: {
         const id = event.path.split('/')[4];
         body = (await getPoll(id)).Item;
@@ -52,6 +51,12 @@ export const handler = async (event, context) => {
         await removeVoteFromPoll(pollId, voteId)
         
         body = voteId;
+        break;
+      }
+      case routeKey.match("DELETE /api/v1/poll/.*$")?.input: {
+        const id = event.path.split('/')[4];
+        await deletePoll(id);
+        body = id;
         break;
       }
       case routeKey.match("DELETE /api/v1/player/.*$")?.input: {
@@ -96,6 +101,13 @@ export const handler = async (event, context) => {
         
         body = createPlayerBody;
         break;
+      case routeKey.match("DELETE /api/v1/game-split/.*/team_entry/.*$")?.input:{
+        const gameId = event.path.split('/')[4];
+        const teamEntryId = event.path.split('/')[6];
+        
+        body = `Unimplemented`;
+        break;
+      }
       case routeKey.match("DELETE /api/v1/game-split/.*$")?.input:{
         const id = event.path.split('/')[4];
         await deleteGameSplit(id);

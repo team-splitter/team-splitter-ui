@@ -1,7 +1,7 @@
 import {splitTeams} from "./team_splitter_service.mjs";
 import {getPollsByDates, addVoteToPoll, removeVoteFromPollByPlayer} from "../repo/poll_repo.mjs";
 import {saveGameSplit} from "../repo/game_split_repo.mjs";
-import {getPlayer} from "../repo/player_repo.mjs";
+import {getPlayer, savePlayer} from "../repo/player_repo.mjs";
 import {sendMessage} from "./telegram_api.mjs";
 
 
@@ -139,7 +139,27 @@ async function addPollAnswer(pollAnswer, context) {
   const playerId = parseInt(pollAnswer.user.id);
 
   const playerResponse = await getPlayer(playerId);
-  const playerVote = {id: context.awsRequestId, player: playerResponse.Item, createdAt: Date.now()};
+  console.log(`player response=${JSON.stringify(playerResponse)}`);
+  let player;
+  if (!playerResponse.Item) {
+    player = {
+      id: parseInt(pollAnswer.user.id),
+      firstName: pollAnswer.user.first_name,
+      lastName: pollAnswer.user.last_name,
+      score: 50,
+      privacy: false
+    }
+    await savePlayer(player);
+    console.log(`created player = ${JSON.stringify(player)}`);
+  } else {
+    player = playerResponse.Item;
+  }
+
+  const playerVote = {
+    id: context.awsRequestId, 
+    player: player, 
+    createdAt: Date.now()
+  };
   await addVoteToPoll(pollAnswer.poll_id, playerVote);
 }
 

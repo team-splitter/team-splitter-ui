@@ -108,3 +108,12 @@ export const removeVoteFromPollByPlayer = async (pollId, playerId) => {
     })
   );
 }
+
+export const savePoll = async (pollDocument) => {
+  return await dynamo.send(
+    new PutCommand({
+      TableName: tableName,
+      Item: pollDocument,
+    })
+  );
+}

@@ -5,6 +5,7 @@ import {
   PutCommand,
   GetCommand,
   DeleteCommand,
+  UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
 
 const client = new DynamoDBClient({});
@@ -49,4 +50,35 @@ export const saveGameSchedule = async (gameSchedule) => {
       Item: gameSchedule,
     })
   );
+}
+
+export const getSchedulesByDateRangeAndStatus = async (fromDate, toDate, status) => {
+  return await dynamo.send(
+    new ScanCommand({ TableName: tableName,
+      FilterExpression: "#date >= :fromDate and #date <= :toDate and #status = :status",
+      ExpressionAttributeNames: {
+        '#date': 'date',
+        '#status': 'status'
+      },
+      ExpressionAttributeValues: {
+        ':fromDate': fromDate,
+        ':toDate': toDate,
+        ':status': status
+      }
+    })
+  );
+}
+
+export const updateGameScheduleStatusAndPollId = async (id, pollId, status) => {
+  return await dynamo.send(
+      new UpdateCommand({
+            TableName: tableName,
+            Key: {
+              id: id,
+            },
+            UpdateExpression: 'SET #status = :status, pollId = :pollId',
+            ExpressionAttributeNames: { "#status" : "status" },
+            ExpressionAttributeValues: { ":status": status, ":pollId": pollId }
+          })
+    );
 }

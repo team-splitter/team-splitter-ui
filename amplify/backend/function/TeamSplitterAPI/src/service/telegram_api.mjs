@@ -3,13 +3,6 @@ import { SSMClient, GetParametersCommand } from "@aws-sdk/client-ssm";
 
 const client = new SSMClient();
 
-const command = new GetParametersCommand({
-  Names: ["TELEGRAM_TOKEN"].map(
-    (secretName) => process.env[secretName]
-  ),
-  WithDecryption: true,
-});
-
 const defaultOptions = {
     host: 'api.telegram.org',
     headers: {
@@ -30,9 +23,26 @@ const post = (path, payload) => new Promise((resolve, reject) => {
 })
 
 export const sendMessage = async (payload) => {
-    const { Parameters } = await client.send(command);
-    const telegramToken = Parameters.pop().Value
+    const telegramToken = await getTelegramToken();
 
-    console.log(`token=${telegramToken}, payload=${JSON.stringify(payload)}`);
+    console.log(`Send Message token=${telegramToken}, payload=${JSON.stringify(payload)}`);
     return await post(`/${telegramToken}/sendMessage`, payload);
+}
+
+export const sendPoll = async (payload) => {
+    const telegramToken = await getTelegramToken();
+
+    console.log(`Send Poll token=${telegramToken}, payload=${JSON.stringify(payload)}`);
+    return await post(`/${telegramToken}/sendPoll`, payload);
+}
+
+const getTelegramToken = async () => {
+    const command = new GetParametersCommand({
+        Names: ["TELEGRAM_TOKEN"].map(
+            (secretName) => process.env[secretName]
+        ),
+        WithDecryption: true,
+    });
+    const { Parameters } = await client.send(command);
+    return Parameters.pop().Value;
 }

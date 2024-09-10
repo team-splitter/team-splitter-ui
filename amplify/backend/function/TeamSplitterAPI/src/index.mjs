@@ -6,6 +6,7 @@ import {handleTelegramUpdate} from "./service/telegram_webhook_handler.mjs";
 import {splitTeams} from "./service/team_splitter_service.mjs";
 
 
+
 export const handler = async (event, context) => {
   console.log(`event=${JSON.stringify(event)}`);
   

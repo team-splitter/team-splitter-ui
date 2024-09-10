@@ -98,9 +98,6 @@
                 ]
               ]
             },
-            "CHAT_ID": {
-              "Ref": "chatId"
-            },
             "TELEGRAM_TOKEN": {
               "Fn::Join": [
                 "",
@@ -122,6 +119,9 @@
                   "TELEGRAM_TOKEN"
                 ]
               ]
+            },
+            "CHAT_ID": {
+              "Ref": "chatId"
             }
           }
         },

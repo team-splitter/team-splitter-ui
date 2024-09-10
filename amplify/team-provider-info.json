@@ -15,7 +15,7 @@
       "function": {
         "TeamSplitterAPI": {
           "deploymentBucketName": "amplify-teamsplitter-dev-81917-deployment",
-          "s3Key": "amplify-builds/TeamSplitterAPI-3075696b625468797841-build.zip",
+          "s3Key": "amplify-builds/TeamSplitterAPI-6f504c2f503878333152-build.zip",
           "secretsPathAmplifyAppId": "d3gnss1xrwtkvn",
           "chatId": "-1001517284618"
         }

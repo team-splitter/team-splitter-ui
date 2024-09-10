@@ -76,28 +76,6 @@
             "REGION": {
               "Ref": "AWS::Region"
             },
-            "ABC_SECRET": {
-              "Fn::Join": [
-                "",
-                [
-                  {
-                    "Fn::Sub": [
-                      "/amplify/${appId}/${env}/AMPLIFY_${functionName}_",
-                      {
-                        "appId": {
-                          "Ref": "secretsPathAmplifyAppId"
-                        },
-                        "env": {
-                          "Ref": "env"
-                        },
-                        "functionName": "TeamSplitterAPI"
-                      }
-                    ]
-                  },
-                  "ABC_SECRET"
-                ]
-              ]
-            },
             "TELEGRAM_TOKEN": {
               "Fn::Join": [
                 "",

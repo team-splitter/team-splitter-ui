@@ -1,8 +1,85 @@
-const text = "/split  a";
+const splits = [
+    {
+        teams: [
+            {
+                players: [
+                    {
+                        id: 1,
+                        name: 'max'
+                    }
+                ]
+            },
+            {
+                players: [
+                    {
+                        id: 2,
+                        name: 'alex'
+                    }
+                ]
+            }
+        ]
+    }, 
+    {
+        teams: [
+            {
+                players: [
+                    {
+                        id: 1,
+                        name: 'max'
+                    }
+                ]
+            },
+            {
+                players: [
+                    {
+                        id: 3,
+                        name: 'serg'
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        teams: [
+            {
+                players: [
+                    {
+                        id: 1,
+                        name: 'max'
+                    }
+                ]
+            },
+            {
+                players: [
+                    {
+                        id: 3,
+                        name: 'serg'
+                    }
+                ]
+            }
+        ]
+    }
+]
 
-const tokens = text.split(/\s+/);
+const stats = {};
 
-const teamNum = tokens.length > 1 && !isNaN(parseInt(tokens[1])) ? parseInt(tokens[1]) : 2;
-console.log(tokens);
+for(let split of splits) {
+  
+  for(let team of split.teams) {
+    for (let player of team.players) {
+      if (!stats[player.id]) {
+        let stat = {
+            "games": 0,
+            "days": 0
+          };
+        stats[player.id] = stat;
+      } 
+      
+      const playerStat = stats[player.id];
+      playerStat.days = playerStat.days + 1;
 
-console.log(teamNum);
+    }
+  }
+}
+
+console.log(`stats =${JSON.stringify(stats)}`);

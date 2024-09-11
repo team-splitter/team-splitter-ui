@@ -1,8 +1,8 @@
 import {splitTeams} from "./team_splitter_service.mjs";
-import {getPollsByDates, addVoteToPoll, removeVoteFromPollByPlayer} from "../repo/poll_repo.mjs";
+import {getPollsByDates, addVoteToPoll, removeVoteFromPollByPlayer, savePoll} from "../repo/poll_repo.mjs";
 import {saveGameSplit} from "../repo/game_split_repo.mjs";
 import {getPlayer, savePlayer} from "../repo/player_repo.mjs";
-import {sendMessage} from "./telegram_api.mjs";
+import {sendMessage, sendPoll, stopPoll} from "./telegram_api.mjs";
 
 
 const allowedUsers = [355281005,156023871];
@@ -51,9 +51,9 @@ async function handleMessage(requestBody, context) {
     if (text.startsWith('/split')) {
       await handleSplitCommand(message, context);
     } else if (text.startsWith('/poll')) {
-      console.log('Hanlding /poll command');
+      await handlePollCommand(message, context);
     } else if (text.startsWith('/closepoll')) {
-      console.log('Hanlding /closepoll command');
+      await handleClosePollCommand(message, context);
     }
 
   } else {
@@ -65,7 +65,7 @@ async function handleMessage(requestBody, context) {
 async function handleSplitCommand(message, context) {
   console.log('Hanlding /split command');
   
-  const polls = (await getPolls()).sort((a,b)=> b.createdAt - a.createdAt);//most recent is on top
+  const polls = (await getRecentPolls()).sort((a,b)=> b.createdAt - a.createdAt);//most recent is on top
   
   if (polls.length == 0) {
     console.log("No polls avaialbe for split");
@@ -115,17 +115,16 @@ const createTeamSplitMessage = (teams) => {
     message += `*Team ${team.name}*\n`;
     
     for(let player of team.players) {
-      message += `${player.firstName} ${player.lastName}\n`;
+      message += `${player.firstName ? player.firstName : ''} ${player.lastName ? player.lastName : ''}\n`;
     }
     
     message += '\n';
   }
   
-  
   return message;
 }
 
-async function getPolls() {
+const getRecentPolls = async () => {
   const now = Date.now();
   const from = now - (3 * 24 * 60 * 60 * 1000);
   const to = now;
@@ -135,7 +134,7 @@ async function getPolls() {
   return (await getPollsByDates(from, to)).Items;
 }
 
-async function addPollAnswer(pollAnswer, context) {
+const addPollAnswer = async (pollAnswer, context) => {
   const playerId = parseInt(pollAnswer.user.id);
 
   const playerResponse = await getPlayer(playerId);
@@ -163,10 +162,61 @@ async function addPollAnswer(pollAnswer, context) {
   await addVoteToPoll(pollAnswer.poll_id, playerVote);
 }
 
-async function removePollAnswer(pollAnswer) {
+const removePollAnswer = async (pollAnswer) => {
   const pollId = pollAnswer.poll_id;
   const playerId = parseInt(pollAnswer.user.id);
 
   await removeVoteFromPollByPlayer(pollId, playerId);
 }
 
+const handlePollCommand = async (message, context) => {
+  const pollTitle = message.text.replace("/poll", "").trim();
+
+  console.log(`Creating poll with title=${pollTitle}`);
+
+  const payload = {
+    "chat_id": chatId,
+    "question": pollTitle,
+    "options": ["+", "-"],
+    "is_anonymous": false
+  }
+
+  const sendPollResponse = await sendPoll(payload);
+  console.log(`sendPollResponse=${JSON.stringify(sendPollResponse)}`);
+
+  const result = sendPollResponse.result;
+  const poll = result.poll;
+
+  const pollDocument = {
+      id: poll.id,
+      question: poll.question,
+      createdAt: Date.now(),
+      messageId: result.message_id,
+      chatId: result.chat.id,
+      answers: []
+  };
+
+  await savePoll(pollDocument);
+} 
+
+const handleClosePollCommand = async (message, context) => {
+  console.log('Hanlding /closepoll command');
+
+  const polls = (await getRecentPolls()).sort((a,b)=> b.createdAt - a.createdAt);//most recent is on top
+  
+  if (polls.length == 0) {
+    console.log("No recent polls avaialbe");
+    return;
+  }
+  
+  const poll = polls.shift(); //take first 
+  console.log(`poll to close = ${JSON.stringify(poll)}`);
+
+  const payload = {
+    "chat_id": poll.chatId,
+    "message_id": poll.messageId
+  }
+  const stopPollResponse = await stopPoll(payload);
+
+  console.log(`stopPollResponse=${JSON.stringify(stopPollResponse)}`);
+}

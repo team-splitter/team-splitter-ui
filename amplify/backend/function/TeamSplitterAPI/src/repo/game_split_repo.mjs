@@ -79,3 +79,24 @@ export const saveGameSplit = async (gameSplitDocument) => {
     })
   );
 }
+
+export const removePlayerFromSplit = async (id, playerId) => {
+  console.log(`Removing player=${playerId} from game split id=${id}`);
+  const gameSplit = (await getGameSplit(id)).Item;
+
+  const teams = gameSplit.teams;
+  teams.forEach((team) => {
+    team.players = team.players.filter((player) => (player.id !== playerId));
+  });
+
+  return await dynamo.send(
+    new UpdateCommand({
+      TableName: tableName,
+      Key: {
+        id: id,
+      },
+      UpdateExpression: 'SET teams = :teams',
+      ExpressionAttributeValues: { ":teams": teams }
+    })
+  );
+}

@@ -36,6 +36,13 @@ export const sendPoll = async (payload) => {
     return await post(`/${telegramToken}/sendPoll`, payload);
 }
 
+export const stopPoll = async (payload) => {
+    const telegramToken = await getTelegramToken();
+
+    console.log(`Stop Poll token=${telegramToken}, payload=${JSON.stringify(payload)}`);
+    return await post(`/${telegramToken}/stopPoll`, payload);
+}
+
 const getTelegramToken = async () => {
     const command = new GetParametersCommand({
         Names: ["TELEGRAM_TOKEN"].map(

@@ -1,6 +1,6 @@
 import {deletePoll, getPoll, getAllPolls, addVoteToPoll, removeVoteFromPoll} from './repo/poll_repo.mjs';
 import {getPlayer, deletePlayer, getAllPlayers, savePlayer} from './repo/player_repo.mjs';
-import {deleteGameSplit, getGameSplit, getGameSplitsByPoll, updateGameSplitWithGames, getAllGameSplits} from './repo/game_split_repo.mjs';
+import {deleteGameSplit, getGameSplit, getGameSplitsByPoll, updateGameSplitWithGames, getAllGameSplits, removePlayerFromSplit} from './repo/game_split_repo.mjs';
 import {deleteGameSchedule, getGameSchedule, getAllGameSchedules, saveGameSchedule} from './repo/game_schedule_repo.mjs';
 import {handleTelegramUpdate} from "./service/telegram_webhook_handler.mjs";
 import {splitTeams} from "./service/team_splitter_service.mjs";
@@ -103,9 +103,10 @@ export const handler = async (event, context) => {
         break;
       case routeKey.match("DELETE /api/v1/game-split/.*/team_entry/.*$")?.input:{
         const gameId = event.path.split('/')[4];
-        const teamEntryId = event.path.split('/')[6];
+        const playerId = parseInt(event.path.split('/')[6]);
         
-        body = `Unimplemented`;
+        await removePlayerFromSplit(gameId, playerId);
+        body = playerId;
         break;
       }
       case routeKey.match("DELETE /api/v1/game-split/.*$")?.input:{

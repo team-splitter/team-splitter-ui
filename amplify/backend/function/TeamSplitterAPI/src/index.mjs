@@ -193,8 +193,6 @@ export const handler = async (event, context) => {
       case "GET /api/v1/player-stat": {
         const toDate = parseInt(event.queryStringParameters.endDate);
         const fromDate = parseInt(event.queryStringParameters.startDate);
-        // const toDate = Date.now();
-        // const fromDate = toDate - (30 * 24 * 60 * 60 * 1000); 
         body = await getPlayerStats(fromDate, toDate);
         break;
       }

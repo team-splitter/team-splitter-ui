@@ -46,6 +46,10 @@ async function handleMessage(requestBody, context) {
   const playerId = message.from.id;
   
   if (allowedUsers.includes(playerId)) {
+    if (!message.text) {
+      console.log(`message doesn't have text. skipping`);
+      return;
+    }
     const text = message.text.trim();
   
     if (text.startsWith('/split')) {

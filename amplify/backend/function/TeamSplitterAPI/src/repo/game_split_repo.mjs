@@ -100,3 +100,18 @@ export const removePlayerFromSplit = async (id, playerId) => {
     })
   );
 }
+
+export const getSplitsByDates = async (fromDate, toDate) => {
+  return await dynamo.send(
+    new ScanCommand({ TableName: tableName,
+      FilterExpression: "#date >= :fromDate and #date <= :toDate",
+      ExpressionAttributeNames: {
+        '#date': 'createdAt'
+      },
+      ExpressionAttributeValues: {
+        ':fromDate': fromDate,
+        ':toDate': toDate
+      }
+    })
+  );
+}

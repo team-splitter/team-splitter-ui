@@ -6,5 +6,5 @@ export type PlayerStat = {
     totalLoss: number
     totalDraw: number
     totalGames: number
-    totolDays: number
+    totalDays: number
 }

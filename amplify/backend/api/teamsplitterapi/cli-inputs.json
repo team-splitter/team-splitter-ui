@@ -42,6 +42,13 @@
       "permissions": {
         "setting": "open"
       }
+    },
+    "/api/v1/player-stat": {
+      "name": "/api/v1/player-stat",
+      "lambdaFunction": "TeamSplitterAPI",
+      "permissions": {
+        "setting": "open"
+      }
     }
   }
 }

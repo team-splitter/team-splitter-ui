@@ -5,6 +5,7 @@ import {deleteGameSchedule, getGameSchedule, getAllGameSchedules, saveGameSchedu
 import {handleTelegramUpdate} from "./service/telegram_webhook_handler.mjs";
 import {splitTeams} from "./service/team_splitter_service.mjs";
 import { handleGameSchedule } from './service/game_scheduler_service.mjs';
+import {getPlayerStats} from './service/player_stat_service.mjs'
 
 
 
@@ -187,6 +188,14 @@ export const handler = async (event, context) => {
         const teamNum = parseInt(event.queryStringParameters.teamsNum);
         let poll = await getPoll(pollId);
         body = splitTeams(poll.Item.answers.map((i) => i.player).filter((i) => i !== undefined), teamNum);
+        break;
+      }
+      case "GET /api/v1/player-stat": {
+        const toDate = parseInt(event.queryStringParameters.endDate);
+        const fromDate = parseInt(event.queryStringParameters.startDate);
+        // const toDate = Date.now();
+        // const fromDate = toDate - (30 * 24 * 60 * 60 * 1000); 
+        body = await getPlayerStats(fromDate, toDate);
         break;
       }
       default:

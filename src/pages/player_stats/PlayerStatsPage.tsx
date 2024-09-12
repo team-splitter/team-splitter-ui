@@ -10,8 +10,9 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 function formatDate(date?: Date): string {
     date = date || new Date();
-    let formattedDate = (moment(date)).format('YYYY-MM-DD');
-    return formattedDate;
+    // let formattedDate = (moment(date)).format('YYYY-MM-DD');
+    let formattedDate = (moment(date)).unix();
+    return `${formattedDate * 1000}`;
 }
 
 const PlayerStatPage: FC<any> = (): ReactElement => {

@@ -1,12 +1,12 @@
 import {deletePoll, getPoll, getAllPolls, addVoteToPoll, removeVoteFromPoll} from './repo/poll_repo.mjs';
 import {getPlayer, deletePlayer, getAllPlayers, savePlayer} from './repo/player_repo.mjs';
-import {deleteGameSplit, getGameSplit, getGameSplitsByPoll, updateGameSplitWithGames, getAllGameSplits, removePlayerFromSplit} from './repo/game_split_repo.mjs';
+import {deleteGameSplit, getGameSplit, getGameSplitsByPoll, getAllGameSplits, removePlayerFromSplit} from './repo/game_split_repo.mjs';
 import {deleteGameSchedule, getGameSchedule, getAllGameSchedules, saveGameSchedule} from './repo/game_schedule_repo.mjs';
 import {handleTelegramUpdate} from "./service/telegram_webhook_handler.mjs";
 import {splitTeams} from "./service/team_splitter_service.mjs";
 import { handleGameSchedule } from './service/game_scheduler_service.mjs';
 import {getPlayerStats} from './service/player_stat_service.mjs'
-
+import { setGameSplitScores } from './service/game_split_service.mjs';
 
 
 export const handler = async (event, context) => {
@@ -148,7 +148,8 @@ export const handler = async (event, context) => {
           }
         });
 
-        body = await updateGameSplitWithGames(id, games);
+        await setGameSplitScores(id, games); //set games in game split
+        //update player scores
         body = games;
         
         break;

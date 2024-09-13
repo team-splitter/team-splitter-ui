@@ -5,6 +5,7 @@ import {
   PutCommand,
   GetCommand,
   DeleteCommand,
+  UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
 
 
@@ -48,6 +49,19 @@ export const savePlayer = async (playerDocument) => {
     new PutCommand({
       TableName: tableName,
       Item: playerDocument,
+    })
+  );
+}
+
+export const updatePlayerScoreWithPoints = async (id, points) => {
+  return await dynamo.send(
+    new UpdateCommand({
+      TableName: tableName,
+      Key: {
+        id: id,
+      },
+      UpdateExpression: 'SET score = score + :points',
+      ExpressionAttributeValues: { ":points": points }
     })
   );
 }

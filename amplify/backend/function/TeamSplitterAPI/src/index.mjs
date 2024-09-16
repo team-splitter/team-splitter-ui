@@ -3,7 +3,7 @@ import {getPlayer, deletePlayer, getAllPlayers, savePlayer} from './repo/player_
 import {deleteGameSplit, getGameSplit, getGameSplitsByPoll, getAllGameSplits, removePlayerFromSplit} from './repo/game_split_repo.mjs';
 import {deleteGameSchedule, getGameSchedule, getAllGameSchedules, saveGameSchedule} from './repo/game_schedule_repo.mjs';
 import {handleTelegramUpdate} from "./service/telegram_webhook_handler.mjs";
-import {splitTeams} from "./service/team_splitter_service.mjs";
+import {splitTeams, splitTeamsByPoll} from "./service/team_splitter_service.mjs";
 import { handleGameSchedule } from './service/game_scheduler_service.mjs';
 import {getPlayerStats} from './service/player_stat_service.mjs'
 import { setGameSplitScores } from './service/game_split_service.mjs';
@@ -187,8 +187,9 @@ export const handler = async (event, context) => {
       case routeKey.match("GET /api/v1/team/split/.*$")?.input: {
         const pollId = event.path.split('/')[5];
         const teamNum = parseInt(event.queryStringParameters.teamsNum);
-        let poll = await getPoll(pollId);
-        body = splitTeams(poll.Item.answers.map((i) => i.player).filter((i) => i !== undefined), teamNum);
+        const poll = (await getPoll(pollId)).Item;
+        
+        body = await splitTeamsByPoll(poll, teamNum);
         break;
       }
       case "GET /api/v1/player-stat": {

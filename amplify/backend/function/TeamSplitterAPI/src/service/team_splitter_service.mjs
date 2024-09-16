@@ -1,4 +1,17 @@
+import { getAllPlayers } from "../repo/player_repo.mjs";
 const team_colors = ['Red', 'Blue', 'Black', 'White'];
+
+export const splitTeamsByPoll = async (poll, teamNum) => {
+    const players = poll.answers.map((i) => i.player).filter((i) => i !== undefined)
+    const playersMap = {};
+    (await getAllPlayers()).Items.forEach((player) => {
+        playersMap[player.id] = player;
+    });
+    //set current actual (at this moment) player scores
+    players.forEach((player) => player.score = playersMap[player.id].score);
+
+    return splitTeams(players, teamNum);
+}
 
 export const splitTeams = (players, teamNum) => {
   const sortedPlayers = players.sort((a,b) => b.score - a.score);

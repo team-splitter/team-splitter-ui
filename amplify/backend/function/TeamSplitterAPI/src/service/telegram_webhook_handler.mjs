@@ -1,4 +1,4 @@
-import {splitTeams} from "./team_splitter_service.mjs";
+import {splitTeamsByPoll} from "./team_splitter_service.mjs";
 import {getPollsByDates, addVoteToPoll, removeVoteFromPollByPlayer, savePoll} from "../repo/poll_repo.mjs";
 import {saveGameSplit} from "../repo/game_split_repo.mjs";
 import {getPlayer, savePlayer} from "../repo/player_repo.mjs";
@@ -78,12 +78,10 @@ async function handleSplitCommand(message, context) {
   
   const poll = polls.shift(); //take first 
   console.log(`poll to split = ${JSON.stringify(poll)}`);
-  
-  const players = poll.answers.map((i) => i.player);
-  
+    
   const tokens = message.text.split(/\s+/);
   const teamNum = tokens.length > 1 && !isNaN(parseInt(tokens[1]))  ? parseInt(tokens[1]) : 2;
-  const teams = splitTeams(players, teamNum);
+  const teams = await splitTeamsByPoll(poll, teamNum);
   
   const sendMessageResponse = await sendTeamSplitMessage(teams);
   console.log(`sendTegegrameMessage response =${JSON.stringify(sendMessageResponse)}`);

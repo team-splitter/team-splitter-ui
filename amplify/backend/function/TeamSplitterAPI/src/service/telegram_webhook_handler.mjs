@@ -82,6 +82,9 @@ async function handleSplitCommand(message, context) {
   const tokens = message.text.split(/\s+/);
   const teamNum = tokens.length > 1 && !isNaN(parseInt(tokens[1]))  ? parseInt(tokens[1]) : 2;
   const teams = await splitTeamsByPoll(poll, teamNum);
+
+  //sort players by first name lexicographically
+  teams.forEach((team) => team.players.sort((a,b) => a.firstName.localeCompare(b.firstName)));
   
   const sendMessageResponse = await sendTeamSplitMessage(teams);
   console.log(`sendTegegrameMessage response =${JSON.stringify(sendMessageResponse)}`);

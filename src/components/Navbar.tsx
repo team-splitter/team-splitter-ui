@@ -84,7 +84,7 @@ const Navbar: FC = (): ReactElement => {
                 }}
               >
                 {routes.map((page) => (
-                  page.navDisplay && isAuthenticated &&
+                  page.navDisplay && (!page.authRequired || isAuthenticated) &&
                   // page.navDisplay &&
                   <Link
                     key={page.key}
@@ -120,7 +120,7 @@ const Navbar: FC = (): ReactElement => {
                 }}
               >
                 {routes.map((page) => (
-                  page.navDisplay && isAuthenticated && 
+                  page.navDisplay && (!page.authRequired || isAuthenticated) && 
                   // page.navDisplay && 
                   <Link
                     key={page.key}

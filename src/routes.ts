@@ -70,7 +70,7 @@ export const routes: Array<Route> = [
         path: '/player_stats',
         enabled: true,
         navDisplay: true,
-        authRequired: true,
+        authRequired: false,
         component: PlayerStatPage
     }, 
     {

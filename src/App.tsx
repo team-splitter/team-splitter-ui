@@ -63,10 +63,17 @@ function App() {
               <Navbar />
               <Routes>
                 {appRoutes.map((route) => (
+                  route.authRequired ?
                   <Route
                     key={route.key}
                     path={route.path}
                     element={<PrivateRoute><route.component /></PrivateRoute>}
+                  />
+                  :
+                  <Route
+                    key={route.key}
+                    path={route.path}
+                    element={<route.component />}
                   />
                 ))}
               </Routes>

@@ -28,7 +28,7 @@ const TeamCard = ({team, gameSplit}: TeamCardProps) => {
             <ol>
                 {team.players.map((player) => {
                     return (
-                        <li key={player.id}>
+                        <li style="height:24px" key={player.id}>
                             {player.firstName} {player.lastName} {player.score}
                             {gameSplit &&
                                 <Tooltip title="Delete">

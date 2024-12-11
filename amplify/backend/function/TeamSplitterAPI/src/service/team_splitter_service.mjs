@@ -1,5 +1,5 @@
 import { getAllPlayers } from "../repo/player_repo.mjs";
-const team_colors = ['Red', 'Blue', 'Black', 'White'];
+const team_colors = ['Red', 'Blue', 'Black', 'White', 'Yellow', 'Green'];
 
 export const splitTeamsByPoll = async (poll, teamNum) => {
     const players = poll.answers.map((i) => i.player).filter((i) => i !== undefined)

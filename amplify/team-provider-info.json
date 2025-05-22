@@ -15,7 +15,7 @@
       "function": {
         "TeamSplitterAPI": {
           "deploymentBucketName": "amplify-teamsplitter-prd-3dc72-deployment",
-          "s3Key": "amplify-builds/TeamSplitterAPI-57702f774c49476a784b-build.zip",
+          "s3Key": "amplify-builds/TeamSplitterAPI-46443575676b666f3772-build.zip",
           "secretsPathAmplifyAppId": "d3gnss1xrwtkvn",
           "chatId": "-1001333858606"
         }
@@ -50,7 +50,7 @@
       "function": {
         "TeamSplitterAPI": {
           "deploymentBucketName": "amplify-teamsplitter-dev-81917-deployment",
-          "s3Key": "amplify-builds/TeamSplitterAPI-4a2f3944617a334b7854-build.zip",
+          "s3Key": "amplify-builds/TeamSplitterAPI-46443575676b666f3772-build.zip",
           "secretsPathAmplifyAppId": "d3gnss1xrwtkvn",
           "chatId": "-1001517284618"
         }

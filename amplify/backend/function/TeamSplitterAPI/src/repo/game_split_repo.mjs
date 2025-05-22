@@ -39,7 +39,7 @@ export const getGameSplit = async (id) => {
 }
 
 export const getGameSplitsByPoll = async (pollId) => {
-  return await dynamo.send(
+  let response = await dynamo.send(
             new ScanCommand({ TableName: tableName,
               ProjectionExpression: "id, createdAt, teams, pollId, teamSize",
               FilterExpression: 'pollId = :pollId',
@@ -47,7 +47,14 @@ export const getGameSplitsByPoll = async (pollId) => {
                   ':pollId': pollId,
               },
             })
-          );  
+          ); 
+
+  response.Items.forEach((game) => {
+    game.teams.forEach((team) => {
+      team.players = team.players.sort((a,b) => b.score - a.score);
+    });
+  });  
+  return response; 
 }
 
 export const getAllGameSplits = async () => {

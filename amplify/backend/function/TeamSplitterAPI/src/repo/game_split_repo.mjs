@@ -60,9 +60,23 @@ export const getGameSplitsByPoll = async (pollId) => {
 export const getAllGameSplits = async () => {
   return await dynamo.send(
             new ScanCommand({ TableName: tableName,
-              ProjectionExpression: "id, createdAt, games, pollId, teamSize"  
+              ProjectionExpression: "id, createdAt, games, pollId, teamSize"
             })
           );
+}
+
+export const getAllGameSplitsPaginated = async (page, pageSize) => {
+  const result = await dynamo.send(
+    new ScanCommand({ TableName: tableName, ProjectionExpression: "id, createdAt, games, pollId, teamSize" })
+  );
+
+  const items = (result.Items || []).sort((a, b) => b.createdAt - a.createdAt);
+  const start = page * pageSize;
+
+  return {
+    content: items.slice(start, start + pageSize),
+    totalElements: items.length
+  };
 }
 
 export const updateGameSplitWithGames = async (id, gamesToAdd) => {

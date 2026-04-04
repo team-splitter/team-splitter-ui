@@ -1,7 +1,6 @@
 import React, { ReactElement, FC, useState, useEffect } from "react";
 import { Box, Typography } from "@mui/material";
 import { Poll } from "api/Poll.types";
-import { Page } from "api/Pagination.types";
 import moment from "moment";
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 import { Link, useParams } from "react-router-dom";
@@ -16,18 +15,19 @@ function format(date: Date): string {
 
 const PollsPage  = () => {
     const [data, setData] = useState<Poll[]>([]);
+    const [totalElements, setTotalElements] = useState<number>(0);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     const [page, setPage] = useState<number>(0);
     const [pageSize, setPageSize] = useState<number>(20);
 
-
-
     useEffect(() => {
-        getPolls()
+        setLoading(true);
+        getPolls(page, pageSize)
             .then((actualData) => {
-                setData(actualData);
+                setData(actualData.content);
+                setTotalElements(actualData.totalElements);
                 setError(null);
             })
             .catch((err) => {
@@ -37,7 +37,7 @@ const PollsPage  = () => {
             .finally(() => {
                 setLoading(false)
             });
-    }, []);
+    }, [page, pageSize]);
 
     const columns: GridColDef[] = [
         { field: 'id', headerName: 'ID', width: 300 },
@@ -89,17 +89,13 @@ const PollsPage  = () => {
                         onPageSizeChange={setPageSize}
                         page={page}
                         onPageChange={setPage}
-                        rowCount={data.length}
+                        rowCount={totalElements}
+                        paginationMode="server"
                         rowsPerPageOptions={[10, 20, 50, 100]}
                         disableSelectionOnClick
                         showCellRightBorder
                         showColumnRightBorder
                         experimentalFeatures={{ newEditingApi: true }}
-                        initialState={{
-                            sorting: {
-                                sortModel: [{field: 'createdAt', sort: 'desc'}]
-                            }
-                        }}
                     />
                 </Box>
             }

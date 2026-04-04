@@ -1,6 +1,6 @@
-import {deletePoll, getPoll, getAllPolls, addVoteToPoll, removeVoteFromPoll} from './repo/poll_repo.mjs';
+import {deletePoll, getPoll, getAllPollsPaginated, addVoteToPoll, removeVoteFromPoll} from './repo/poll_repo.mjs';
 import {getPlayer, deletePlayer, getAllPlayers, savePlayer} from './repo/player_repo.mjs';
-import {deleteGameSplit, getGameSplit, getGameSplitsByPoll, getAllGameSplits, removePlayerFromSplit} from './repo/game_split_repo.mjs';
+import {deleteGameSplit, getGameSplit, getGameSplitsByPoll, getAllGameSplitsPaginated, removePlayerFromSplit} from './repo/game_split_repo.mjs';
 import {deleteGameSchedule, getGameSchedule, getAllGameSchedules, saveGameSchedule} from './repo/game_schedule_repo.mjs';
 import {handleTelegramUpdate} from "./service/telegram_webhook_handler.mjs";
 import {splitTeams, splitTeamsByPoll} from "./service/team_splitter_service.mjs";
@@ -31,9 +31,12 @@ export const handler = async (event, context) => {
         body = (await getPoll(id)).Item;
         break;
       }
-      case "GET /api/v1/poll":
-        body = (await getAllPolls()).Items;
+      case "GET /api/v1/poll": {
+        const page = parseInt(event.queryStringParameters?.page ?? '0');
+        const pageSize = parseInt(event.queryStringParameters?.pageSize ?? '20');
+        body = await getAllPollsPaginated(page, pageSize);
         break;
+      }
       case routeKey.match("POST /api/v1/poll/.*/vote$")?.input: {
         const pollId = event.path.split('/')[4];
         requestJSON = JSON.parse(event.body);
@@ -124,15 +127,16 @@ export const handler = async (event, context) => {
       }
       case "GET /api/v1/game-split":
         if (event.queryStringParameters && event.queryStringParameters.pollId) {
-          response = await getGameSplitsByPoll(event.queryStringParameters.pollId)
+          response = await getGameSplitsByPoll(event.queryStringParameters.pollId);
+          body = {
+            content: response.Items,
+            totalElements: response.Count
+          };
         } else {
-          response = await getAllGameSplits();
+          const page = parseInt(event.queryStringParameters?.page ?? '0');
+          const pageSize = parseInt(event.queryStringParameters?.pageSize ?? '20');
+          body = await getAllGameSplitsPaginated(page, pageSize);
         }
-        
-        body = {
-          content: response.Items,
-          totalElements: response.Count
-        };
         break;
       case routeKey.match("POST /api/v1/game-split/.*/score")?.input: {
         const id = event.path.split('/')[4];

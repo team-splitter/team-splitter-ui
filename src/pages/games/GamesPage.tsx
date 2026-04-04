@@ -73,10 +73,11 @@ const GamesPage  = () => {
     }
     
     useEffect(() => {
-        getGameSplits()
+        setLoading(true);
+        getGameSplits(page, pageSize)
             .then((data) => {
                 setGameSplits(data.content);
-                setGameSplitsCount(data.totalElements)
+                setGameSplitsCount(data.totalElements);
                 setError(null);
             })
             .catch((err) => {
@@ -87,7 +88,7 @@ const GamesPage  = () => {
             .finally(() => {
                 setLoading(false)
             });
-    }, []);
+    }, [page, pageSize]);
 
     const columns: GridColDef[] = [
         { 
@@ -193,7 +194,7 @@ const GamesPage  = () => {
                         getRowHeight={() => 'auto'}
                         rows={gameSplits}
                         columns={columns}
-                        // paginationMode="server"
+                        paginationMode="server"
                         pageSize={pageSize}
                         onPageSizeChange={setPageSize}
                         page={page}
@@ -203,11 +204,6 @@ const GamesPage  = () => {
                         disableSelectionOnClick
                         showCellRightBorder
                         showColumnRightBorder
-                        initialState={{
-                            sorting: {
-                                sortModel: [{field: 'createdAt', sort: 'desc'}]
-                            }
-                        }}
                     />
                 </Box>
             }

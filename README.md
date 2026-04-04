@@ -15,20 +15,31 @@ Runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 
-## How to regenerate SSL self signed certificate
+## AWS & Amplify
 
-1. Genenate new cert and key
+### AWS Login
+```sh
+amplify configure
 ```
-openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout nginx-selfsigned.key -out nginx-selfsigned.crt
+Or if using SSO:
+```sh
+aws sso login --profile <profile-name>
 ```
 
-2. Add to k8s secret 
-```
-kubectl create secret tls nginx-secret-cert --cert=nginx-selfsigned.crt --key=nginx-selfsigned.key -n team-splitter
+### Amplify Environment Commands
+```sh
+amplify env list                  # list all environments
+amplify env checkout <env-name>   # switch to an environment
+amplify env add                   # create a new environment
+amplify env pull                  # pull current env cloud resources
+amplify env remove <env-name>     # delete an environment
 ```
 
-3. Restart the pod/deployment so new cert/key is applied in ArgoCD
-
+### Deploy Backend & Frontend
+```sh
+amplify push       # deploy backend only (Lambda, DynamoDB, etc.)
+amplify publish    # deploy backend + build and deploy frontend
+```
 
 ## Real certificates
 https://www.ssls.com/

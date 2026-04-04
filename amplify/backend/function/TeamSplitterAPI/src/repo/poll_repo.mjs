@@ -44,6 +44,20 @@ export const getAllPolls = async () => {
   );
 }
 
+export const getAllPollsPaginated = async (page, pageSize) => {
+  const result = await dynamo.send(
+    new ScanCommand({ TableName: tableName, ProjectionExpression: "id, createdAt, question" })
+  );
+
+  const items = (result.Items || []).sort((a, b) => b.createdAt - a.createdAt);
+  const start = page * pageSize;
+
+  return {
+    content: items.slice(start, start + pageSize),
+    totalElements: items.length
+  };
+}
+
 export const getPollsByDates = async (from, to) => {
   return await dynamo.send(
     new ScanCommand({ TableName: tableName,

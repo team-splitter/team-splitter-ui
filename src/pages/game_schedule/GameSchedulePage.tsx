@@ -17,7 +17,6 @@ function formatDateTime(date: Date): string {
 
 export const GameSchedulePage = () => {
     const [schedules, setSchedules] = useState<GameSchedule[]>([]);
-    const [pastSchedules, setPastSchedules] = useState<GameSchedule[]>([]);
     const [schedule, setSchedule] = useState<GameSchedule>({} as GameSchedule);
     const [shownPage, setShownPage] = useState('table');
     const [addEditFormVisible, setAddEditFormVisible] = useState(false);
@@ -27,22 +26,13 @@ export const GameSchedulePage = () => {
     const onDeleteGameSchedule = async (schedule: GameSchedule) => {
         await deleteScheduleById(schedule.id);
         setSchedules(schedules.filter(i => i.id !== schedule.id));
-        setPastSchedules(pastSchedules.filter(i => i.id !== schedule.id));
-
     }
 
     useEffect(() => {
         getAllSchedules()
             .then((data) => {
-                const now  = new Date();
-                const past = data
-                    .filter((i) => i.date < now)
-                    .sort((a, b) => {
-                        if (a.date == b.date) return 0;
-                        else if (a.date > b.date) return -1;
-                        else return 1;
-                    })
-                const future =  data
+                const now = new Date();
+                const future = data
                     .filter((i) => i.date >= now)
                     .sort((a, b) => {
                         if (a.date == b.date) return 0;
@@ -50,7 +40,6 @@ export const GameSchedulePage = () => {
                         else return -1;
                     })
                 setSchedules(future)
-                setPastSchedules(past)
             })
     }, [])
 
@@ -104,44 +93,6 @@ export const GameSchedulePage = () => {
                     }
                 </tbody>
             </table>
-            <h1>Past Schedules</h1>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Location</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-
-                </thead>
-                <tbody>
-                    {pastSchedules.map((schedule) => {
-                        return (
-                            <tr key={schedule.id}>
-                                <td>{formatDateTime(schedule.date)}</td>
-                                <td>{schedule.location}</td>
-                                <td>{schedule.status}</td>
-                                <td>
-                                    {schedule.pollId &&
-                                        <Link to={`/poll/${schedule.pollId}`}>Poll</Link>
-                                    }
-                                    <Tooltip title="Delete">
-                                        <IconButton onClick={async (e) => {
-                                            setOpen(true); 
-                                            setSelectedSchedule(schedule);
-                                         }}>
-                                            <DeleteIcon />
-                                        </IconButton>
-                                    </Tooltip>
-                                </td>
-                            </tr>
-                        )
-                    })
-                    }
-                </tbody>
-            </table>
-
             <ConfirmDialog
                         title="Delete Game Schedule?"
                         open={open}

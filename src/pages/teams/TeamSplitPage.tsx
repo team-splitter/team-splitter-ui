@@ -1,16 +1,18 @@
 import { Box, Button, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from "@mui/material";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Team } from "../../api/Team.types";
-import { getPollTeamSplit } from "../../services/PollTeamSplitService";
+import { getPollTeamSplit, splitPollTeams } from "../../services/PollTeamSplitService";
 import TeamCardList from "./TeamCardList";
 
 type TeamSplitPageProps = {
     pollId: string
+    onSplitSuccess?: () => void
 }
 
-const TeamSplitPage = ({ pollId }: TeamSplitPageProps) => {
+const TeamSplitPage = ({ pollId, onSplitSuccess }: TeamSplitPageProps) => {
     const [teams, setTeams] = useState<Team[] | null>(null);
     const [loading, setLoading] = useState(true);
+    const [splitting, setSplitting] = useState(false);
     const [error, setError] = useState(null);
     const [teamsNum, setTeamsNum] = useState(2);
     const [splitStrategy, setSplitStrategy] = useState("TEAM_SCORE_BALANCE");
@@ -26,8 +28,22 @@ const TeamSplitPage = ({ pollId }: TeamSplitPageProps) => {
                 setError(err.message)
                 setTeams(null)
             })
-            .finally(() => setLoading(false)) 
+            .finally(() => setLoading(false))
     }, [teamsNum, splitStrategy])
+
+    const handleSplit = () => {
+        setSplitting(true);
+        splitPollTeams(pollId, teamsNum)
+            .then((response) => {
+                setTeams(response);
+                setError(null);
+                onSplitSuccess?.();
+            })
+            .catch(err => {
+                setError(err.message);
+            })
+            .finally(() => setSplitting(false));
+    };
 
     return (
         <div>
@@ -70,9 +86,11 @@ const TeamSplitPage = ({ pollId }: TeamSplitPageProps) => {
                     <MenuItem value={"CIRCULAR"}>CIRCULAR</MenuItem>
                 </Select>
             </FormControl>
-            {/* <FormControl variant="filled" sx={{ m: 1, minWidth: 120 }}>
-                <Button onClick={()=> {teamSplit();}} variant="contained">Split</Button>
-            </FormControl> */}
+            <FormControl variant="filled" sx={{ m: 1, minWidth: 120 }}>
+                <Button onClick={handleSplit} variant="contained" disabled={splitting}>
+                    {splitting ? 'Splitting...' : 'Split'}
+                </Button>
+            </FormControl>
             {teams &&
                 <Box sx={{
                     width: '100%',

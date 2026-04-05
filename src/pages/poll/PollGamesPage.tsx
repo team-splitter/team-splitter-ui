@@ -5,9 +5,10 @@ import GameSplitListCard from "../games/GameSplitListCard";
 
 type GamesPageProps = {
     pollId: string
+    refreshKey?: number
 }
 
-export const PollGamesPage = ({ pollId }: GamesPageProps) => {
+export const PollGamesPage = ({ pollId, refreshKey }: GamesPageProps) => {
 
     const [gameSplits, setGameSplits] = useState<GameSplit[] | null>(null);
     const [loading, setLoading] = useState(true);
@@ -26,7 +27,7 @@ export const PollGamesPage = ({ pollId }: GamesPageProps) => {
             .finally(() => {
                 setLoading(false)
             });
-    }, []);
+    }, [refreshKey]);
 
     return (
         <div>

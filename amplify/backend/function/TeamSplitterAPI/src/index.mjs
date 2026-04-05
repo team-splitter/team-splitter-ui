@@ -1,8 +1,8 @@
 import {deletePoll, getPoll, getAllPollsPaginated, addVoteToPoll, removeVoteFromPoll, savePoll} from './repo/poll_repo.mjs';
 import {getPlayer, deletePlayer, getAllPlayers, savePlayer} from './repo/player_repo.mjs';
-import {deleteGameSplit, getGameSplit, getGameSplitsByPoll, getAllGameSplitsPaginated, removePlayerFromSplit} from './repo/game_split_repo.mjs';
+import {deleteGameSplit, getGameSplit, getGameSplitsByPoll, getAllGameSplitsPaginated, removePlayerFromSplit, saveGameSplit} from './repo/game_split_repo.mjs';
 import {deleteGameSchedule, getGameSchedule, getAllGameSchedules, saveGameSchedule} from './repo/game_schedule_repo.mjs';
-import {handleTelegramUpdate} from "./service/telegram_webhook_handler.mjs";
+import {handleTelegramUpdate, sendTeamSplitMessage} from "./service/telegram_webhook_handler.mjs";
 import {sendPoll, deleteMessage} from "./service/telegram_api.mjs";
 import {splitTeams, splitTeamsByPoll} from "./service/team_splitter_service.mjs";
 import { handleGameSchedule } from './service/game_scheduler_service.mjs';
@@ -227,8 +227,26 @@ export const handler = async (event, context) => {
         const pollId = event.path.split('/')[5];
         const teamNum = parseInt(event.queryStringParameters.teamsNum);
         const poll = (await getPoll(pollId)).Item;
-        
+
         body = await splitTeamsByPoll(poll, teamNum);
+        break;
+      }
+      case routeKey.match("POST /api/v1/poll/.*/split$")?.input: {
+        const pollId = event.path.split('/')[4];
+        const teamNum = parseInt(event.queryStringParameters?.teamsNum ?? '2');
+        const poll = (await getPoll(pollId)).Item;
+        const teams = await splitTeamsByPoll(poll, teamNum);
+        teams.forEach((team) => team.players.sort((a, b) => a.firstName.localeCompare(b.firstName)));
+        await sendTeamSplitMessage(teams);
+        await saveGameSplit({
+          id: context.awsRequestId,
+          pollId: poll.id,
+          createdAt: Date.now(),
+          teams,
+          teamSize: teamNum,
+          splitAlg: 'TEAM_SCORE_BALANCE'
+        });
+        body = teams;
         break;
       }
       case "GET /api/v1/player-stat": {

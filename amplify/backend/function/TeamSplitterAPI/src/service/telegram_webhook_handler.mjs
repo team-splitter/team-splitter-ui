@@ -100,7 +100,7 @@ async function handleSplitCommand(message, context) {
   
 }
 
-const sendTeamSplitMessage = async (teams) => {
+export const sendTeamSplitMessage = async (teams) => {
   const message = createTeamSplitMessage(teams);
   console.log(`message=${message}`);
   

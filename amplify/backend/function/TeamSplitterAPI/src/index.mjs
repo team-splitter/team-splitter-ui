@@ -3,7 +3,7 @@ import {getPlayer, deletePlayer, getAllPlayers, savePlayer} from './repo/player_
 import {deleteGameSplit, getGameSplit, getGameSplitsByPoll, getAllGameSplitsPaginated, removePlayerFromSplit} from './repo/game_split_repo.mjs';
 import {deleteGameSchedule, getGameSchedule, getAllGameSchedules, saveGameSchedule} from './repo/game_schedule_repo.mjs';
 import {handleTelegramUpdate} from "./service/telegram_webhook_handler.mjs";
-import {sendPoll} from "./service/telegram_api.mjs";
+import {sendPoll, deleteMessage} from "./service/telegram_api.mjs";
 import {splitTeams, splitTeamsByPoll} from "./service/team_splitter_service.mjs";
 import { handleGameSchedule } from './service/game_scheduler_service.mjs';
 import {getPlayerStats} from './service/player_stat_service.mjs'
@@ -86,6 +86,14 @@ export const handler = async (event, context) => {
       }
       case routeKey.match("DELETE /api/v1/poll/.*$")?.input: {
         const id = event.path.split('/')[4];
+        const pollToDelete = (await getPoll(id)).Item;
+        if (pollToDelete?.messageId && pollToDelete?.chatId) {
+          try {
+            await deleteMessage({ chat_id: pollToDelete.chatId, message_id: pollToDelete.messageId });
+          } catch (telegramErr) {
+            console.log(`Could not delete Telegram message: ${telegramErr.message}`);
+          }
+        }
         await deletePoll(id);
         body = id;
         break;

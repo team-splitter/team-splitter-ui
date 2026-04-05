@@ -72,3 +72,7 @@ export const createPoll = async (question: string): Promise<Poll> => {
 
     return response;
 }
+
+export const deletePoll = async (pollId: string): Promise<void> => {
+    await del(`${backendUrl()}/poll/${pollId}`);
+}

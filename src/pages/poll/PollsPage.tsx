@@ -4,8 +4,9 @@ import { Poll } from "api/Poll.types";
 import moment from "moment";
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 import { Link, useParams } from "react-router-dom";
-import { getPolls, createPoll } from "services/PollService";
+import { getPolls, createPoll, deletePoll } from "services/PollService";
 import Loading from "components/Loading";
+import ConfirmDialog from "components/ConfirmDialog";
 
 
 function format(date: Date): string {
@@ -24,6 +25,26 @@ const PollsPage  = () => {
 
     const [pollName, setPollName] = useState<string>("");
     const [creating, setCreating] = useState(false);
+
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [pollToDelete, setPollToDelete] = useState<string | null>(null);
+
+    const handleDeleteClick = (pollId: string) => {
+        setPollToDelete(pollId);
+        setConfirmOpen(true);
+    };
+
+    const handleDeleteConfirm = () => {
+        if (!pollToDelete) return;
+        deletePoll(pollToDelete)
+            .then(() => getPolls(page, pageSize))
+            .then((actualData) => {
+                setData(actualData.content);
+                setTotalElements(actualData.totalElements);
+            })
+            .catch((err) => setError(err.message))
+            .finally(() => setPollToDelete(null));
+    };
 
     const handleCreatePoll = () => {
         if (!pollName.trim()) return;
@@ -82,10 +103,20 @@ const PollsPage  = () => {
         {
             field: 'actions',
             headerName: 'Actions',
+            width: 150,
             sortable: false,
             filterable: false,
             renderCell: (params) => (
-                <Link to={`/poll/${params.row.id}`}>View</Link>
+                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                    <Link to={`/poll/${params.row.id}`}>View</Link>
+                    <Button
+                        size="small"
+                        color="error"
+                        onClick={() => handleDeleteClick(params.row.id)}
+                    >
+                        Delete
+                    </Button>
+                </Box>
             ),
         }
     ];
@@ -135,6 +166,14 @@ const PollsPage  = () => {
                     />
                 </Box>
             }
+            <ConfirmDialog
+                title="Delete Poll"
+                open={confirmOpen}
+                setOpen={setConfirmOpen}
+                onConfirm={handleDeleteConfirm}
+            >
+                Are you sure you want to delete this poll? This will also close it in Telegram.
+            </ConfirmDialog>
         </div>
     )
 }

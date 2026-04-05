@@ -43,6 +43,13 @@ export const stopPoll = async (payload) => {
     return await post(`/${telegramToken}/stopPoll`, payload);
 }
 
+export const deleteMessage = async (payload) => {
+    const telegramToken = await getTelegramToken();
+
+    console.log(`Delete Message token=${telegramToken}, payload=${JSON.stringify(payload)}`);
+    return await post(`/${telegramToken}/deleteMessage`, payload);
+}
+
 const getTelegramToken = async () => {
     const command = new GetParametersCommand({
         Names: ["TELEGRAM_TOKEN"].map(

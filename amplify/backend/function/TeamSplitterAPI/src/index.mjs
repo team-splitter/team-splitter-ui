@@ -1,8 +1,9 @@
-import {deletePoll, getPoll, getAllPollsPaginated, addVoteToPoll, removeVoteFromPoll} from './repo/poll_repo.mjs';
+import {deletePoll, getPoll, getAllPollsPaginated, addVoteToPoll, removeVoteFromPoll, savePoll} from './repo/poll_repo.mjs';
 import {getPlayer, deletePlayer, getAllPlayers, savePlayer} from './repo/player_repo.mjs';
 import {deleteGameSplit, getGameSplit, getGameSplitsByPoll, getAllGameSplitsPaginated, removePlayerFromSplit} from './repo/game_split_repo.mjs';
 import {deleteGameSchedule, getGameSchedule, getAllGameSchedules, saveGameSchedule} from './repo/game_schedule_repo.mjs';
 import {handleTelegramUpdate} from "./service/telegram_webhook_handler.mjs";
+import {sendPoll} from "./service/telegram_api.mjs";
 import {splitTeams, splitTeamsByPoll} from "./service/team_splitter_service.mjs";
 import { handleGameSchedule } from './service/game_scheduler_service.mjs';
 import {getPlayerStats} from './service/player_stat_service.mjs'
@@ -35,6 +36,32 @@ export const handler = async (event, context) => {
         const page = parseInt(event.queryStringParameters?.page ?? '0');
         const pageSize = parseInt(event.queryStringParameters?.pageSize ?? '20');
         body = await getAllPollsPaginated(page, pageSize);
+        break;
+      }
+      case "POST /api/v1/poll": {
+        requestJSON = JSON.parse(event.body);
+
+        const sendPollResponse = await sendPoll({
+          chat_id: process.env.CHAT_ID,
+          question: requestJSON.question,
+          options: ["+", "-"],
+          is_anonymous: false
+        });
+
+        const result = sendPollResponse.result;
+        const poll = result.poll;
+
+        const pollDocument = {
+          id: poll.id,
+          question: poll.question,
+          createdAt: Date.now(),
+          messageId: result.message_id,
+          chatId: result.chat.id,
+          answers: []
+        };
+
+        await savePoll(pollDocument);
+        body = pollDocument;
         break;
       }
       case routeKey.match("POST /api/v1/poll/.*/vote$")?.input: {

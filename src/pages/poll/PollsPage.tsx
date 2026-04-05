@@ -1,10 +1,10 @@
 import React, { ReactElement, FC, useState, useEffect } from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, Button, TextField } from "@mui/material";
 import { Poll } from "api/Poll.types";
 import moment from "moment";
 import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
 import { Link, useParams } from "react-router-dom";
-import { getPolls } from "services/PollService";
+import { getPolls, createPoll } from "services/PollService";
 import Loading from "components/Loading";
 
 
@@ -21,6 +21,25 @@ const PollsPage  = () => {
 
     const [page, setPage] = useState<number>(0);
     const [pageSize, setPageSize] = useState<number>(20);
+
+    const [pollName, setPollName] = useState<string>("");
+    const [creating, setCreating] = useState(false);
+
+    const handleCreatePoll = () => {
+        if (!pollName.trim()) return;
+        setCreating(true);
+        createPoll(pollName.trim())
+            .then(() => {
+                setPollName("");
+                return getPolls(page, pageSize);
+            })
+            .then((actualData) => {
+                setData(actualData.content);
+                setTotalElements(actualData.totalElements);
+            })
+            .catch((err) => setError(err.message))
+            .finally(() => setCreating(false));
+    };
 
     useEffect(() => {
         setLoading(true);
@@ -74,6 +93,23 @@ const PollsPage  = () => {
     return (
         <div>
             <h1>Polls</h1>
+            <Box sx={{ display: 'flex', gap: 2, mb: 2, alignItems: 'center' }}>
+                <TextField
+                    label="Poll name"
+                    value={pollName}
+                    onChange={(e) => setPollName(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleCreatePoll()}
+                    size="small"
+                    sx={{ width: 300 }}
+                />
+                <Button
+                    variant="contained"
+                    onClick={handleCreatePoll}
+                    disabled={!pollName.trim() || creating}
+                >
+                    Create Poll
+                </Button>
+            </Box>
             {loading && <Loading/>}
             {error && (
                 <div>{`There is a problem fetching the poll data - ${error}`}</div>

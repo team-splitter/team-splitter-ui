@@ -59,7 +59,16 @@ export const addPollVote = async (pollId: string, playerId: number): Promise<Pol
                 "id": playerId
             }
         }
-    )) as PollVote 
+    )) as PollVote
 
-    return response;     
+    return response;
+}
+
+export const createPoll = async (question: string): Promise<Poll> => {
+    const response = (await post(
+        `${backendUrl()}/poll`,
+        { question }
+    )) as Poll
+
+    return response;
 }

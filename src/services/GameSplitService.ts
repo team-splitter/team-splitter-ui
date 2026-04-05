@@ -38,6 +38,15 @@ export const deleteGameSplitById = async (gameSplitId: string): Promise<boolean>
     return response;
 }
 
+export const moveGameSplitPlayer = async (gameSplitId: string, playerId: number, fromTeam: string, toTeam: string): Promise<GameSplit> => {
+    const response = (await put(
+        `${backendUrl()}/game-split/${gameSplitId}/move-player`,
+        { playerId, fromTeam, toTeam }
+    )) as GameSplit;
+
+    return response;
+}
+
 export const setGameSplitScores = async (gameSplitId: string, gameScores: GameScore[]): Promise<Game []> => {
 
     const response = (await post(

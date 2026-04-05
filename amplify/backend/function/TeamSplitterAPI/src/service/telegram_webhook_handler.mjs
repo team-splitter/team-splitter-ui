@@ -118,7 +118,7 @@ export const sendTeamSplitMessage = async (teams) => {
   return await sendMessage(payload);
 }
 
-const createTeamSplitMessage = (teams) => {
+export const createTeamSplitMessage = (teams) => {
   let message = '';
   for(let team of teams) {
     message += `*Team ${team.name}*\n`;

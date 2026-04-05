@@ -122,6 +122,45 @@ export const removePlayerFromSplit = async (id, playerId) => {
   );
 }
 
+export const movePlayerBetweenTeams = async (id, playerId, fromTeamName, toTeamName) => {
+  console.log(`Moving player=${playerId} from team=${fromTeamName} to team=${toTeamName} in game split id=${id}`);
+  const gameSplit = (await getGameSplit(id)).Item;
+
+  const teams = gameSplit.teams;
+  let playerToMove = null;
+
+  teams.forEach((team) => {
+    if (team.name === fromTeamName) {
+      const idx = team.players.findIndex((p) => p.id === playerId);
+      if (idx !== -1) {
+        playerToMove = team.players[idx];
+        team.players.splice(idx, 1);
+      }
+    }
+  });
+
+  if (!playerToMove) {
+    throw new Error(`Player ${playerId} not found in team ${fromTeamName}`);
+  }
+
+  teams.forEach((team) => {
+    if (team.name === toTeamName) {
+      team.players.push(playerToMove);
+    }
+  });
+
+  await dynamo.send(
+    new UpdateCommand({
+      TableName: tableName,
+      Key: { id },
+      UpdateExpression: 'SET teams = :teams',
+      ExpressionAttributeValues: { ':teams': teams }
+    })
+  );
+
+  return { ...gameSplit, teams };
+}
+
 export const getSplitsByDates = async (fromDate, toDate) => {
   return await dynamo.send(
     new ScanCommand({ TableName: tableName,

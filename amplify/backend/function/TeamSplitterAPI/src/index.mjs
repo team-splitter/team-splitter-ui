@@ -1,9 +1,9 @@
 import {deletePoll, getPoll, getAllPollsPaginated, addVoteToPoll, removeVoteFromPoll, savePoll} from './repo/poll_repo.mjs';
 import {getPlayer, deletePlayer, getAllPlayers, savePlayer} from './repo/player_repo.mjs';
-import {deleteGameSplit, getGameSplit, getGameSplitsByPoll, getAllGameSplitsPaginated, removePlayerFromSplit, saveGameSplit} from './repo/game_split_repo.mjs';
+import {deleteGameSplit, getGameSplit, getGameSplitsByPoll, getAllGameSplitsPaginated, removePlayerFromSplit, saveGameSplit, movePlayerBetweenTeams} from './repo/game_split_repo.mjs';
 import {deleteGameSchedule, getGameSchedule, getAllGameSchedules, saveGameSchedule} from './repo/game_schedule_repo.mjs';
-import {handleTelegramUpdate, sendTeamSplitMessage} from "./service/telegram_webhook_handler.mjs";
-import {sendPoll, deleteMessage} from "./service/telegram_api.mjs";
+import {handleTelegramUpdate, sendTeamSplitMessage, createTeamSplitMessage} from "./service/telegram_webhook_handler.mjs";
+import {sendPoll, deleteMessage, editMessageText} from "./service/telegram_api.mjs";
 import {splitTeams, splitTeamsByPoll} from "./service/team_splitter_service.mjs";
 import { handleGameSchedule } from './service/game_scheduler_service.mjs';
 import {getPlayerStats} from './service/player_stat_service.mjs'
@@ -143,9 +143,33 @@ export const handler = async (event, context) => {
       case routeKey.match("DELETE /api/v1/game-split/.*/team_entry/.*$")?.input:{
         const gameId = event.path.split('/')[4];
         const playerId = parseInt(event.path.split('/')[6]);
-        
+
         await removePlayerFromSplit(gameId, playerId);
         body = playerId;
+        break;
+      }
+      case routeKey.match("PUT /api/v1/game-split/.*/move-player$")?.input: {
+        const gameId = event.path.split('/')[4];
+        requestJSON = JSON.parse(event.body);
+        const { playerId, fromTeam, toTeam } = requestJSON;
+
+        const updatedSplit = await movePlayerBetweenTeams(gameId, playerId, fromTeam, toTeam);
+
+        if (updatedSplit.telegramMessageId) {
+          try {
+            const text = createTeamSplitMessage(updatedSplit.teams);
+            await editMessageText({
+              chat_id: process.env.CHAT_ID,
+              message_id: updatedSplit.telegramMessageId,
+              text,
+              parse_mode: 'MarkdownV2'
+            });
+          } catch (telegramErr) {
+            console.log(`Could not edit Telegram message: ${telegramErr.message}`);
+          }
+        }
+
+        body = updatedSplit;
         break;
       }
       case routeKey.match("DELETE /api/v1/game-split/.*$")?.input:{

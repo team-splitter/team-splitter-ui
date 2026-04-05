@@ -1,8 +1,8 @@
+import { useState } from "react";
 import { Team, GameSplit } from "../../api/Team.types";
 import { IconButton, Tooltip } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Player } from "api/Player.types";
-import { useState } from "react";
 import ConfirmDialog from 'components/ConfirmDialog';
 import { deleteGameSplitPlayerEntry } from "services/GameSplitService";
 
@@ -11,55 +11,78 @@ type TeamCardProps = {
     gameSplit?: GameSplit
     onDragStart?: (player: Player, fromTeamName: string) => void
     onDrop?: (toTeamName: string) => void
+    onTouchMove?: (x: number, y: number) => void
+    onTouchDrop?: (x: number, y: number) => void
+    isTouchDragTarget?: boolean
+    draggingPlayer?: Player | null
 }
 
-const TeamCard = ({team, gameSplit, onDragStart, onDrop}: TeamCardProps) => {
+const TeamCard = ({team, gameSplit, onDragStart, onDrop, onTouchMove, onTouchDrop, isTouchDragTarget, draggingPlayer}: TeamCardProps) => {
     const [open, setOpen] = useState(false);
     const [selectedPlayer, setSelectedPlayer] = useState<Player>({} as Player);
-    const [isDragOver, setIsDragOver] = useState(false);
+    const [isMouseDragOver, setIsMouseDragOver] = useState(false);
 
-    const onDeletePlayerEntry = async (gameId:string , player: Player) => {
+    const onDeletePlayerEntry = async (gameId: string, player: Player) => {
         await deleteGameSplitPlayerEntry(gameId, player.id);
-    }
+    };
 
     const totalTeamScore = team.players.map(p => p.score).reduce((acc, score) => acc + score, 0);
 
+    const canDrag = !!onDragStart;
+    const isDragTarget = isMouseDragOver || isTouchDragTarget;
+
     return (
         <div
+            data-team-name={team.name}
             style={{
                 width: "400px",
                 display: "block",
                 float: "left",
-                outline: isDragOver ? "2px dashed #1976d2" : "none",
+                outline: isDragTarget ? "2px dashed #1976d2" : "none",
                 borderRadius: "4px",
-                backgroundColor: isDragOver ? "rgba(25, 118, 210, 0.05)" : "transparent",
+                backgroundColor: isDragTarget ? "rgba(25, 118, 210, 0.08)" : "transparent",
                 transition: "background-color 0.15s, outline 0.15s"
             }}
             onDragOver={(e) => {
                 if (onDrop) {
                     e.preventDefault();
-                    setIsDragOver(true);
+                    setIsMouseDragOver(true);
                 }
             }}
-            onDragLeave={() => setIsDragOver(false)}
+            onDragLeave={() => setIsMouseDragOver(false)}
             onDrop={(e) => {
                 e.preventDefault();
-                setIsDragOver(false);
+                setIsMouseDragOver(false);
                 onDrop?.(team.name);
             }}
         >
             <h1>{team.name}</h1>
             <ol>
                 {team.players.map((player) => {
+                    const isBeingDragged = draggingPlayer?.id === player.id;
                     return (
                         <li
+                            key={player.id}
                             style={{
                                 height: "24px",
-                                cursor: onDragStart ? "grab" : "default"
+                                cursor: canDrag ? "grab" : "default",
+                                userSelect: "none",
+                                touchAction: canDrag ? "none" : "auto",
+                                opacity: isBeingDragged ? 0.35 : 1,
+                                fontStyle: isBeingDragged ? "italic" : "normal",
+                                transition: "opacity 0.15s"
                             }}
-                            key={player.id}
-                            draggable={!!onDragStart}
+                            draggable={canDrag}
                             onDragStart={() => onDragStart?.(player, team.name)}
+                            onTouchStart={() => onDragStart?.(player, team.name)}
+                            onTouchMove={(e) => {
+                                const touch = e.touches[0];
+                                onTouchMove?.(touch.clientX, touch.clientY);
+                            }}
+                            onTouchEnd={(e) => {
+                                const touch = e.changedTouches[0];
+                                onTouchDrop?.(touch.clientX, touch.clientY);
+                            }}
                         >
                             {player.firstName} {player.lastName} {player.score}
                             {gameSplit &&
@@ -73,7 +96,7 @@ const TeamCard = ({team, gameSplit, onDragStart, onDrop}: TeamCardProps) => {
                                 </Tooltip>
                             }
                         </li>
-                    )
+                    );
                 })}
             </ol>
             <div>Team Score:<b>{totalTeamScore}</b></div>
@@ -83,13 +106,13 @@ const TeamCard = ({team, gameSplit, onDragStart, onDrop}: TeamCardProps) => {
                     title="Delete Player from Game?"
                     open={open}
                     setOpen={setOpen}
-                    onConfirm={()=> onDeletePlayerEntry(gameSplit.id, selectedPlayer)}
+                    onConfirm={() => onDeletePlayerEntry(gameSplit.id, selectedPlayer)}
                 >
                     Are you sure you want to delete this player?
                 </ConfirmDialog>
             }
         </div>
-    )
+    );
 }
 
 export default TeamCard;

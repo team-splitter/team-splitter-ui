@@ -23,7 +23,8 @@ export type GameSplit = {
     teamSize: number,
     teams: Team[],
     games: Game [],
-    createdAt: Date
+    createdAt: Date,
+    telegramMessageId?: number
 }
 
 export type GameScore = {

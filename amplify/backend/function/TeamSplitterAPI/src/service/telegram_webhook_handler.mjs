@@ -88,15 +88,19 @@ async function handleSplitCommand(message, context) {
   
   const sendMessageResponse = await sendTeamSplitMessage(teams);
   console.log(`sendTegegrameMessage response =${JSON.stringify(sendMessageResponse)}`);
-  
-  await saveGameSplit({
+
+  const gameSplitDocument = {
     id: context.awsRequestId,
     pollId: poll.id,
     createdAt: Date.now(),
     teams,
     teamSize: teamNum,
     splitAlg: 'TEAM_SCORE_BALANCE'
-  })
+  };
+  if (sendMessageResponse?.result?.message_id) {
+    gameSplitDocument.telegramMessageId = sendMessageResponse.result.message_id;
+  }
+  await saveGameSplit(gameSplitDocument);
   
 }
 

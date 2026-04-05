@@ -150,6 +150,14 @@ export const handler = async (event, context) => {
       }
       case routeKey.match("DELETE /api/v1/game-split/.*$")?.input:{
         const id = event.path.split('/')[4];
+        const gameSplitToDelete = (await getGameSplit(id)).Item;
+        if (gameSplitToDelete?.telegramMessageId) {
+          try {
+            await deleteMessage({ chat_id: process.env.CHAT_ID, message_id: gameSplitToDelete.telegramMessageId });
+          } catch (telegramErr) {
+            console.log(`Could not delete Telegram message: ${telegramErr.message}`);
+          }
+        }
         await deleteGameSplit(id);
         body = `${id}`;
         break;
@@ -237,15 +245,19 @@ export const handler = async (event, context) => {
         const poll = (await getPoll(pollId)).Item;
         const teams = await splitTeamsByPoll(poll, teamNum);
         teams.forEach((team) => team.players.sort((a, b) => a.firstName.localeCompare(b.firstName)));
-        await sendTeamSplitMessage(teams);
-        await saveGameSplit({
+        const sendMessageResponse = await sendTeamSplitMessage(teams);
+        const gameSplitDocument = {
           id: context.awsRequestId,
           pollId: poll.id,
           createdAt: Date.now(),
           teams,
           teamSize: teamNum,
           splitAlg: 'TEAM_SCORE_BALANCE'
-        });
+        };
+        if (sendMessageResponse?.result?.message_id) {
+          gameSplitDocument.telegramMessageId = sendMessageResponse.result.message_id;
+        }
+        await saveGameSplit(gameSplitDocument);
         body = teams;
         break;
       }

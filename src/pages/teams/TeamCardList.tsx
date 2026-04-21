@@ -37,14 +37,14 @@ export const TeamCardList = ({teams: initialTeams, gameSplit}: TeamCardListProps
                 return { ...team, players: team.players.filter(p => p.id !== drag.player.id) };
             }
             if (team.name === toTeamName) {
-                return { ...team, players: [...team.players, drag.player] };
+                return { ...team, players: [...team.players, drag.player].sort((a, b) => b.score - a.score) };
             }
             return team;
         }));
 
         try {
             const updated = await moveGameSplitPlayer(gameSplit.id, drag.player.id, drag.fromTeamName, toTeamName);
-            setTeams(updated.teams);
+            setTeams(updated.teams.map(team => ({ ...team, players: [...team.players].sort((a, b) => b.score - a.score) })));
         } catch (err) {
             console.error('Failed to move player', err);
             setTeams(initialTeams);

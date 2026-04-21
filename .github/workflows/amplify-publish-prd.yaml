@@ -1,9 +1,6 @@
 name: Amplify Publish Prd
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 jobs:

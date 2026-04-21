@@ -38,4 +38,4 @@ jobs:
         run: amplify status
 
       - name: Publish to dev
-        run: amplify publish --environment dev --yes
+        run: amplify publish --yes

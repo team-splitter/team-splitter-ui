@@ -2,7 +2,7 @@ import React, { ReactElement, FC, useState, useEffect } from "react";
 import { Box, Typography, Button } from "@mui/material";
 import { Player } from "../../api/Player.types";
 import moment from "moment";
-import { DataGrid, GridColDef, GridRowId,GridCellEditCommitParams, GridRenderCellParams, GridValueGetterParams, renderActionsCell } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridRowId,GridCellEditCommitParams, GridRenderCellParams, GridValueGetterParams, renderActionsCell, GridToolbarContainer, GridPagination } from '@mui/x-data-grid';
 import PlayerActions from "./PlayerActions";
 import { getPlayers } from "../../services/PlayerService";
 import Loading from "components/Loading";
@@ -119,6 +119,13 @@ const PlayersTable: FC<any> = ({showEditPage, showAddPlayerPage}: Props): ReactE
                             setRowId(params.id);
                             }
                         }
+                        components={{
+                            Toolbar: () => (
+                                <GridToolbarContainer sx={{ justifyContent: 'flex-end' }}>
+                                    <GridPagination />
+                                </GridToolbarContainer>
+                            ),
+                        }}
                     />
                 </Box>
             }

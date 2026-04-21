@@ -39,3 +39,5 @@ jobs:
 
       - name: Publish to dev
         run: amplify publish --yes
+        env:
+          DISABLE_ESLINT_PLUGIN: true

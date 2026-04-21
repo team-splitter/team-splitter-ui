@@ -30,13 +30,11 @@ jobs:
       - name: Install Amplify CLI
         run: npm install -g @aws-amplify/cli
 
-      - name: Configure Amplify for CI
-        run: |
-          echo '{"projectPath":"'"$GITHUB_WORKSPACE"'","envName":"dev","defaultEditor":"vscode"}' > amplify/.config/local-env-info.json
-          echo '{"dev":{"configLevel":"project","useProfile":false},"prd":{"configLevel":"project","useProfile":false}}' > amplify/.config/local-aws-info.json
+      - name: Amplify Pull 
+        run: amplify pull --appId ${{ secrets.AMPLIFY_APP_ID }} --envName dev --yes
 
       - name: Amplify status
         run: amplify status
-        
+
       - name: Publish to dev
         run: amplify publish --environment dev --yes

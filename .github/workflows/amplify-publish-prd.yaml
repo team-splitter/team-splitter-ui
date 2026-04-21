@@ -8,19 +8,13 @@ jobs:
     runs-on: ubuntu-latest
     if: "!contains(github.event.head_commit.message, 'skip ci')"
 
-    env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_DEFAULT_REGION: us-east-1
-      CI: false
-
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js 18
+      - name: Setup Node.js 20
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           cache: npm
           cache-dependency-path: package-lock.json
 
@@ -30,10 +24,20 @@ jobs:
       - name: Install Amplify CLI
         run: npm install -g @aws-amplify/cli
 
-      - name: Configure Amplify for CI
-        run: |
-          echo '{"projectPath":"'"$GITHUB_WORKSPACE"'","envName":"prd","defaultEditor":"vscode"}' > amplify/.config/local-env-info.json
-          echo '{"dev":{"configLevel":"project","useProfile":false},"prd":{"configLevel":"project","useProfile":false}}' > amplify/.config/local-aws-info.json
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Amplify Pull 
+        run: amplify pull --appId ${{ vars.AMPLIFY_APP_ID }} --envName prd --yes
+
+      - name: Amplify status
+        run: amplify status
 
       - name: Publish to prd
-        run: amplify publish --environment prd --yes
+        run: amplify publish --yes
+        env:
+          DISABLE_ESLINT_PLUGIN: true

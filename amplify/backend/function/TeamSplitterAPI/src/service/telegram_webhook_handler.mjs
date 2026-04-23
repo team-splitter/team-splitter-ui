@@ -124,7 +124,8 @@ export const createTeamSplitMessage = (teams) => {
     message += `*Team ${team.name}*\n`;
     
     for(let player of team.players) {
-      message += `${player.firstName ? player.firstName : ''} ${player.lastName ? player.lastName : ''}\n`;
+      const name = `${player.firstName ? player.firstName : ''} ${player.lastName ? player.lastName : ''}`.trim();
+      message += player.id ? `[${name}](tg://user?id=${player.id})\n` : `${name}\n`;
     }
     
     message += '\n';

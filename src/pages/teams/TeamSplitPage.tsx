@@ -98,7 +98,7 @@ const TeamSplitPage = ({ pollId, onSplitSuccess }: TeamSplitPageProps) => {
                     alignItems: 'center',
                     justifyContent: 'center'
                 }}>
-                    <TeamCardList teams={teams} />
+                    <TeamCardList teams={teams} draggable={false} />
                 </Box>
             }
         </div>

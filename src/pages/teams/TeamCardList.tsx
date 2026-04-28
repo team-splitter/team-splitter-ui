@@ -7,6 +7,7 @@ import { moveGameSplitPlayer } from "services/GameSplitService";
 type TeamCardListProps = {
     teams: Team[]
     gameSplit?: GameSplit
+    draggable?: boolean
 }
 
 export type DragState = {
@@ -14,7 +15,7 @@ export type DragState = {
     fromTeamName: string
 }
 
-export const TeamCardList = ({teams: initialTeams, gameSplit}: TeamCardListProps) => {
+export const TeamCardList = ({teams: initialTeams, gameSplit, draggable = true}: TeamCardListProps) => {
     const [teams, setTeams] = useState<Team[]>(initialTeams);
     useEffect(() => { 
         setTeams(initialTeams);
@@ -88,12 +89,14 @@ export const TeamCardList = ({teams: initialTeams, gameSplit}: TeamCardListProps
                     key={team.name}
                     team={team}
                     gameSplit={gameSplit}
-                    onDragStart={onDragStart}
-                    onDrop={applyDrop}
-                    onTouchMove={onTouchMove}
-                    onTouchDrop={onTouchDrop}
-                    isTouchDragTarget={touchTargetTeam === team.name}
-                    draggingPlayer={draggingPlayer}
+                    {...(draggable && {
+                        onDragStart,
+                        onDrop: applyDrop,
+                        onTouchMove,
+                        onTouchDrop,
+                        isTouchDragTarget: touchTargetTeam === team.name,
+                        draggingPlayer,
+                    })}
                 />
             ))}
 

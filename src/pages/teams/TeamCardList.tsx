@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Team, GameSplit } from "../../api/Team.types";
 import { Player } from "api/Player.types";
 import TeamCard from "./TeamCard";
@@ -16,6 +16,10 @@ export type DragState = {
 
 export const TeamCardList = ({teams: initialTeams, gameSplit}: TeamCardListProps) => {
     const [teams, setTeams] = useState<Team[]>(initialTeams);
+    useEffect(() => { 
+        setTeams(initialTeams);
+    }, [initialTeams]);
+    
     const dragState = useRef<DragState | null>(null);
     const [ghostPos, setGhostPos] = useState<{ x: number; y: number } | null>(null);
     const [touchTargetTeam, setTouchTargetTeam] = useState<string | null>(null);

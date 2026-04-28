@@ -29,7 +29,7 @@ const TeamSplitPage = ({ pollId, onSplitSuccess }: TeamSplitPageProps) => {
                 setTeams(null)
             })
             .finally(() => setLoading(false))
-    }, [teamsNum, splitStrategy])
+    }, [pollId, teamsNum, splitStrategy])
 
     const handleSplit = () => {
         setSplitting(true);

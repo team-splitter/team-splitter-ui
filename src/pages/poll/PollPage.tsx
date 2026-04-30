@@ -18,6 +18,7 @@ const PollPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null> (null);
     const [splitKey, setSplitKey] = useState(0);
+    const [voteKey, setVoteKey] = useState(0);
 
     useEffect(()=> {
         getPollById(pollId)
@@ -45,11 +46,11 @@ const PollPage = () => {
             {poll && 
                 <div>
                     <h1>{poll.question}</h1>
-                    <PollVotesPage pollId={pollId} poll={poll}/>
+                    <PollVotesPage pollId={pollId} poll={poll} onVoteChange={() => setVoteKey(k => k + 1)}/>
                 </div>
             }
             
-            <TeamSplitPage pollId={pollId} onSplitSuccess={() => setSplitKey(k => k + 1)}/>
+            <TeamSplitPage pollId={pollId} refreshKey={voteKey} onSplitSuccess={() => setSplitKey(k => k + 1)}/>
             <PollGamesPage pollId={pollId} refreshKey={splitKey}/>
         </>
         

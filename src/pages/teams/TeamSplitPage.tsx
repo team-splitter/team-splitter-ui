@@ -6,10 +6,11 @@ import TeamCardList from "./TeamCardList";
 
 type TeamSplitPageProps = {
     pollId: string
+    refreshKey?: number
     onSplitSuccess?: () => void
 }
 
-const TeamSplitPage = ({ pollId, onSplitSuccess }: TeamSplitPageProps) => {
+const TeamSplitPage = ({ pollId, refreshKey, onSplitSuccess }: TeamSplitPageProps) => {
     const [teams, setTeams] = useState<Team[] | null>(null);
     const [loading, setLoading] = useState(true);
     const [splitting, setSplitting] = useState(false);
@@ -29,7 +30,7 @@ const TeamSplitPage = ({ pollId, onSplitSuccess }: TeamSplitPageProps) => {
                 setTeams(null)
             })
             .finally(() => setLoading(false))
-    }, [pollId, teamsNum, splitStrategy])
+    }, [pollId, teamsNum, splitStrategy, refreshKey])
 
     const handleSplit = () => {
         setSplitting(true);

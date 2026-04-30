@@ -10,9 +10,10 @@ import ConfirmDialog from 'components/ConfirmDialog';
 type Props = {
     poll: Poll
     pollId: string
+    onVoteChange?: () => void
 }
 
-export const PollVotesPage = ({ pollId, poll }: Props) => {
+export const PollVotesPage = ({ pollId, poll, onVoteChange }: Props) => {
     const [votes, setVotes] = useState(poll.answers as PollVote[]);
     const [players, setPlayers] = useState([] as Player[]);
     const [error, setError] = useState(null);
@@ -27,13 +28,14 @@ export const PollVotesPage = ({ pollId, poll }: Props) => {
         if (selectedPlayer !== null) {
             const vote = await addPollVote(pollId, selectedPlayer.id);
             setVotes([...votes, vote]);
+            onVoteChange?.();
         }
     }
 
     const onDeletePlayerVote = async (voteToRemove: PollVote) => {
         await deletePollVote(pollId, voteToRemove.id);
         setVotes(votes.filter((vote) => vote.id !== voteToRemove.id));
-
+        onVoteChange?.();
     }
 
     useEffect(() => {

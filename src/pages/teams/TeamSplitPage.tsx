@@ -17,6 +17,7 @@ const TeamSplitPage = ({ pollId, refreshKey, onSplitSuccess }: TeamSplitPageProp
     const [error, setError] = useState(null);
     const [teamsNum, setTeamsNum] = useState(2);
     const [splitStrategy, setSplitStrategy] = useState("TEAM_SCORE_BALANCE");
+    const [playerUpdateKey, setPlayerUpdateKey] = useState(0);
 
     useEffect(() => {
         getPollTeamSplit(pollId, teamsNum, splitStrategy)
@@ -30,7 +31,7 @@ const TeamSplitPage = ({ pollId, refreshKey, onSplitSuccess }: TeamSplitPageProp
                 setTeams(null)
             })
             .finally(() => setLoading(false))
-    }, [pollId, teamsNum, splitStrategy, refreshKey])
+    }, [pollId, teamsNum, splitStrategy, refreshKey, playerUpdateKey])
 
     const handleSplit = () => {
         setSplitting(true);
@@ -99,7 +100,7 @@ const TeamSplitPage = ({ pollId, refreshKey, onSplitSuccess }: TeamSplitPageProp
                     alignItems: 'center',
                     justifyContent: 'center'
                 }}>
-                    <TeamCardList teams={teams} draggable={false} />
+                    <TeamCardList teams={teams} draggable={false} onPlayerUpdated={() => setPlayerUpdateKey(k => k + 1)} />
                 </Box>
             }
         </div>

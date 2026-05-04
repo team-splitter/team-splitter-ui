@@ -1,4 +1,4 @@
-import {deletePoll, getPoll, getAllPollsPaginated, addVoteToPoll, removeVoteFromPoll, savePoll} from './repo/poll_repo.mjs';
+import {deletePoll, getPoll, getAllPollsPaginated, addVoteToPoll, removeVoteFromPoll, savePoll, updatePlayerInPollVotes} from './repo/poll_repo.mjs';
 import {getPlayer, deletePlayer, getAllPlayers, savePlayer} from './repo/player_repo.mjs';
 import {deleteGameSplit, getGameSplit, getGameSplitsByPoll, getAllGameSplitsPaginated, removePlayerFromSplit, saveGameSplit, movePlayerBetweenTeams} from './repo/game_split_repo.mjs';
 import {deleteGameSchedule, getGameSchedule, getAllGameSchedules, saveGameSchedule} from './repo/game_schedule_repo.mjs';
@@ -124,6 +124,7 @@ export const handler = async (event, context) => {
         exisinting.score = requestJSON.score;
         
         await savePlayer(exisinting);
+        await updatePlayerInPollVotes(playerId, { firstName: exisinting.firstName, lastName: exisinting.lastName, score: exisinting.score });
         body = exisinting;
         break;
       }

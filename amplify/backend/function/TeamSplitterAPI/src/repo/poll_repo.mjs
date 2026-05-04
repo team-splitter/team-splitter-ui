@@ -123,6 +123,23 @@ export const removeVoteFromPollByPlayer = async (pollId, playerId) => {
   );
 }
 
+export const updatePlayerInPollVotes = async (playerId, playerData) => {
+  const polls = (await dynamo.send(new ScanCommand({ TableName: tableName }))).Items || [];
+  const pollsWithPlayer = polls.filter(p => p.answers?.some(a => a.player?.id === playerId));
+
+  await Promise.all(pollsWithPlayer.map(poll => {
+    const updatedAnswers = poll.answers.map(a =>
+      a.player?.id === playerId ? { ...a, player: { ...a.player, ...playerData } } : a
+    );
+    return dynamo.send(new UpdateCommand({
+      TableName: tableName,
+      Key: { id: poll.id },
+      UpdateExpression: 'SET answers = :answers',
+      ExpressionAttributeValues: { ':answers': updatedAnswers }
+    }));
+  }));
+}
+
 export const savePoll = async (pollDocument) => {
   return await dynamo.send(
     new PutCommand({

@@ -119,7 +119,10 @@ export const PollVotesPage = ({ pollId, poll, onVoteChange }: Props) => {
                     <AddPlayer
                         mode="edit"
                         player={editPlayer}
-                        cancelButtonHandler={() => setEditPlayer(null)}
+                        cancelButtonHandler={() => {
+                                setEditPlayer(null);
+                                getVotesForPoll(pollId).then(setVotes);
+                            }}
                     />
                 )}
             </Dialog>

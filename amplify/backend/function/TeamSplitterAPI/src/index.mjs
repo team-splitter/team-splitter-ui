@@ -124,7 +124,8 @@ export const handler = async (event, context) => {
         exisinting.score = requestJSON.score;
         
         await savePlayer(exisinting);
-        await updatePlayerInPollVotes(playerId, { firstName: exisinting.firstName, lastName: exisinting.lastName, score: exisinting.score });
+        const completedPollIds = ((await getAllGameSplits()).Items || []).map(s => s.pollId);
+        await updatePlayerInPollVotes(playerId, { firstName: exisinting.firstName, lastName: exisinting.lastName, score: exisinting.score }, completedPollIds);
         body = exisinting;
         break;
       }

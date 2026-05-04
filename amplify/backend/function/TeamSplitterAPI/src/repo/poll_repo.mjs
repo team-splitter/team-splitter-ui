@@ -123,9 +123,10 @@ export const removeVoteFromPollByPlayer = async (pollId, playerId) => {
   );
 }
 
-export const updatePlayerInPollVotes = async (playerId, playerData) => {
+export const updatePlayerInPollVotes = async (playerId, playerData, excludePollIds = []) => {
   const polls = (await dynamo.send(new ScanCommand({ TableName: tableName }))).Items || [];
-  const pollsWithPlayer = polls.filter(p => p.answers?.some(a => a.player?.id === playerId));
+  const excludeSet = new Set(excludePollIds);
+  const pollsWithPlayer = polls.filter(p => !excludeSet.has(p.id) && p.answers?.some(a => a.player?.id === playerId));
 
   await Promise.all(pollsWithPlayer.map(poll => {
     const updatedAnswers = poll.answers.map(a =>

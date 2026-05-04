@@ -20,7 +20,7 @@ export const PollGamesPage = ({ pollId, refreshKey }: GamesPageProps) => {
     useEffect(() => {
         getGameSplitsByPollId(pollId)
             .then((data) => {
-                setGameSplits(data.content);
+                setGameSplits([...data.content].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
                 setError(null);
             })
             .catch((err) => {

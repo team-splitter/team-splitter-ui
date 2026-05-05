@@ -8,6 +8,7 @@ type TeamCardListProps = {
     teams: Team[]
     gameSplit?: GameSplit
     draggable?: boolean
+    onPlayerUpdated?: () => void
 }
 
 export type DragState = {
@@ -15,7 +16,7 @@ export type DragState = {
     fromTeamName: string
 }
 
-export const TeamCardList = ({teams: initialTeams, gameSplit, draggable = true}: TeamCardListProps) => {
+export const TeamCardList = ({teams: initialTeams, gameSplit, draggable = true, onPlayerUpdated}: TeamCardListProps) => {
     const [teams, setTeams] = useState<Team[]>(initialTeams);
     useEffect(() => { 
         setTeams(initialTeams);
@@ -89,6 +90,7 @@ export const TeamCardList = ({teams: initialTeams, gameSplit, draggable = true}:
                     key={team.name}
                     team={team}
                     gameSplit={gameSplit}
+                    onPlayerUpdated={onPlayerUpdated}
                     {...(draggable && {
                         onDragStart,
                         onDrop: applyDrop,

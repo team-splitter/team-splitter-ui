@@ -1,4 +1,4 @@
-import { Autocomplete, Button, FormControl, IconButton, InputLabel, MenuItem, Select, SelectChangeEvent, TextField, Tooltip } from "@mui/material"
+import { Autocomplete, Button, Dialog, FormControl, IconButton, TextField, Tooltip } from "@mui/material"
 import { useEffect, useState } from "react"
 import { Player } from "api/Player.types"
 import { Poll, PollVote } from "api/Poll.types"
@@ -6,6 +6,7 @@ import { getPlayers } from "services/PlayerService"
 import { addPollVote, getVotesForPoll, deletePollVote } from "services/PollService"
 import DeleteIcon from '@mui/icons-material/Delete';
 import ConfirmDialog from 'components/ConfirmDialog';
+import AddPlayer from "pages/players/AddPlayer";
 
 type Props = {
     poll: Poll
@@ -22,6 +23,7 @@ export const PollVotesPage = ({ pollId, poll, onVoteChange }: Props) => {
     const [selectedPlayer, setSelectedPlayer] = useState<Player | null> (null);
     const [addPlayerEnabled, setAddPlayerButtonEnabled] = useState(false);
     const [selectedVote, setSelectedVote] = useState<PollVote>({} as PollVote);
+    const [editPlayer, setEditPlayer] = useState<Player | null>(null);
 
     const handleAddPlayer = async (e: any) => {
         e.preventDefault();
@@ -85,7 +87,11 @@ export const PollVotesPage = ({ pollId, poll, onVoteChange }: Props) => {
             <ol>
                 {votes.map((vote) => {
                     return (
-                        <li key={vote.id}>{vote.player ? `${vote.player.firstName || ''} ${vote.player.lastName || ''}`: `deleted user`}
+                        <li key={vote.id}>
+                            {vote.player
+                                ? <span style={{ cursor: "pointer", textDecoration: "underline dotted" }} onClick={() => setEditPlayer(vote.player)}>{vote.player.firstName || ''} {vote.player.lastName || ''}</span>
+                                : `deleted user`
+                            }
                             <Tooltip title="Delete">
                                 <IconButton onClick={(e) => { 
                                     setOpen(true); 
@@ -108,6 +114,18 @@ export const PollVotesPage = ({ pollId, poll, onVoteChange }: Props) => {
                     </ConfirmDialog>
             </ol>
 
+            <Dialog open={!!editPlayer} onClose={() => setEditPlayer(null)}>
+                {editPlayer && (
+                    <AddPlayer
+                        mode="edit"
+                        player={editPlayer}
+                        cancelButtonHandler={() => {
+                                setEditPlayer(null);
+                                getVotesForPoll(pollId).then(setVotes);
+                            }}
+                    />
+                )}
+            </Dialog>
         </div>
     )
 }

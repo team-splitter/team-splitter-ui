@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Team, GameSplit } from "../../api/Team.types";
-import { IconButton, Tooltip } from "@mui/material";
+import { Dialog, IconButton, Tooltip } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Player } from "api/Player.types";
 import ConfirmDialog from 'components/ConfirmDialog';
 import { deleteGameSplitPlayerEntry } from "services/GameSplitService";
+import AddPlayer from "pages/players/AddPlayer";
 
 type TeamCardProps = {
     team: Team
@@ -15,12 +16,14 @@ type TeamCardProps = {
     onTouchDrop?: (x: number, y: number) => void
     isTouchDragTarget?: boolean
     draggingPlayer?: Player | null
+    onPlayerUpdated?: () => void
 }
 
-const TeamCard = ({team, gameSplit, onDragStart, onDrop, onTouchMove, onTouchDrop, isTouchDragTarget, draggingPlayer}: TeamCardProps) => {
+const TeamCard = ({team, gameSplit, onDragStart, onDrop, onTouchMove, onTouchDrop, isTouchDragTarget, draggingPlayer, onPlayerUpdated}: TeamCardProps) => {
     const [open, setOpen] = useState(false);
     const [selectedPlayer, setSelectedPlayer] = useState<Player>({} as Player);
     const [isMouseDragOver, setIsMouseDragOver] = useState(false);
+    const [editPlayer, setEditPlayer] = useState<Player | null>(null);
 
     const onDeletePlayerEntry = async (gameId: string, player: Player) => {
         await deleteGameSplitPlayerEntry(gameId, player.id);
@@ -84,7 +87,12 @@ const TeamCard = ({team, gameSplit, onDragStart, onDrop, onTouchMove, onTouchDro
                                 onTouchDrop?.(touch.clientX, touch.clientY);
                             }}
                         >
-                            {player.firstName} {player.lastName} {player.score}
+                            <span
+                                style={{ cursor: "pointer", textDecoration: "underline dotted", userSelect: "text" }}
+                                onClick={() => setEditPlayer(player)}
+                            >
+                                {player.firstName} {player.lastName} {player.score}
+                            </span>
                             {gameSplit &&
                                 <Tooltip title="Delete">
                                     <IconButton onClick={() => {
@@ -111,6 +119,18 @@ const TeamCard = ({team, gameSplit, onDragStart, onDrop, onTouchMove, onTouchDro
                     Are you sure you want to delete this player?
                 </ConfirmDialog>
             }
+            <Dialog open={!!editPlayer} onClose={() => setEditPlayer(null)}>
+                {editPlayer && (
+                    <AddPlayer
+                        mode="edit"
+                        player={editPlayer}
+                        cancelButtonHandler={() => {
+                            setEditPlayer(null);
+                            onPlayerUpdated?.();
+                        }}
+                    />
+                )}
+            </Dialog>
         </div>
     );
 }

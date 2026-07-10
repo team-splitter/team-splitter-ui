@@ -84,7 +84,7 @@ export const TeamCardList = ({teams: initialTeams, gameSplit, draggable = true, 
     const draggingPlayer = dragState.current?.player ?? null;
 
     return (
-        <div style={{ position: "relative" }}>
+        <div style={{ position: "relative", display: "flex", flexWrap: "wrap", gap: "16px" }}>
             {teams.map((team) => (
                 <TeamCard
                     key={team.name}

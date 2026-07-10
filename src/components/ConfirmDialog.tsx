@@ -20,14 +20,15 @@ const ConfirmDialog = (props: Props) => {
       open={open}
       onClose={() => setOpen(false)}
       aria-labelledby="confirm-dialog"
+      PaperProps={{ sx: { borderRadius: 3, minWidth: 360 } }}
     >
-      <DialogTitle id="confirm-dialog">{title}</DialogTitle>
+      <DialogTitle id="confirm-dialog" sx={{ fontWeight: 700 }}>{title}</DialogTitle>
       <DialogContent>{children}</DialogContent>
-      <DialogActions>
+      <DialogActions sx={{ px: 3, pb: 2 }}>
         <Button
-          variant="contained"
+          variant="text"
+          color="inherit"
           onClick={() => setOpen(false)}
-          color="secondary"
         >
           No
         </Button>

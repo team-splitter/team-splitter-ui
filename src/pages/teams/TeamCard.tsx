@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Team, GameSplit } from "../../api/Team.types";
-import { Dialog, IconButton, Tooltip } from "@mui/material";
+import { Box, Card, Chip, Dialog, IconButton, Link as MuiLink, Stack, Tooltip, Typography } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Player } from "api/Player.types";
 import ConfirmDialog from 'components/ConfirmDialog';
@@ -35,16 +35,15 @@ const TeamCard = ({team, gameSplit, onDragStart, onDrop, onTouchMove, onTouchDro
     const isDragTarget = isMouseDragOver || isTouchDragTarget;
 
     return (
-        <div
+        <Card
             data-team-name={team.name}
-            style={{
-                width: "400px",
-                display: "block",
-                float: "left",
-                outline: isDragTarget ? "2px dashed #1976d2" : "none",
-                borderRadius: "4px",
-                backgroundColor: isDragTarget ? "rgba(25, 118, 210, 0.08)" : "transparent",
-                transition: "background-color 0.15s, outline 0.15s"
+            sx={{
+                width: 320,
+                p: 2,
+                outline: isDragTarget ? "2px dashed" : "none",
+                outlineColor: "primary.main",
+                backgroundColor: isDragTarget ? "rgba(11, 116, 209, 0.06)" : "background.paper",
+                transition: "background-color 0.15s, outline 0.15s",
             }}
             onDragOver={(e) => {
                 if (onDrop) {
@@ -59,21 +58,31 @@ const TeamCard = ({team, gameSplit, onDragStart, onDrop, onTouchMove, onTouchDro
                 onDrop?.(team.name);
             }}
         >
-            <h1>{team.name}</h1>
-            <ol>
+            <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+                <Typography variant="h6">{team.name}</Typography>
+                <Chip size="small" color="primary" variant="outlined" label={`Score ${totalTeamScore}`} />
+            </Stack>
+
+            <Stack component="ol" sx={{ listStyle: "none", m: 0, p: 0 }} spacing={0}>
                 {team.players.map((player) => {
                     const isBeingDragged = draggingPlayer?.id === player.id;
                     return (
-                        <li
+                        <Box
+                            component="li"
                             key={player.id}
-                            style={{
-                                height: "24px",
+                            sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                                py: 0.5,
+                                borderBottom: "1px solid",
+                                borderColor: "divider",
                                 cursor: canDrag ? "grab" : "default",
                                 userSelect: "none",
                                 touchAction: canDrag ? "none" : "auto",
                                 opacity: isBeingDragged ? 0.35 : 1,
                                 fontStyle: isBeingDragged ? "italic" : "normal",
-                                transition: "opacity 0.15s"
+                                transition: "opacity 0.15s",
                             }}
                             draggable={canDrag}
                             onDragStart={() => onDragStart?.(player, team.name)}
@@ -87,27 +96,32 @@ const TeamCard = ({team, gameSplit, onDragStart, onDrop, onTouchMove, onTouchDro
                                 onTouchDrop?.(touch.clientX, touch.clientY);
                             }}
                         >
-                            <span
-                                style={{ cursor: "pointer", textDecoration: "underline dotted", userSelect: "text" }}
+                            <MuiLink
+                                component="button"
+                                underline="hover"
+                                color="text.primary"
+                                sx={{ textAlign: "left", userSelect: "text" }}
                                 onClick={() => setEditPlayer(player)}
                             >
-                                {player.firstName} {player.lastName} {player.score}
-                            </span>
+                                {player.firstName} {player.lastName}
+                                <Typography component="span" color="text.secondary" sx={{ ml: 1 }}>
+                                    {player.score}
+                                </Typography>
+                            </MuiLink>
                             {gameSplit &&
                                 <Tooltip title="Delete">
-                                    <IconButton onClick={() => {
+                                    <IconButton size="small" onClick={() => {
                                         setOpen(true);
                                         setSelectedPlayer(player);
                                     }}>
-                                        <DeleteIcon />
+                                        <DeleteIcon fontSize="small" />
                                     </IconButton>
                                 </Tooltip>
                             }
-                        </li>
+                        </Box>
                     );
                 })}
-            </ol>
-            <div>Team Score:<b>{totalTeamScore}</b></div>
+            </Stack>
 
             {gameSplit &&
                 <ConfirmDialog
@@ -131,7 +145,7 @@ const TeamCard = ({team, gameSplit, onDragStart, onDrop, onTouchMove, onTouchDro
                     />
                 )}
             </Dialog>
-        </div>
+        </Card>
     );
 }
 

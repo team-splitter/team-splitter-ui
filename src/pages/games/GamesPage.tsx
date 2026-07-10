@@ -1,15 +1,18 @@
-import { Box, IconButton, TextField, Tooltip } from "@mui/material";
-import { DataGrid, GridColDef, GridRenderCellParams, GridValueGetterParams } from "@mui/x-data-grid";
+import { Button, IconButton, TextField, Tooltip } from "@mui/material";
+import { GridColDef, GridRenderCellParams, GridValueGetterParams } from "@mui/x-data-grid";
 import { GameSplit, GameScore } from "api/Team.types";
 import ConfirmDialog from "components/ConfirmDialog";
-import Loading from "components/Loading";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { deleteGameSplitById, getGameSplits, setGameSplitScores } from "services/GameSplitService";
 import DeleteIcon from '@mui/icons-material/Delete';
 import SportsScoreRoundedIcon from '@mui/icons-material/SportsScoreRounded';
-import { Page } from "api/Pagination.types";
+import PageLayout from "components/layout/PageLayout";
+import PageHeader from "components/layout/PageHeader";
+import ErrorMessage from "components/layout/ErrorMessage";
+import DataTable from "components/layout/DataTable";
+import InlineLoading from "components/layout/InlineLoading";
 
 function format(date: Date): string {
     let formattedDate = (moment(date)).format('YYYY-MM-DD HH:mm:ss');
@@ -152,7 +155,7 @@ const GamesPage  = () => {
             filterable: false,
             renderCell: (params: GridRenderCellParams<any, GameSplit>) => (
                 <div>
-                    <Link to={`/poll/${params.row.pollId}`}>Poll</Link>
+                    <Button size="small" component={Link} to={`/poll/${params.row.pollId}`}>Poll</Button>
                     <Tooltip title="Delete">
                         <IconButton onClick={async (e) => {
                             setOpen(true); 
@@ -180,32 +183,26 @@ const GamesPage  = () => {
     ];
 
     return (
-        <div>
-            <h1>Games Splits</h1>
-            {loading && <Loading/>}
-            {error && (
-                <div>{`There is a problem fetching the game splits data - ${error}`}</div>
-            )}
+        <PageLayout>
+            <PageHeader
+                title="Game Splits"
+                subtitle="Generated team splits and their scores"
+            />
+            <ErrorMessage message={error && `There is a problem fetching the game splits data - ${error}`} />
+            {loading && <InlineLoading/>}
 
-            {gameSplits &&
-                <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                    <DataGrid
-                        autoHeight
-                        getRowHeight={() => 'auto'}
-                        rows={gameSplits}
-                        columns={columns}
-                        paginationMode="server"
-                        pageSize={pageSize}
-                        onPageSizeChange={setPageSize}
-                        page={page}
-                        onPageChange={setPage}
-                        rowCount={gameSplitsCount}
-                        rowsPerPageOptions={[10, 20, 50, 100]}
-                        disableSelectionOnClick
-                        showCellRightBorder
-                        showColumnRightBorder
-                    />
-                </Box>
+            {!loading && gameSplits &&
+                <DataTable
+                    getRowHeight={() => 'auto'}
+                    rows={gameSplits}
+                    columns={columns}
+                    paginationMode="server"
+                    pageSize={pageSize}
+                    onPageSizeChange={setPageSize}
+                    page={page}
+                    onPageChange={setPage}
+                    rowCount={gameSplitsCount}
+                />
             }
 
             {gameSplits &&
@@ -260,7 +257,7 @@ const GamesPage  = () => {
                 </div>
             </ConfirmDialog>
             }
-        </div>
+        </PageLayout>
     )
 }
 

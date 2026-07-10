@@ -1,11 +1,15 @@
 import { PlayerStat } from "api/PlayerStat.types";
 import { FC, ReactElement, useEffect, useState } from "react";
 import { getPlayerStats } from "services/PlayerStatsService";
-import { DataGrid, GridColDef, GridRowId,GridCellEditCommitParams, GridRenderCellParams, GridValueGetterParams, renderActionsCell } from '@mui/x-data-grid';
-import { Box, Button, Grid, TextField } from "@mui/material";
-import { Controller, useForm } from 'react-hook-form';
+import { GridColDef, GridRowId, GridCellEditCommitParams } from '@mui/x-data-grid';
+import { Stack, TextField } from "@mui/material";
 import moment from "moment";
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import PageLayout from "components/layout/PageLayout";
+import PageHeader from "components/layout/PageHeader";
+import ErrorMessage from "components/layout/ErrorMessage";
+import DataTable from "components/layout/DataTable";
+import InlineLoading from "components/layout/InlineLoading";
 
 
 function formatDate(date?: Date): string {
@@ -29,16 +33,8 @@ const PlayerStatPage: FC<any> = (): ReactElement => {
     const [rowId, setRowId] = useState<GridRowId>({} as GridRowId);
     const [pageSize, setPageSize] = useState<number>(100);
 
-    const { control, register, handleSubmit } = useForm();
-
     const [startDate, setStartDate] = useState<Date>(defaultStartDate);
     const [endDate, setEndDate] = useState<Date>(now);
-
-
-    const onFormSumbit = async (data: any) => {
-        console.log(data);
-    
-    }
 
     useEffect(() => {
         getPlayerStats(formatDate(startDate), formatDate(endDate))
@@ -119,83 +115,57 @@ const PlayerStatPage: FC<any> = (): ReactElement => {
     ];
 
     return (
-        <div style={{padding:"10px"}}>
-            <h1>Player Stats</h1>
-            {loading && <div> A moment please...</div>}
-            {error && (
-                <div>{`There is a problem fetching the player stats - ${error}`}</div>
-            )}
+        <PageLayout>
+            <PageHeader
+                title="Player Stats"
+                subtitle="Win/loss records over a date range"
+                action={
+                    <Stack direction="row" spacing={2}>
+                        <DatePicker
+                            label="Start Date"
+                            value={startDate}
+                            onChange={(date: Date | null) => {
+                                setStartDate(date || new Date());
+                            }}
+                            maxDate={endDate}
+                            renderInput={(props) => <TextField {...props} />}
+                        />
+                        <DatePicker
+                            label="End Date"
+                            value={endDate}
+                            onChange={(date: Date | null) => {
+                                setEndDate(date || new Date());
+                            }}
+                            minDate={startDate}
+                            maxDate={now}
+                            renderInput={(props) => <TextField {...props} />}
+                        />
+                    </Stack>
+                }
+            />
+            <ErrorMessage message={error && `There is a problem fetching the player stats - ${error}`} />
+            {loading && <InlineLoading/>}
 
-            {playerStats &&
-                <Box sx={{
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }}>
-                    <Grid container direction={'column'} spacing={1}>
-                        <Grid container spacing={2} padding={3}>
-                            <Grid item>
-                                <Grid container spacing={2}>
-                                    <Grid item>
-                                        <DatePicker
-                                            label="Start Date"
-                                            value={startDate}
-                                            onChange={(date: Date | null) => {
-                                                setStartDate(date || new Date());
-                                            }}
-                                            maxDate={endDate}
-                                            renderInput={(props) =>
-                                                <TextField
-                                                    size="small" {...props} />}
-                                        />
-                                    </Grid>
-                                    <Grid item>
-                                        <DatePicker
-                                            label="End Date"
-                                            value={endDate}
-                                            onChange={(date: Date | null) => {
-                                                setEndDate(date || new Date());
-                                            }}
-                                            minDate={startDate}
-                                            maxDate={now}
-                                            renderInput={(props) =>
-                                                <TextField
-                                                    size="small" {...props} />}
-                                        />
-                                    </Grid>
-                                </Grid>
-                            </Grid>
-                        </Grid>
-                    
-                        <Grid item>
-                        <DataGrid
-                            autoHeight
-                                rows={playerStats}
-                                columns={columns}
-                                pageSize={pageSize}
-                                onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-                                rowsPerPageOptions={[10, 20, 50, 100]}
-                                disableSelectionOnClick
-                                showCellRightBorder
-                                showColumnRightBorder
-                                experimentalFeatures={{ newEditingApi: true }}
-                                initialState={{
-                                    sorting: {
-                                        sortModel: [{field: 'totalGames', sort: 'desc'}]
-                                    }
-                                }}
-                                getRowId={(row) => row.playerId}
-                                onCellEditCommit={(params: GridCellEditCommitParams) => {
-                                    setRowId(params.id);
-                                    }
-                                }
-                            />
-                        </Grid>
-                    </Grid>
-                </Box>
+            {!loading && playerStats &&
+                <DataTable
+                    rows={playerStats}
+                    columns={columns}
+                    pageSize={pageSize}
+                    onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+                    experimentalFeatures={{ newEditingApi: true }}
+                    initialState={{
+                        sorting: {
+                            sortModel: [{field: 'totalGames', sort: 'desc'}]
+                        }
+                    }}
+                    getRowId={(row) => row.playerId}
+                    onCellEditCommit={(params: GridCellEditCommitParams) => {
+                        setRowId(params.id);
+                        }
+                    }
+                />
             }
-        </div>
+        </PageLayout>
     )
 }
 

@@ -1,8 +1,10 @@
-import { Box, Button, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from "@mui/material";
+import { Box, Button, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Stack } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Team } from "../../api/Team.types";
 import { getPollTeamSplit, splitPollTeams } from "../../services/PollTeamSplitService";
 import TeamCardList from "./TeamCardList";
+import ErrorMessage from "components/layout/ErrorMessage";
+import InlineLoading from "components/layout/InlineLoading";
 
 type TeamSplitPageProps = {
     pollId: string
@@ -48,62 +50,54 @@ const TeamSplitPage = ({ pollId, refreshKey, onSplitSuccess }: TeamSplitPageProp
     };
 
     return (
-        <div>
-            <h1>Team Split</h1>
-            {loading && <div> A moment please...</div>}
-            {error && (
-                <div>{`There is a problem fetching the teams - ${error}`}</div>
-            )}
+        <Box>
+            <ErrorMessage message={error && `There is a problem fetching the teams - ${error}`} />
 
-            <FormControl variant="standard" sx={{ m: 1, minWidth: 200 }}>
-                <InputLabel id="teams-number-label">Teams Number</InputLabel>
-                <Select
-                    labelId="teams-number-label"
-                    id="teams-number-select"
-                    value={teamsNum.toString()}
-                    onChange={(event: SelectChangeEvent) => {
-                        setTeamsNum(Number(event.target.value));
-                    }}
-                >
-                    <MenuItem value={2}>2</MenuItem>
-                    <MenuItem value={3}>3</MenuItem>
-                    <MenuItem value={4}>4</MenuItem>
-                    <MenuItem value={5}>5</MenuItem>
-                    <MenuItem value={6}>6</MenuItem>
-                </Select>
-
-            </FormControl>
-            <FormControl variant="standard" sx={{ m: 1, minWidth: 200 }}>
-                <InputLabel id="split-strategy-label">Split Strategy</InputLabel>
-                <Select
-                    labelId="split-strategy-label"
-                    id="split-strategy-select"
-                    value={splitStrategy}
-                    onChange={(event: SelectChangeEvent) => {
-                        setSplitStrategy(event.target.value);
-                    }}
-                >
-                    <MenuItem value={"TEAM_SCORE_BALANCE"}>TEAM_SCORE_BALANCE</MenuItem>
-                    <MenuItem value={"BACK_AND_FORCE"}>BACK_AND_FORCE</MenuItem>
-                    <MenuItem value={"CIRCULAR"}>CIRCULAR</MenuItem>
-                </Select>
-            </FormControl>
-            <FormControl variant="filled" sx={{ m: 1, minWidth: 120 }}>
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems={{ sm: "center" }} sx={{ mb: 2 }}>
+                <FormControl size="small" sx={{ minWidth: 160 }}>
+                    <InputLabel id="teams-number-label">Teams Number</InputLabel>
+                    <Select
+                        labelId="teams-number-label"
+                        id="teams-number-select"
+                        label="Teams Number"
+                        value={teamsNum.toString()}
+                        onChange={(event: SelectChangeEvent) => {
+                            setTeamsNum(Number(event.target.value));
+                        }}
+                    >
+                        <MenuItem value={2}>2</MenuItem>
+                        <MenuItem value={3}>3</MenuItem>
+                        <MenuItem value={4}>4</MenuItem>
+                        <MenuItem value={5}>5</MenuItem>
+                        <MenuItem value={6}>6</MenuItem>
+                    </Select>
+                </FormControl>
+                <FormControl size="small" sx={{ minWidth: 220 }}>
+                    <InputLabel id="split-strategy-label">Split Strategy</InputLabel>
+                    <Select
+                        labelId="split-strategy-label"
+                        id="split-strategy-select"
+                        label="Split Strategy"
+                        value={splitStrategy}
+                        onChange={(event: SelectChangeEvent) => {
+                            setSplitStrategy(event.target.value);
+                        }}
+                    >
+                        <MenuItem value={"TEAM_SCORE_BALANCE"}>TEAM_SCORE_BALANCE</MenuItem>
+                        <MenuItem value={"BACK_AND_FORCE"}>BACK_AND_FORCE</MenuItem>
+                        <MenuItem value={"CIRCULAR"}>CIRCULAR</MenuItem>
+                    </Select>
+                </FormControl>
                 <Button onClick={handleSplit} variant="contained" disabled={splitting}>
                     {splitting ? 'Splitting...' : 'Split'}
                 </Button>
-            </FormControl>
+            </Stack>
+
+            {loading && <InlineLoading />}
             {teams &&
-                <Box sx={{
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }}>
-                    <TeamCardList teams={teams} draggable={false} onPlayerUpdated={() => setPlayerUpdateKey(k => k + 1)} />
-                </Box>
+                <TeamCardList teams={teams} draggable={false} onPlayerUpdated={() => setPlayerUpdateKey(k => k + 1)} />
             }
-        </div>
+        </Box>
     )
 }
 

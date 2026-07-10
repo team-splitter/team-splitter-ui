@@ -1,12 +1,18 @@
-import React, { ReactElement, FC, useState, useEffect } from "react";
-import { Box, Typography, Button, TextField } from "@mui/material";
+import React, { useState, useEffect } from "react";
+import { Box, Button, IconButton, TextField, Tooltip } from "@mui/material";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { Poll } from "api/Poll.types";
 import moment from "moment";
-import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
-import { Link, useParams } from "react-router-dom";
+import { GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
+import { Link } from "react-router-dom";
 import { getPolls, createPoll, deletePoll } from "services/PollService";
-import Loading from "components/Loading";
 import ConfirmDialog from "components/ConfirmDialog";
+import PageLayout from "components/layout/PageLayout";
+import PageHeader from "components/layout/PageHeader";
+import ErrorMessage from "components/layout/ErrorMessage";
+import DataTable from "components/layout/DataTable";
+import InlineLoading from "components/layout/InlineLoading";
 
 
 function format(date: Date): string {
@@ -80,11 +86,12 @@ const PollsPage  = () => {
     }, [page, pageSize]);
 
     const columns: GridColDef[] = [
-        { field: 'id', headerName: 'ID', width: 300 },
+        { field: 'id', headerName: 'ID', width: 220 },
         {
             field: 'question',
             headerName: 'Question',
-            width: 600,
+            flex: 1,
+            minWidth: 240,
             editable: true,
             sortable: false,
             filterable: false,
@@ -92,7 +99,7 @@ const PollsPage  = () => {
         {
             field: 'createdAt',
             headerName: 'Creation Time',
-            width: 200,
+            width: 180,
             editable: false,
             sortable: false,
             filterable: false,
@@ -103,68 +110,69 @@ const PollsPage  = () => {
         {
             field: 'actions',
             headerName: 'Actions',
-            width: 150,
+            width: 110,
             sortable: false,
             filterable: false,
             renderCell: (params) => (
-                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                    <Link to={`/poll/${params.row.id}`}>View</Link>
-                    <Button
-                        size="small"
-                        color="error"
-                        onClick={() => handleDeleteClick(params.row.id)}
-                    >
-                        Delete
-                    </Button>
+                <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+                    <Tooltip title="View">
+                        <IconButton size="small" component={Link} to={`/poll/${params.row.id}`}>
+                            <VisibilityIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Delete">
+                        <IconButton
+                            size="small"
+                            color="error"
+                            onClick={() => handleDeleteClick(params.row.id)}
+                        >
+                            <DeleteIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
                 </Box>
             ),
         }
     ];
 
     return (
-        <div>
-            <h1>Polls</h1>
-            <Box sx={{ display: 'flex', gap: 2, mb: 2, alignItems: 'center' }}>
-                <TextField
-                    label="Poll name"
-                    value={pollName}
-                    onChange={(e) => setPollName(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleCreatePoll()}
-                    size="small"
-                    sx={{ width: 300 }}
-                />
-                <Button
-                    variant="contained"
-                    onClick={handleCreatePoll}
-                    disabled={!pollName.trim() || creating}
-                >
-                    Create Poll
-                </Button>
-            </Box>
-            {loading && <Loading/>}
-            {error && (
-                <div>{`There is a problem fetching the poll data - ${error}`}</div>
-            )}
+        <PageLayout>
+            <PageHeader
+                title="Polls"
+                subtitle="Create and manage pickup-game polls"
+                action={
+                    <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
+                        <TextField
+                            label="Poll name"
+                            value={pollName}
+                            onChange={(e) => setPollName(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && handleCreatePoll()}
+                            sx={{ width: 260 }}
+                        />
+                        <Button
+                            variant="contained"
+                            onClick={handleCreatePoll}
+                            disabled={!pollName.trim() || creating}
+                        >
+                            Create Poll
+                        </Button>
+                    </Box>
+                }
+            />
+            <ErrorMessage message={error && `There is a problem fetching the poll data - ${error}`} />
+            {loading && <InlineLoading/>}
 
-            {data &&
-                <Box sx={{width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                    <DataGrid
-                        autoHeight
-                        rows={data}
-                        columns={columns}
-                        pageSize={pageSize}
-                        onPageSizeChange={setPageSize}
-                        page={page}
-                        onPageChange={setPage}
-                        rowCount={totalElements}
-                        paginationMode="server"
-                        rowsPerPageOptions={[10, 20, 50, 100]}
-                        disableSelectionOnClick
-                        showCellRightBorder
-                        showColumnRightBorder
-                        experimentalFeatures={{ newEditingApi: true }}
-                    />
-                </Box>
+            {!loading && data &&
+                <DataTable
+                    rows={data}
+                    columns={columns}
+                    pageSize={pageSize}
+                    onPageSizeChange={setPageSize}
+                    page={page}
+                    onPageChange={setPage}
+                    rowCount={totalElements}
+                    paginationMode="server"
+                    experimentalFeatures={{ newEditingApi: true }}
+                />
             }
             <ConfirmDialog
                 title="Delete Poll"
@@ -174,7 +182,7 @@ const PollsPage  = () => {
             >
                 Are you sure you want to delete this poll? This will also close it in Telegram.
             </ConfirmDialog>
-        </div>
+        </PageLayout>
     )
 }
 

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Box, Typography } from "@mui/material";
 import { GameSplit } from "../../api/Team.types";
 import { getGameSplitsByPollId, deleteGameSplitById } from "../../services/GameSplitService";
 import GameSplitListCard from "../games/GameSplitListCard";
@@ -43,10 +44,12 @@ export const PollGamesPage = ({ pollId, refreshKey }: GamesPageProps) => {
     };
 
     return (
-        <div>
-            <h1>Games Splits</h1>
-            {gameSplits &&
+        <Box>
+            {gameSplits && gameSplits.length > 0 &&
                 <GameSplitListCard gameSplits={gameSplits} onDelete={handleDeleteClick} />
+            }
+            {gameSplits && gameSplits.length === 0 &&
+                <Typography color="text.secondary">No game splits yet.</Typography>
             }
             <ConfirmDialog
                 title="Delete Game?"
@@ -56,7 +59,7 @@ export const PollGamesPage = ({ pollId, refreshKey }: GamesPageProps) => {
             >
                 Are you sure you want to delete game?
             </ConfirmDialog>
-        </div>
+        </Box>
 
     )
 }

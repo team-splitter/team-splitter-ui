@@ -1,8 +1,9 @@
-import React, { ReactElement, FC, useState, useEffect } from "react";
-import { Box, Typography, Button } from "@mui/material"
+import React, { ReactElement, FC, useState } from "react";
+import { Card } from "@mui/material"
 import PlayersTable from "./PlayersTable";
 import AddPlayer from "./AddPlayer";
 import { Player } from "../../api/Player.types";
+import PageLayout from "components/layout/PageLayout";
 
 
 const PlayersPage: FC<any> = (): ReactElement => {
@@ -38,9 +39,13 @@ const PlayersPage: FC<any> = (): ReactElement => {
             )}
 
             {(shownPage === 'add' || shownPage === 'edit') && (
-                <AddPlayer mode={shownPage} cancelButtonHandler={cancelClickHandler} player={player}/>
+                <PageLayout maxWidth="sm">
+                    <Card sx={{ display: 'inline-block' }}>
+                        <AddPlayer mode={shownPage} cancelButtonHandler={cancelClickHandler} player={player}/>
+                    </Card>
+                </PageLayout>
             )}
-            
+
         </div>
     )
 }

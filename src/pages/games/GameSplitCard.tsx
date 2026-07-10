@@ -1,4 +1,4 @@
-import { Box, IconButton, Tooltip } from "@mui/material";
+import { Box, IconButton, Stack, Tooltip, Typography } from "@mui/material";
 import { GameSplit } from "../../api/Team.types";
 import TeamCardList from "../teams/TeamCardList";
 import moment from "moment";
@@ -15,9 +15,16 @@ type GameCardProps = {
 
 export const GameSplitCard = ({gameSplit, onDelete}: GameCardProps) => {
     return (
-        <div>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <h1>Game ({gameSplit.id}) {formatDateTime(gameSplit.createdAt)}</h1>
+        <Box sx={{ mb: 4 }}>
+            <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1.5 }}>
+                <Box>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 700, color: "text.primary" }}>
+                        {formatDateTime(gameSplit.createdAt)}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                        Game {gameSplit.id}
+                    </Typography>
+                </Box>
                 {onDelete && (
                     <Tooltip title="Delete">
                         <IconButton onClick={() => onDelete(gameSplit.id)}>
@@ -25,16 +32,9 @@ export const GameSplitCard = ({gameSplit, onDelete}: GameCardProps) => {
                         </IconButton>
                     </Tooltip>
                 )}
-            </Box>
-            <Box sx={{
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }}>
-                    <TeamCardList teams={gameSplit.teams} gameSplit={gameSplit}/>
-                </Box>
-        </div>
+            </Stack>
+            <TeamCardList teams={gameSplit.teams} gameSplit={gameSplit}/>
+        </Box>
 
     )
 }

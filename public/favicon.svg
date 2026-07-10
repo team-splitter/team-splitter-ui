@@ -1,0 +1,47 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2e7d32"/>
+      <stop offset="1" stop-color="#1b5e20"/>
+    </linearGradient>
+  </defs>
+
+  <!-- rounded background -->
+  <rect x="0" y="0" width="512" height="512" rx="112" fill="url(#bg)"/>
+
+  <!-- soccer ball centered, split into two team halves -->
+  <g transform="translate(256 256)">
+    <defs>
+      <clipPath id="ball"><circle r="150"/></clipPath>
+    </defs>
+    <!-- ball body: two team-colored halves -->
+    <g clip-path="url(#ball)">
+      <rect x="-150" y="-150" width="150" height="300" fill="#dce8fb"/>
+      <rect x="0" y="-150" width="150" height="300" fill="#fbdcdc"/>
+    </g>
+    <!-- the split line down the middle -->
+    <line x1="0" y1="-150" x2="0" y2="150" stroke="#0d3d12" stroke-width="8"/>
+    <circle r="150" fill="none" stroke="#0d3d12" stroke-width="10"/>
+
+    <!-- central black pentagon -->
+    <polygon points="0,-56 53,-17 33,45 -33,45 -53,-17" fill="#111111"/>
+
+    <!-- outer partial pentagons around the rim -->
+    <g fill="#111111">
+      <polygon points="0,-150 40,-120 24,-96 -24,-96 -40,-120"/>
+      <polygon points="150,-46 132,0 96,4 78,-40 108,-72"/>
+      <polygon points="93,138 55,112 78,72 120,84 122,124"/>
+      <polygon points="-93,138 -55,112 -78,72 -120,84 -122,124"/>
+      <polygon points="-150,-46 -132,0 -96,4 -78,-40 -108,-72"/>
+    </g>
+
+    <!-- seams connecting center pentagon to rim -->
+    <g stroke="#111111" stroke-width="9" stroke-linecap="round">
+      <line x1="0" y1="-56" x2="0" y2="-116"/>
+      <line x1="53" y1="-17" x2="100" y2="-40"/>
+      <line x1="33" y1="45" x2="72" y2="78"/>
+      <line x1="-33" y1="45" x2="-72" y2="78"/>
+      <line x1="-53" y1="-17" x2="-100" y2="-40"/>
+    </g>
+  </g>
+</svg>

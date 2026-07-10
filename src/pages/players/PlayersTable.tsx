@@ -1,17 +1,16 @@
 import React, { ReactElement, FC, useState, useEffect } from "react";
-import { Box, Typography, Button } from "@mui/material";
+import { Button } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 import { Player } from "../../api/Player.types";
-import moment from "moment";
-import { DataGrid, GridColDef, GridRowId,GridCellEditCommitParams, GridRenderCellParams, GridValueGetterParams, renderActionsCell, GridToolbarContainer, GridPagination } from '@mui/x-data-grid';
+import { GridColDef, GridRowId, GridCellEditCommitParams, GridToolbarContainer, GridPagination } from '@mui/x-data-grid';
 import PlayerActions from "./PlayerActions";
 import { getPlayers } from "../../services/PlayerService";
-import Loading from "components/Loading";
+import PageLayout from "components/layout/PageLayout";
+import PageHeader from "components/layout/PageHeader";
+import ErrorMessage from "components/layout/ErrorMessage";
+import DataTable from "components/layout/DataTable";
+import InlineLoading from "components/layout/InlineLoading";
 
-
-function format(date: Date): string {
-    let formattedDate = (moment(date)).format('YYYY-MM-DD HH:mm:ss');
-    return formattedDate;
-}
 type Props = {
     showEditPage: (player: Player)=> void;
     showAddPlayerPage: (e: any) => void;
@@ -82,54 +81,46 @@ const PlayersTable: FC<any> = ({showEditPage, showAddPlayerPage}: Props): ReactE
     ];
 
     return (
-        <div style={{padding:"10px"}}>
-            <h1>Players</h1>
-            <Button variant="outlined" style={{margin: "5px"}} onClick={showAddPlayerPage}>Add Player</Button>
-            {loading && <Loading/>}
-            {error && (
-                <div>{`There is a problem fetching the poll data - ${error}`}</div>
-            )}
+        <PageLayout>
+            <PageHeader
+                title="Players"
+                subtitle="Manage the player roster and scores"
+                action={
+                    <Button variant="contained" startIcon={<AddIcon />} onClick={showAddPlayerPage}>
+                        Add Player
+                    </Button>
+                }
+            />
+            <ErrorMessage message={error && `There is a problem fetching the player data - ${error}`} />
+            {loading && <InlineLoading/>}
 
-            {players &&
-                <Box sx={{
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }}>
-                    
-                    <DataGrid
-                    autoHeight
-                        rows={players}
-                        columns={columns}
-                        pageSize={pageSize}
-                        onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-                        rowsPerPageOptions={[10, 20, 50, 100]}
-                        disableSelectionOnClick
-                        showCellRightBorder
-                        showColumnRightBorder
-                        experimentalFeatures={{ newEditingApi: true }}
-                        initialState={{
-                            sorting: {
-                                sortModel: [{field: 'score', sort: 'desc'}]
-                            }
-                        }}
-                        getRowId={(row) => row.id}
-                        onCellEditCommit={(params: GridCellEditCommitParams) => {
-                            setRowId(params.id);
-                            }
+            {!loading && players &&
+                <DataTable
+                    rows={players}
+                    columns={columns}
+                    pageSize={pageSize}
+                    onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+                    experimentalFeatures={{ newEditingApi: true }}
+                    initialState={{
+                        sorting: {
+                            sortModel: [{field: 'score', sort: 'desc'}]
                         }
-                        components={{
-                            Toolbar: () => (
-                                <GridToolbarContainer sx={{ justifyContent: 'flex-end' }}>
-                                    <GridPagination />
-                                </GridToolbarContainer>
-                            ),
-                        }}
-                    />
-                </Box>
+                    }}
+                    getRowId={(row) => row.id}
+                    onCellEditCommit={(params: GridCellEditCommitParams) => {
+                        setRowId(params.id);
+                        }
+                    }
+                    components={{
+                        Toolbar: () => (
+                            <GridToolbarContainer sx={{ justifyContent: 'flex-end' }}>
+                                <GridPagination />
+                            </GridToolbarContainer>
+                        ),
+                    }}
+                />
             }
-        </div>
+        </PageLayout>
     )
 }
 

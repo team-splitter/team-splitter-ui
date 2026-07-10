@@ -17,6 +17,7 @@ const tableName = `game_split_${envName}`;
 
 
 export const deleteGameSplit = async (id) => {
+  console.log(`[${tableName}] deleteGameSplit id=${id}`);
   return await dynamo.send(
     new DeleteCommand({
       TableName: tableName,
@@ -28,6 +29,7 @@ export const deleteGameSplit = async (id) => {
 }
 
 export const getGameSplit = async (id) => {
+  console.log(`[${tableName}] getGameSplit id=${id}`);
   return await dynamo.send(
           new GetCommand({
             TableName: tableName,
@@ -39,6 +41,7 @@ export const getGameSplit = async (id) => {
 }
 
 export const getGameSplitsByPoll = async (pollId) => {
+  console.log(`[${tableName}] getGameSplitsByPoll pollId=${pollId}`);
   let response = await dynamo.send(
             new ScanCommand({ TableName: tableName,
               ProjectionExpression: "id, createdAt, teams, pollId, teamSize",
@@ -58,6 +61,7 @@ export const getGameSplitsByPoll = async (pollId) => {
 }
 
 export const getAllGameSplits = async () => {
+  console.log(`[${tableName}] getAllGameSplits`);
   return await dynamo.send(
             new ScanCommand({ TableName: tableName,
               ProjectionExpression: "id, createdAt, games, pollId, teamSize"
@@ -66,6 +70,7 @@ export const getAllGameSplits = async () => {
 }
 
 export const getAllGameSplitsPaginated = async (page, pageSize) => {
+  console.log(`[${tableName}] getAllGameSplitsPaginated page=${page}, pageSize=${pageSize}`);
   const result = await dynamo.send(
     new ScanCommand({ TableName: tableName, ProjectionExpression: "id, createdAt, games, pollId, teamSize" })
   );
@@ -80,6 +85,7 @@ export const getAllGameSplitsPaginated = async (page, pageSize) => {
 }
 
 export const updateGameSplitWithGames = async (id, gamesToAdd) => {
+  console.log(`[${tableName}] updateGameSplitWithGames id=${id}, gameCount=${gamesToAdd?.length}`);
   return await dynamo.send(
     new UpdateCommand({
       TableName: tableName,
@@ -93,6 +99,7 @@ export const updateGameSplitWithGames = async (id, gamesToAdd) => {
 }
 
 export const saveGameSplit = async (gameSplitDocument) => {
+  console.log(`[${tableName}] saveGameSplit id=${gameSplitDocument?.id}, pollId=${gameSplitDocument?.pollId}, teamSize=${gameSplitDocument?.teamSize}`);
   return await dynamo.send(
     new PutCommand({
       TableName: tableName,
@@ -162,6 +169,7 @@ export const movePlayerBetweenTeams = async (id, playerId, fromTeamName, toTeamN
 }
 
 export const getSplitsByDates = async (fromDate, toDate) => {
+  console.log(`[${tableName}] getSplitsByDates fromDate=${fromDate}, toDate=${toDate}`);
   return await dynamo.send(
     new ScanCommand({ TableName: tableName,
       FilterExpression: "#date >= :fromDate and #date <= :toDate",

@@ -1,8 +1,9 @@
 import {getSplitsByDates} from "../repo/game_split_repo.mjs";
 
 export const getPlayerStats = async (fromDate, toDate) => {
+    console.log(`getPlayerStats invoked. fromDate=${fromDate}, toDate=${toDate}`);
     const splits = (await getSplitsByDates(fromDate, toDate)).Items.filter((split) => split.games);
-    
+
     console.log(`count splits=${splits.length}`);
     
     const stats = {};
@@ -87,7 +88,8 @@ export const getPlayerStats = async (fromDate, toDate) => {
         totalDays: value.days
       }
       });
-    
+
+    console.log(`getPlayerStats computed stats for ${result.length} player(s)`);
     return result;
   };
   

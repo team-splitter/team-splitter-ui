@@ -1,6 +1,7 @@
 import {getGameSplit, updateGameSplitWithGames, } from '../repo/game_split_repo.mjs';
 import { updatePlayerScoreWithPoints } from '../repo/player_repo.mjs';
 export const setGameSplitScores = async (id, requestJSON) => {
+    console.log(`setGameSplitScores invoked. gameSplitId=${id}, gameCount=${requestJSON?.length}`);
     const games = requestJSON.map((item) => {
         return {
           teamOneName: item.teamOneName,
@@ -11,6 +12,7 @@ export const setGameSplitScores = async (id, requestJSON) => {
         }
       });
 
+    console.log(`Updating game split id=${id} with games=${JSON.stringify(games)}`);
     await updateGameSplitWithGames(id, games); //set games in game split
 
     //update player scores
@@ -48,9 +50,12 @@ export const setGameSplitScores = async (id, requestJSON) => {
     .reduce((a,b)=>a.concat(b))
     .filter((playerPoint) => playerPoint.points !== 0);
 
+    console.log(`teamPoints=${JSON.stringify(teamPoints)}, adjusting scores for ${playerPoints.length} player(s)`);
     for (const playerPoint of playerPoints) {
+        console.log(`Updating playerId=${playerPoint.playerId} score by points=${playerPoint.points}`);
         await updatePlayerScoreWithPoints(playerPoint.playerId, playerPoint.points);
     }
-    
+
+    console.log(`setGameSplitScores finished for gameSplitId=${id}`);
     return games;
 }

@@ -16,6 +16,7 @@ const envName = process.env.ENV;
 const tableName = `game_schedule_${envName}`;
 
 export const deleteGameSchedule = async (id) => {
+  console.log(`[${tableName}] deleteGameSchedule id=${id}`);
   return await dynamo.send(
     new DeleteCommand({
       TableName: tableName,
@@ -27,6 +28,7 @@ export const deleteGameSchedule = async (id) => {
 }
 
 export const getGameSchedule = async (id) => {
+  console.log(`[${tableName}] getGameSchedule id=${id}`);
   return await dynamo.send(
     new GetCommand({
       TableName: tableName,
@@ -38,12 +40,14 @@ export const getGameSchedule = async (id) => {
 }
 
 export const getAllGameSchedules = async () => {
+  console.log(`[${tableName}] getAllGameSchedules`);
   return await dynamo.send(
     new ScanCommand({ TableName: tableName})
   );
 }
 
 export const saveGameSchedule = async (gameSchedule) => {
+  console.log(`[${tableName}] saveGameSchedule id=${gameSchedule?.id}`);
   return await dynamo.send(
     new PutCommand({
       TableName: tableName,
@@ -53,6 +57,7 @@ export const saveGameSchedule = async (gameSchedule) => {
 }
 
 export const getSchedulesByDateRangeAndStatus = async (fromDate, toDate, status) => {
+  console.log(`[${tableName}] getSchedulesByDateRangeAndStatus fromDate=${fromDate}, toDate=${toDate}, status=${status}`);
   return await dynamo.send(
     new ScanCommand({ TableName: tableName,
       FilterExpression: "#date >= :fromDate and #date <= :toDate and #status = :status",
@@ -70,6 +75,7 @@ export const getSchedulesByDateRangeAndStatus = async (fromDate, toDate, status)
 }
 
 export const updateGameScheduleStatusAndPollId = async (id, pollId, status) => {
+  console.log(`[${tableName}] updateGameScheduleStatusAndPollId id=${id}, pollId=${pollId}, status=${status}`);
   return await dynamo.send(
       new UpdateCommand({
             TableName: tableName,

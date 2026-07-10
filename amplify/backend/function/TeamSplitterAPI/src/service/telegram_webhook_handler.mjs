@@ -12,31 +12,38 @@ const chatId = process.env.CHAT_ID;
 
 
 export const handleTelegramUpdate = async (event, context) => {
+    console.log(`handleTelegramUpdate invoked. awsRequestId=${context.awsRequestId}`);
+    console.log(`raw event body=${event.body}`);
+
     const requestBody = JSON.parse(event.body);
-    
+    console.log(`parsed update. update_id=${requestBody.update_id}, hasPollAnswer=${!!requestBody.poll_answer}, hasMessage=${!!requestBody.message}`);
+
     if (requestBody.poll_answer) {
       await handlePollAnswer(requestBody, context);
-    } 
-    
+    }
+
     if (requestBody.message) {
       await handleMessage(requestBody, context);
-      
+
     }
+
+    console.log(`handleTelegramUpdate finished. update_id=${requestBody.update_id}`);
 }
 
 async function handlePollAnswer(requestBody, context) {
   console.log('Poll answer update');
   const pollAnswer = requestBody.poll_answer;
-  
-  
+  console.log(`poll answer: poll_id=${pollAnswer.poll_id}, userId=${pollAnswer.user?.id}, userName=${pollAnswer.user?.first_name}, option_ids=${JSON.stringify(pollAnswer.option_ids)}`);
+
+
   if (pollAnswer.option_ids.length == 0) {//retract vote
-    console.log("Retract vote");
+    console.log(`Retract vote for userId=${pollAnswer.user?.id} on poll_id=${pollAnswer.poll_id}`);
     await removePollAnswer(pollAnswer);
   } else if (pollAnswer.option_ids[0] === 0) {//going
-    console.log("Add vote");
+    console.log(`Add vote for userId=${pollAnswer.user?.id} on poll_id=${pollAnswer.poll_id}`);
     await addPollAnswer(pollAnswer, context);
   } else {
-    console.log("Ignore vote");
+    console.log(`Ignore vote for userId=${pollAnswer.user?.id}, option_ids=${JSON.stringify(pollAnswer.option_ids)}`);
   }
 }
 
@@ -44,26 +51,32 @@ async function handlePollAnswer(requestBody, context) {
 async function handleMessage(requestBody, context) {
   const message = requestBody.message;
   const playerId = message.from.id;
-  
+  console.log(`handleMessage: playerId=${playerId}, playerName=${message.from?.first_name}, chatId=${message.chat?.id}, messageId=${message.message_id}, text=${message.text}`);
+
   if (allowedUsers.includes(playerId)) {
     if (!message.text) {
       console.log(`message doesn't have text. skipping`);
       return;
     }
     const text = message.text.trim();
-  
+
     if (text.startsWith('/split')) {
+      console.log(`Routing to /split command handler`);
       await handleSplitCommand(message, context);
     } else if (text.startsWith('/poll')) {
+      console.log(`Routing to /poll command handler`);
       await handlePollCommand(message, context);
     } else if (text.startsWith('/closepoll')) {
+      console.log(`Routing to /closepoll command handler`);
       await handleClosePollCommand(message, context);
+    } else {
+      console.log(`No matching command for text=${text}. Known commands=${JSON.stringify(knownCommands)}`);
     }
 
   } else {
     console.log(`playerId=${playerId} is not in allowedUsers=${allowedUsers}`);
   }
-  
+
 }
 
 async function handleSplitCommand(message, context) {
@@ -76,12 +89,14 @@ async function handleSplitCommand(message, context) {
     return;
   }
   
-  const poll = polls.shift(); //take first 
+  const poll = polls.shift(); //take first
   console.log(`poll to split = ${JSON.stringify(poll)}`);
-    
+
   const tokens = message.text.split(/\s+/);
   const teamNum = tokens.length > 1 && !isNaN(parseInt(tokens[1]))  ? parseInt(tokens[1]) : 2;
+  console.log(`Splitting poll_id=${poll.id} into teamNum=${teamNum}`);
   const teams = await splitTeamsByPoll(poll, teamNum);
+  console.log(`splitTeamsByPoll produced ${teams.length} teams with sizes=${JSON.stringify(teams.map((t) => t.players.length))}`);
 
   //sort players by first name lexicographically
   teams.forEach((team) => team.players.sort((a,b) => a.firstName.localeCompare(b.firstName)));
@@ -100,8 +115,10 @@ async function handleSplitCommand(message, context) {
   if (sendMessageResponse?.result?.message_id) {
     gameSplitDocument.telegramMessageId = sendMessageResponse.result.message_id;
   }
+  console.log(`Saving game split. id=${gameSplitDocument.id}, pollId=${gameSplitDocument.pollId}, telegramMessageId=${gameSplitDocument.telegramMessageId}`);
   await saveGameSplit(gameSplitDocument);
-  
+  console.log(`Game split saved for pollId=${poll.id}`);
+
 }
 
 export const sendTeamSplitMessage = async (teams) => {
@@ -140,7 +157,9 @@ const getRecentPolls = async () => {
   
   console.log(`Find polls from=${from} to=${to}`);
 
-  return (await getPollsByDates(from, to)).Items;
+  const items = (await getPollsByDates(from, to)).Items;
+  console.log(`getRecentPolls found ${items?.length ?? 0} poll(s)`);
+  return items;
 }
 
 const addPollAnswer = async (pollAnswer, context) => {
@@ -164,18 +183,22 @@ const addPollAnswer = async (pollAnswer, context) => {
   }
 
   const playerVote = {
-    id: context.awsRequestId, 
-    player: player, 
+    id: context.awsRequestId,
+    player: player,
     createdAt: Date.now()
   };
+  console.log(`Adding vote to poll_id=${pollAnswer.poll_id} for playerId=${player.id} (${player.firstName})`);
   await addVoteToPoll(pollAnswer.poll_id, playerVote);
+  console.log(`Vote added to poll_id=${pollAnswer.poll_id} for playerId=${player.id}`);
 }
 
 const removePollAnswer = async (pollAnswer) => {
   const pollId = pollAnswer.poll_id;
   const playerId = parseInt(pollAnswer.user.id);
 
+  console.log(`Removing vote from poll_id=${pollId} for playerId=${playerId}`);
   await removeVoteFromPollByPlayer(pollId, playerId);
+  console.log(`Vote removed from poll_id=${pollId} for playerId=${playerId}`);
 }
 
 const handlePollCommand = async (message, context) => {
@@ -205,8 +228,10 @@ const handlePollCommand = async (message, context) => {
       answers: []
   };
 
+  console.log(`Saving poll document. id=${pollDocument.id}, messageId=${pollDocument.messageId}, chatId=${pollDocument.chatId}`);
   await savePoll(pollDocument);
-} 
+  console.log(`Poll document saved. id=${pollDocument.id}`);
+}
 
 const handleClosePollCommand = async (message, context) => {
   console.log('Hanlding /closepoll command');
@@ -225,6 +250,7 @@ const handleClosePollCommand = async (message, context) => {
     "chat_id": poll.chatId,
     "message_id": poll.messageId
   }
+  console.log(`Stopping poll. poll_id=${poll.id}, chatId=${poll.chatId}, messageId=${poll.messageId}`);
   const stopPollResponse = await stopPoll(payload);
 
   console.log(`stopPollResponse=${JSON.stringify(stopPollResponse)}`);

@@ -2,7 +2,9 @@ import { getAllPlayers } from "../repo/player_repo.mjs";
 const team_colors = ['Red', 'Blue', 'Black', 'White', 'Yellow', 'Green'];
 
 export const splitTeamsByPoll = async (poll, teamNum) => {
+    console.log(`splitTeamsByPoll invoked. pollId=${poll.id}, teamNum=${teamNum}, answerCount=${poll.answers?.length}`);
     const players = poll.answers.map((i) => i.player).filter((i) => i !== undefined)
+    console.log(`Resolved ${players.length} player(s) from poll answers`);
     const playersMap = {};
     (await getAllPlayers()).Items.forEach((player) => {
         playersMap[player.id] = player;
@@ -14,8 +16,9 @@ export const splitTeamsByPoll = async (poll, teamNum) => {
 }
 
 export const splitTeams = (players, teamNum) => {
+  console.log(`splitTeams invoked. playerCount=${players.length}, teamNum=${teamNum}`);
   const sortedPlayers = players.sort((a,b) => b.score - a.score);
-  
+
   const q = new PriorityQueue();
   
   const teams = [];
@@ -29,10 +32,11 @@ export const splitTeams = (players, teamNum) => {
     elem.node.push(player);
     elem.priority = elem.priority + player.score;
     
-    q.enqueue(elem.node, elem.priority);  
+    q.enqueue(elem.node, elem.priority);
   });
-  
-  
+
+
+  console.log(`splitTeams produced teams=${JSON.stringify(teams.map((t) => ({ name: t.name, size: t.players.length, totalScore: t.players.reduce((s, p) => s + p.score, 0) })))}`);
   return teams;
 }
 

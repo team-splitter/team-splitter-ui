@@ -8,14 +8,18 @@ const chatId = process.env.CHAT_ID;
 export const handleGameSchedule = async () => {
     const fromDate = Date.now();
     const toDate = fromDate + (2 * 24 * 60 * 60 * 1000); //2 days in advance
+    console.log(`handleGameSchedule invoked. Looking for CREATED schedules from=${fromDate} to=${toDate}`);
     let schedules = (await getSchedulesByDateRangeAndStatus(fromDate, toDate, 'CREATED')).Items;
-    
+    console.log(`Found ${schedules?.length ?? 0} CREATED schedule(s) in range`);
+
     schedules = schedules.sort((a,b)=> a.date - b.date);
-    
+
     if (schedules.length > 0) {
       const schedule = schedules.shift();
+      console.log(`Selected schedule id=${schedule.id}, date=${schedule.date}, location=${schedule.location}`);
       const pollTitle = createPollTitle(schedule);
-      
+      console.log(`Created poll title="${pollTitle}"`);
+
       const payload = {
         "chat_id": chatId,
         "question": pollTitle,
@@ -38,14 +42,18 @@ export const handleGameSchedule = async () => {
             answers: []
         };
 
+      console.log(`Saving poll document id=${pollDocument.id}, messageId=${pollDocument.messageId}, chatId=${pollDocument.chatId}`);
       await savePoll(pollDocument);
 
+      console.log(`Updating schedule id=${schedule.id} to POLL_OPENED with pollId=${pollDocument.id}`);
       await updateGameScheduleStatusAndPollId(schedule.id, pollDocument.id, 'POLL_OPENED');
+      console.log(`Poll created id=${poll.id} for schedule id=${schedule.id}`);
       return `Poll created id=${poll.id}`;
     } else {
-      return 'no game schedules';   
+      console.log('No game schedules to open a poll for');
+      return 'no game schedules';
     }
-} 
+}
 
 const formatDate = (theDate) => {
     const day = theDate.getUTCDate();

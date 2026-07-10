@@ -4,7 +4,7 @@
         "url": "http://localhost:8080"
     },
     "auth": {
-        "domain": "dev-pes8zfo8kxraazha.us.auth0.com",
-        "clientId": "mwxmcMxxdGz4OU4qrgpgHJoNJybaqJxP"
+        "domain": "teamsplitter.us.auth0.com",
+        "clientId": "YH98gmi5byGR0i9b0obfxGOYqjnARrLO"
     }
 }

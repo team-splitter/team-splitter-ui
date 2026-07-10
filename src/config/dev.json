@@ -4,7 +4,7 @@
         "url": "local config"
     },
     "auth": {
-        "domain": "dev-pes8zfo8kxraazha.us.auth0.com",
-        "clientId": "unlLsZKR5cc2jf9J8MM0rKL0Lt786ANT"
+        "domain": "teamsplitter.us.auth0.com",
+        "clientId": "YH98gmi5byGR0i9b0obfxGOYqjnARrLO"
     }
 }

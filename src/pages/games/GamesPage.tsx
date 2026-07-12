@@ -1,4 +1,4 @@
-import { Button, IconButton, TextField, Tooltip } from "@mui/material";
+import { IconButton, TextField, Tooltip } from "@mui/material";
 import { GridColDef, GridRenderCellParams, GridValueGetterParams } from "@mui/x-data-grid";
 import { GameSplit, GameScore } from "api/Team.types";
 import ConfirmDialog from "components/ConfirmDialog";
@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 import { deleteGameSplitById, getGameSplits, setGameSplitScores } from "services/GameSplitService";
 import DeleteIcon from '@mui/icons-material/Delete';
 import SportsScoreRoundedIcon from '@mui/icons-material/SportsScoreRounded';
+import PollRoundedIcon from '@mui/icons-material/PollRounded';
 import PageLayout from "components/layout/PageLayout";
 import PageHeader from "components/layout/PageHeader";
 import ErrorMessage from "components/layout/ErrorMessage";
@@ -155,7 +156,11 @@ const GamesPage  = () => {
             filterable: false,
             renderCell: (params: GridRenderCellParams<any, GameSplit>) => (
                 <div>
-                    <Button size="small" component={Link} to={`/poll/${params.row.pollId}`}>Poll</Button>
+                    <Tooltip title="Poll">
+                        <IconButton component={Link} to={`/poll/${params.row.pollId}`}>
+                            <PollRoundedIcon />
+                        </IconButton>
+                    </Tooltip>
                     <Tooltip title="Delete">
                         <IconButton color="error" onClick={async (e) => {
                             setOpen(true);

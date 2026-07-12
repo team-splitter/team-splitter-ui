@@ -60,7 +60,10 @@ const TeamCard = ({team, gameSplit, onDragStart, onDrop, onTouchMove, onTouchDro
         >
             <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
                 <Typography variant="h6">{team.name}</Typography>
-                <Chip size="small" color="primary" variant="outlined" label={`Score ${totalTeamScore}`} />
+                <Stack direction="row" spacing={1} alignItems="center">
+                    <Chip size="small" color="primary" variant="outlined" label={`Players ${team.players.length}`} />
+                    <Chip size="small" color="primary" variant="outlined" label={`Score ${totalTeamScore}`} />
+                </Stack>
             </Stack>
 
             <Stack component="ol" sx={{ listStyle: "none", m: 0, p: 0 }} spacing={0}>

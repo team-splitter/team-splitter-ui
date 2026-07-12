@@ -74,6 +74,10 @@ export const PollVotesPage = ({ pollId, poll, onVoteChange }: Props) => {
                 <Button disabled={!addPlayerEnabled} onClick={handleAddPlayer} variant="contained">Add Player Vote</Button>
             </Stack>
 
+            <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                Players Going: {votes.length}
+            </Typography>
+
             <List disablePadding>
                 {votes.map((vote) => (
                     <ListItem

@@ -27,7 +27,7 @@ export const GameSplitCard = ({gameSplit, onDelete}: GameCardProps) => {
                 </Box>
                 {onDelete && (
                     <Tooltip title="Delete">
-                        <IconButton onClick={() => onDelete(gameSplit.id)}>
+                        <IconButton color="error" onClick={() => onDelete(gameSplit.id)}>
                             <DeleteIcon />
                         </IconButton>
                     </Tooltip>

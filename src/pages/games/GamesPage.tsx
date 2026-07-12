@@ -95,8 +95,8 @@ const GamesPage  = () => {
 
     const columns: GridColDef[] = [
         { 
-            field: 'id', 
-            headerName: 'Split ID', 
+            field: 'id',
+            headerName: 'Split ID',
             width: 300,
             sortable: false,
             filterable: false,
@@ -157,8 +157,8 @@ const GamesPage  = () => {
                 <div>
                     <Button size="small" component={Link} to={`/poll/${params.row.pollId}`}>Poll</Button>
                     <Tooltip title="Delete">
-                        <IconButton onClick={async (e) => {
-                            setOpen(true); 
+                        <IconButton color="error" onClick={async (e) => {
+                            setOpen(true);
                             setSelectedGameId(params.row.id);
                             }}>
                             <DeleteIcon />

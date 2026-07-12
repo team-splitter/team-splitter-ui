@@ -55,7 +55,7 @@ const PlayerActions = ({ params, rowId, showEditPage, onRemovePlayer }: PlayerAc
       </Tooltip>
 
       <Tooltip title="Delete">
-        <IconButton onClick={(e) => {setOpen(true)}}>
+        <IconButton color="error" onClick={(e) => {setOpen(true)}}>
           <DeleteIcon />
         </IconButton>
       </Tooltip>

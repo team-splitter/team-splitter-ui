@@ -81,7 +81,7 @@ export const PollVotesPage = ({ pollId, poll, onVoteChange }: Props) => {
                         divider
                         secondaryAction={
                             <Tooltip title="Delete">
-                                <IconButton edge="end" onClick={() => { setOpen(true); setSelectedVote(vote); }}>
+                                <IconButton edge="end" color="error" onClick={() => { setOpen(true); setSelectedVote(vote); }}>
                                     <DeleteIcon />
                                 </IconButton>
                             </Tooltip>

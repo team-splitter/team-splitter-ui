@@ -78,7 +78,7 @@ export const GameSchedulePage = () => {
                         <Button size="small" component={Link} to={`/poll/${params.row.pollId}`}>Poll</Button>
                     }
                     <Tooltip title="Delete">
-                        <IconButton onClick={() => { setOpen(true); setSelectedSchedule(params.row); }}>
+                        <IconButton color="error" onClick={() => { setOpen(true); setSelectedSchedule(params.row); }}>
                             <DeleteIcon />
                         </IconButton>
                     </Tooltip>

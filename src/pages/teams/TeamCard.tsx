@@ -110,7 +110,7 @@ const TeamCard = ({team, gameSplit, onDragStart, onDrop, onTouchMove, onTouchDro
                             </MuiLink>
                             {gameSplit &&
                                 <Tooltip title="Delete">
-                                    <IconButton size="small" onClick={() => {
+                                    <IconButton size="small" color="error" onClick={() => {
                                         setOpen(true);
                                         setSelectedPlayer(player);
                                     }}>

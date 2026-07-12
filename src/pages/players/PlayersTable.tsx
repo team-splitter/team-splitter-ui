@@ -45,19 +45,21 @@ const PlayersTable: FC<any> = ({showEditPage, showAddPlayerPage}: Props): ReactE
         {
             field: 'id',
             headerName: 'ID',
-            width: 200,
+            width: 120,
             editable: false,
         },
         {
             field: 'firstName',
             headerName: 'First Name',
-            width: 100,
+            flex: 1,
+            minWidth: 120,
             editable: true,
         },
         {
             field: 'lastName',
             headerName: 'Last Name',
-            width: 100,
+            flex: 1,
+            minWidth: 120,
             editable: true,
         },
         {
@@ -65,12 +67,12 @@ const PlayersTable: FC<any> = ({showEditPage, showAddPlayerPage}: Props): ReactE
             headerName: 'Score',
             width: 100,
             editable: true,
-            
+
         },
         {
             field: 'actions',
             headerName: 'Actions',
-            width: 100,
+            width: 110,
             align: 'left',
             sortable: false,
             disableColumnMenu: true,

@@ -44,7 +44,7 @@ export const getGameSplitsByPoll = async (pollId) => {
   console.log(`[${tableName}] getGameSplitsByPoll pollId=${pollId}`);
   let response = await dynamo.send(
             new ScanCommand({ TableName: tableName,
-              ProjectionExpression: "id, createdAt, teams, pollId, teamSize",
+              ProjectionExpression: "id, createdAt, teams, pollId, teamSize, telegramMessageId",
               FilterExpression: 'pollId = :pollId',
               ExpressionAttributeValues: {
                   ':pollId': pollId,
@@ -104,6 +104,20 @@ export const saveGameSplit = async (gameSplitDocument) => {
     new PutCommand({
       TableName: tableName,
       Item: gameSplitDocument,
+    })
+  );
+}
+
+export const updateGameSplitTelegramMessageId = async (id, telegramMessageId) => {
+  console.log(`[${tableName}] updateGameSplitTelegramMessageId id=${id}, telegramMessageId=${telegramMessageId}`);
+  return await dynamo.send(
+    new UpdateCommand({
+      TableName: tableName,
+      Key: {
+        id: id,
+      },
+      UpdateExpression: 'SET telegramMessageId = :telegramMessageId',
+      ExpressionAttributeValues: { ":telegramMessageId": telegramMessageId }
     })
   );
 }

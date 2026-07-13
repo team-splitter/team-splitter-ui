@@ -1,8 +1,8 @@
 import { getAllPlayers } from "../repo/player_repo.mjs";
 const team_colors = ['Red', 'Blue', 'Black', 'White', 'Yellow', 'Green'];
 
-export const splitTeamsByPoll = async (poll, teamNum) => {
-    console.log(`splitTeamsByPoll invoked. pollId=${poll.id}, teamNum=${teamNum}, answerCount=${poll.answers?.length}`);
+export const splitTeamsByPoll = async (poll, teamNum, teamNames) => {
+    console.log(`splitTeamsByPoll invoked. pollId=${poll.id}, teamNum=${teamNum}, teamNames=${JSON.stringify(teamNames)}, answerCount=${poll.answers?.length}`);
     const players = poll.answers.map((i) => i.player).filter((i) => i !== undefined)
     console.log(`Resolved ${players.length} player(s) from poll answers`);
     const playersMap = {};
@@ -12,18 +12,19 @@ export const splitTeamsByPoll = async (poll, teamNum) => {
     //set current actual (at this moment) player scores
     players.forEach((player) => player.score = playersMap[player.id].score);
 
-    return splitTeams(players, teamNum);
+    return splitTeams(players, teamNum, teamNames);
 }
 
-export const splitTeams = (players, teamNum) => {
-  console.log(`splitTeams invoked. playerCount=${players.length}, teamNum=${teamNum}`);
+export const splitTeams = (players, teamNum, teamNames) => {
+  console.log(`splitTeams invoked. playerCount=${players.length}, teamNum=${teamNum}, teamNames=${JSON.stringify(teamNames)}`);
   const sortedPlayers = players.sort((a,b) => b.score - a.score);
 
   const q = new PriorityQueue();
-  
+
   const teams = [];
   for(let i = 0; i < teamNum; i++) {
-    teams[i] = {name: team_colors[i], players: []};
+    const name = teamNames && teamNames[i] ? teamNames[i] : team_colors[i];
+    teams[i] = {name, players: []};
     q.enqueue(teams[i].players, 0);
   }
 

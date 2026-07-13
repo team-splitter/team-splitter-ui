@@ -81,7 +81,7 @@ const TeamCard = ({team, gameSplit, onDragStart, onDrop, onTouchMove, onTouchDro
             </Stack>
 
             <Stack component="ol" sx={{ listStyle: "none", m: 0, p: 0 }} spacing={0}>
-                {team.players.map((player) => {
+                {team.players.map((player, index) => {
                     const isBeingDragged = draggingPlayer?.id === player.id;
                     return (
                         <Box
@@ -113,18 +113,23 @@ const TeamCard = ({team, gameSplit, onDragStart, onDrop, onTouchMove, onTouchDro
                                 onTouchDrop?.(touch.clientX, touch.clientY);
                             }}
                         >
-                            <MuiLink
-                                component="button"
-                                underline="hover"
-                                color="text.primary"
-                                sx={{ textAlign: "left", userSelect: "text" }}
-                                onClick={() => setEditPlayer(player)}
-                            >
-                                {player.firstName} {player.lastName}
-                                <Typography component="span" color="text.secondary" sx={{ ml: 1 }}>
-                                    {player.score}
+                            <Box sx={{ display: "flex", alignItems: "center", minWidth: 0 }}>
+                                <Typography component="span" color="text.secondary" sx={{ minWidth: 24, flexShrink: 0 }}>
+                                    {index + 1}.
                                 </Typography>
-                            </MuiLink>
+                                <MuiLink
+                                    component="button"
+                                    underline="hover"
+                                    color="text.primary"
+                                    sx={{ textAlign: "left", userSelect: "text" }}
+                                    onClick={() => setEditPlayer(player)}
+                                >
+                                    {player.firstName} {player.lastName}
+                                    <Typography component="span" color="text.secondary" sx={{ ml: 1 }}>
+                                        {player.score}
+                                    </Typography>
+                                </MuiLink>
+                            </Box>
                             {gameSplit &&
                                 <Tooltip title="Delete">
                                     <IconButton size="small" color="error" onClick={() => {

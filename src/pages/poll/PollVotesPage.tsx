@@ -79,7 +79,7 @@ export const PollVotesPage = ({ pollId, poll, onVoteChange }: Props) => {
             </Typography>
 
             <List disablePadding>
-                {votes.map((vote) => (
+                {votes.map((vote, index) => (
                     <ListItem
                         key={vote.id}
                         divider
@@ -91,6 +91,9 @@ export const PollVotesPage = ({ pollId, poll, onVoteChange }: Props) => {
                             </Tooltip>
                         }
                     >
+                        <Typography component="span" color="text.secondary" sx={{ minWidth: 28 }}>
+                            {index + 1}.
+                        </Typography>
                         <ListItemText
                             primary={
                                 vote.player

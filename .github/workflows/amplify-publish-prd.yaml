@@ -31,8 +31,13 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Amplify Pull 
+      - name: Amplify Pull
         run: amplify pull --appId ${{ vars.AMPLIFY_APP_ID }} --envName prd --yes
+
+      # amplify pull overwrites the local Lambda source with the deployed version,
+      # discarding committed backend changes. Restore the repo's backend so they deploy.
+      - name: Restore repo backend
+        run: git checkout -- amplify/backend
 
       - name: Amplify status
         run: amplify status

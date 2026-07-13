@@ -6,6 +6,7 @@ import { Player } from "api/Player.types";
 import ConfirmDialog from 'components/ConfirmDialog';
 import { deleteGameSplitPlayerEntry } from "services/GameSplitService";
 import AddPlayer from "pages/players/AddPlayer";
+import { TEAM_COLOR_HEX } from "./teamColors";
 
 type TeamCardProps = {
     team: Team
@@ -59,7 +60,20 @@ const TeamCard = ({team, gameSplit, onDragStart, onDrop, onTouchMove, onTouchDro
             }}
         >
             <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
-                <Typography variant="h6">{team.name}</Typography>
+                <Stack direction="row" alignItems="center" spacing={1}>
+                    {TEAM_COLOR_HEX[team.name] &&
+                        <Box sx={{
+                            width: 14,
+                            height: 14,
+                            borderRadius: "50%",
+                            flexShrink: 0,
+                            backgroundColor: TEAM_COLOR_HEX[team.name],
+                            border: "1px solid",
+                            borderColor: "divider",
+                        }} />
+                    }
+                    <Typography variant="h6">{team.name}</Typography>
+                </Stack>
                 <Stack direction="row" spacing={1} alignItems="center">
                     <Chip size="small" color="primary" variant="outlined" label={`Players ${team.players.length}`} />
                     <Chip size="small" color="primary" variant="outlined" label={`Score ${totalTeamScore}`} />

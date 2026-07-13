@@ -1,6 +1,6 @@
 import {deletePoll, getPoll, getAllPollsPaginated, addVoteToPoll, removeVoteFromPoll, savePoll, updatePlayerInPollVotes} from './repo/poll_repo.mjs';
 import {getPlayer, deletePlayer, getAllPlayers, savePlayer} from './repo/player_repo.mjs';
-import {deleteGameSplit, getGameSplit, getGameSplitsByPoll, getAllGameSplitsPaginated, removePlayerFromSplit, saveGameSplit, movePlayerBetweenTeams} from './repo/game_split_repo.mjs';
+import {deleteGameSplit, getGameSplit, getGameSplitsByPoll, getAllGameSplitsPaginated, removePlayerFromSplit, saveGameSplit, movePlayerBetweenTeams, updateGameSplitTelegramMessageId} from './repo/game_split_repo.mjs';
 import {deleteGameSchedule, getGameSchedule, getAllGameSchedules, saveGameSchedule} from './repo/game_schedule_repo.mjs';
 import {handleTelegramUpdate, sendTeamSplitMessage, createTeamSplitMessage} from "./service/telegram_webhook_handler.mjs";
 import {sendPoll, deleteMessage, editMessageText} from "./service/telegram_api.mjs";
@@ -188,6 +188,29 @@ export const handler = async (event, context) => {
         body = `${id}`;
         break;
       }
+      case routeKey.match("POST /api/v1/game-split/.*/telegram$")?.input: {
+        const id = event.path.split('/')[4];
+        const gameSplit = (await getGameSplit(id)).Item;
+        if (!gameSplit) {
+          throw new Error(`Game split ${id} not found`);
+        }
+        // Best-effort delete of the previous message so the chat isn't cluttered with duplicates.
+        if (gameSplit.telegramMessageId) {
+          try {
+            await deleteMessage({ chat_id: process.env.CHAT_ID, message_id: gameSplit.telegramMessageId });
+          } catch (telegramErr) {
+            console.log(`Could not delete previous Telegram message: ${telegramErr.message}`);
+          }
+        }
+        const sendMessageResponse = await sendTeamSplitMessage(gameSplit.teams);
+        const newMessageId = sendMessageResponse?.result?.message_id;
+        if (newMessageId) {
+          await updateGameSplitTelegramMessageId(id, newMessageId);
+          gameSplit.telegramMessageId = newMessageId;
+        }
+        body = gameSplit;
+        break;
+      }
       case routeKey.match("GET /api/v1/game-split/{id}")?.input: {
         const id = event.path.split('/')[4];
         body = await getGameSplit(id);
@@ -260,18 +283,22 @@ export const handler = async (event, context) => {
       case routeKey.match("GET /api/v1/team/split/.*$")?.input: {
         const pollId = event.path.split('/')[5];
         const teamNum = parseInt(event.queryStringParameters.teamsNum);
+        const teamNamesParam = event.queryStringParameters?.teamNames;
+        const teamNames = teamNamesParam ? teamNamesParam.split(',') : undefined;
         const poll = (await getPoll(pollId)).Item;
 
-        body = await splitTeamsByPoll(poll, teamNum);
+        body = await splitTeamsByPoll(poll, teamNum, teamNames);
         break;
       }
       case routeKey.match("POST /api/v1/poll/.*/split$")?.input: {
         const pollId = event.path.split('/')[4];
         const teamNum = parseInt(event.queryStringParameters?.teamsNum ?? '2');
+        const requestBody = event.body ? JSON.parse(event.body) : {};
+        const teamNames = requestBody.teamNames;
+        const sendTelegram = requestBody.sendTelegram !== false; // default true
         const poll = (await getPoll(pollId)).Item;
-        const teams = await splitTeamsByPoll(poll, teamNum);
+        const teams = await splitTeamsByPoll(poll, teamNum, teamNames);
         teams.forEach((team) => team.players.sort((a, b) => a.firstName.localeCompare(b.firstName)));
-        const sendMessageResponse = await sendTeamSplitMessage(teams);
         const gameSplitDocument = {
           id: context.awsRequestId,
           pollId: poll.id,
@@ -280,8 +307,11 @@ export const handler = async (event, context) => {
           teamSize: teamNum,
           splitAlg: 'TEAM_SCORE_BALANCE'
         };
-        if (sendMessageResponse?.result?.message_id) {
-          gameSplitDocument.telegramMessageId = sendMessageResponse.result.message_id;
+        if (sendTelegram) {
+          const sendMessageResponse = await sendTeamSplitMessage(teams);
+          if (sendMessageResponse?.result?.message_id) {
+            gameSplitDocument.telegramMessageId = sendMessageResponse.result.message_id;
+          }
         }
         await saveGameSplit(gameSplitDocument);
         body = teams;

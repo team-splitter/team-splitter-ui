@@ -47,6 +47,15 @@ export const moveGameSplitPlayer = async (gameSplitId: string, playerId: number,
     return response;
 }
 
+export const resendGameSplitTelegram = async (gameSplitId: string): Promise<GameSplit> => {
+
+    const response = (await post(
+        `${backendUrl()}/game-split/${gameSplitId}/telegram`, {}
+    )) as GameSplit;
+
+    return response;
+}
+
 export const setGameSplitScores = async (gameSplitId: string, gameScores: GameScore[]): Promise<Game []> => {
 
     const response = (await post(

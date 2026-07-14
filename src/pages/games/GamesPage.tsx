@@ -1,6 +1,6 @@
 import { IconButton, TextField, Tooltip } from "@mui/material";
 import { GridColDef, GridRenderCellParams, GridValueGetterParams } from "@mui/x-data-grid";
-import { GameSplit, GameScore } from "api/Team.types";
+import { GameSplit, GameScore, Team } from "api/Team.types";
 import ConfirmDialog from "components/ConfirmDialog";
 import moment from "moment";
 import { useEffect, useState } from "react";
@@ -20,15 +20,23 @@ function format(date: Date): string {
     return formattedDate;
 }
 
-const twoTeamsScores = [{"teamOneName": "Red", "teamTwoName": "Blue", teamOneScored: 0, teamTwoScored: 0}];
-const fourTeamScores = [
-    {"teamOneName": "Red", "teamTwoName": "White", teamOneScored: 0, teamTwoScored: 0},
-    {"teamOneName": "Blue", "teamTwoName": "Black", teamOneScored: 0, teamTwoScored: 0},
-    {"teamOneName": "Red", "teamTwoName": "Black", teamOneScored: 0, teamTwoScored: 0},
-    {"teamOneName": "Blue", "teamTwoName": "White", teamOneScored: 0, teamTwoScored: 0},
-    {"teamOneName": "Red", "teamTwoName": "Blue", teamOneScored: 0, teamTwoScored: 0},
-    {"teamOneName": "Black", "teamTwoName": "White", teamOneScored: 0, teamTwoScored: 0},
-];
+// Build a round-robin of score entries (one game per unique pair of teams)
+// from the split's actual team names, so scores are set against the teams the
+// backend generated rather than hardcoded color names.
+const buildGameScores = (teams: Team[] = []): GameScore[] => {
+    const scores: GameScore[] = [];
+    for (let i = 0; i < teams.length; i++) {
+        for (let j = i + 1; j < teams.length; j++) {
+            scores.push({
+                teamOneName: teams[i].name,
+                teamTwoName: teams[j].name,
+                teamOneScored: 0,
+                teamTwoScored: 0,
+            });
+        }
+    }
+    return scores;
+};
 
 
 const GamesPage  = () => {
@@ -41,7 +49,7 @@ const GamesPage  = () => {
     const [selectedGameId, setSelectedGameId] = useState<string>('');
     const [openScore, setOpenScore] = useState(false);
 
-    const [gameScores, setGameScores] = useState<GameScore[]>(twoTeamsScores);
+    const [gameScores, setGameScores] = useState<GameScore[]>([]);
 
     const [page, setPage] = useState<number>(0);
     const [pageSize, setPageSize] = useState<number>(20);
@@ -173,9 +181,9 @@ const GamesPage  = () => {
                     {(!params.row.games || params.row.games.length == 0) &&
                         <Tooltip title="Set Score">
                             <IconButton onClick={async (e) => {
-                                setOpenScore(true); 
+                                setOpenScore(true);
                                 setSelectedGameId(params.row.id);
-                                setGameScores(params.row.teamSize == 2 ? twoTeamsScores : fourTeamScores);
+                                setGameScores(buildGameScores(params.row.teams));
                                 }}>
                                 <SportsScoreRoundedIcon/>
                             </IconButton>

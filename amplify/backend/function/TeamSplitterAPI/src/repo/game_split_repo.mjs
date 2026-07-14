@@ -78,8 +78,14 @@ export const getAllGameSplitsPaginated = async (page, pageSize) => {
   const items = (result.Items || []).sort((a, b) => b.createdAt - a.createdAt);
   const start = page * pageSize;
 
+  // The games list only needs team names, so drop the (potentially large) player rosters.
+  const content = items.slice(start, start + pageSize).map((item) => ({
+    ...item,
+    teams: item.teams?.map(({ players, ...team }) => team),
+  }));
+
   return {
-    content: items.slice(start, start + pageSize),
+    content,
     totalElements: items.length
   };
 }

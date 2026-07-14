@@ -211,7 +211,7 @@ export const handler = async (event, context) => {
         body = gameSplit;
         break;
       }
-      case routeKey.match("GET /api/v1/game-split/{id}")?.input: {
+      case routeKey.match("GET /api/v1/game-split/.*$")?.input: {
         const id = event.path.split('/')[4];
         body = await getGameSplit(id);
         body = body.Item;

@@ -5,7 +5,7 @@ import ConfirmDialog from "components/ConfirmDialog";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { deleteGameSplitById, getGameSplits, setGameSplitScores } from "services/GameSplitService";
+import { deleteGameSplitById, getGameSplitById, getGameSplits, setGameSplitScores } from "services/GameSplitService";
 import DeleteIcon from '@mui/icons-material/Delete';
 import SportsScoreRoundedIcon from '@mui/icons-material/SportsScoreRounded';
 import PollRoundedIcon from '@mui/icons-material/PollRounded';
@@ -57,6 +57,15 @@ const GamesPage  = () => {
     const onDeleteGame = async (gameId:string) => {
         await deleteGameSplitById(gameId);
         setGameSplits(gameSplits.filter(i => i.id !== gameId));
+    }
+
+    const onSetScoreClick = async (gameSplitId: string) => {
+        // The paginated list omits team rosters, so fetch the full split to get
+        // its team names (colors) before opening the score dialog.
+        const gameSplit = await getGameSplitById(gameSplitId);
+        setSelectedGameId(gameSplitId);
+        setGameScores(buildGameScores(gameSplit.teams));
+        setOpenScore(true);
     }
 
     const onSaveGameScores = async (gameSplitId: string, gameScores: GameScore[] ) => {
@@ -180,11 +189,7 @@ const GamesPage  = () => {
 
                     {(!params.row.games || params.row.games.length == 0) &&
                         <Tooltip title="Set Score">
-                            <IconButton onClick={async (e) => {
-                                setOpenScore(true);
-                                setSelectedGameId(params.row.id);
-                                setGameScores(buildGameScores(params.row.teams));
-                                }}>
+                            <IconButton onClick={() => onSetScoreClick(params.row.id)}>
                                 <SportsScoreRoundedIcon/>
                             </IconButton>
                         </Tooltip>

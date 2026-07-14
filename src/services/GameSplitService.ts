@@ -12,6 +12,14 @@ export const getGameSplitsByPollId = async (pollId: string): Promise<Page<GameSp
     return response;
 }
 
+export const getGameSplitById = async (gameSplitId: string): Promise<GameSplit> => {
+    const response = (await get(
+        `${backendUrl()}/game-split/${gameSplitId}`
+    )) as GameSplit
+
+    return response;
+}
+
 export const getGameSplits = async (page: number, pageSize: number): Promise<Page<GameSplit>> => {
     const response = (await get(
         `${backendUrl()}/game-split?page=${page}&pageSize=${pageSize}`

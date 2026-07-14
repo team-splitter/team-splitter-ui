@@ -72,20 +72,14 @@ export const getAllGameSplits = async () => {
 export const getAllGameSplitsPaginated = async (page, pageSize) => {
   console.log(`[${tableName}] getAllGameSplitsPaginated page=${page}, pageSize=${pageSize}`);
   const result = await dynamo.send(
-    new ScanCommand({ TableName: tableName, ProjectionExpression: "id, createdAt, games, teams, pollId, teamSize" })
+    new ScanCommand({ TableName: tableName, ProjectionExpression: "id, createdAt, games, pollId, teamSize" })
   );
 
   const items = (result.Items || []).sort((a, b) => b.createdAt - a.createdAt);
   const start = page * pageSize;
 
-  // The games list only needs team names, so drop the (potentially large) player rosters.
-  const content = items.slice(start, start + pageSize).map((item) => ({
-    ...item,
-    teams: item.teams?.map(({ players, ...team }) => team),
-  }));
-
   return {
-    content,
+    content: items.slice(start, start + pageSize),
     totalElements: items.length
   };
 }

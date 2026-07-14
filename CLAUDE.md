@@ -51,3 +51,7 @@ See `README.md` for the full Amplify workflow (`amplify env`, `amplify push`, `a
 ## Deployment
 
 Production is a multi-stage Docker build (`Dockerfile`): builds with Node 16 then serves the static bundle from nginx. `core/nginx/nginx.conf` forces HTTPS, serves the SPA with `try_files ... /index.html`, and reverse-proxies `/api` to `http://backend:8080/`. Images are published to `ghcr.io/team-splitter/team-splitter-ui` via `dockerBuild.sh <version>` / `dockerPush.sh <version>`.
+
+## Instructions
+- Never create JIRA tickets for this repo.
+- Never use knowledge-gateway-mcp

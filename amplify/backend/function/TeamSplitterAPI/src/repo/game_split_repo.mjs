@@ -72,7 +72,7 @@ export const getAllGameSplits = async () => {
 export const getAllGameSplitsPaginated = async (page, pageSize) => {
   console.log(`[${tableName}] getAllGameSplitsPaginated page=${page}, pageSize=${pageSize}`);
   const result = await dynamo.send(
-    new ScanCommand({ TableName: tableName, ProjectionExpression: "id, createdAt, games, pollId, teamSize" })
+    new ScanCommand({ TableName: tableName, ProjectionExpression: "id, createdAt, games, teams, pollId, teamSize" })
   );
 
   const items = (result.Items || []).sort((a, b) => b.createdAt - a.createdAt);

@@ -1,4 +1,4 @@
-import { IconButton, TextField, Tooltip } from "@mui/material";
+import { Dialog, DialogContent, DialogTitle, IconButton, TextField, Tooltip } from "@mui/material";
 import { GridColDef, GridRenderCellParams, GridValueGetterParams } from "@mui/x-data-grid";
 import { GameSplit, GameScore, Team } from "api/Team.types";
 import ConfirmDialog from "components/ConfirmDialog";
@@ -9,6 +9,9 @@ import { deleteGameSplitById, getGameSplitById, getGameSplits, setGameSplitScore
 import DeleteIcon from '@mui/icons-material/Delete';
 import SportsScoreRoundedIcon from '@mui/icons-material/SportsScoreRounded';
 import PollRoundedIcon from '@mui/icons-material/PollRounded';
+import GroupsRoundedIcon from '@mui/icons-material/GroupsRounded';
+import CloseIcon from '@mui/icons-material/Close';
+import GameSplitCard from "./GameSplitCard";
 import PageLayout from "components/layout/PageLayout";
 import PageHeader from "components/layout/PageHeader";
 import ErrorMessage from "components/layout/ErrorMessage";
@@ -51,6 +54,9 @@ const GamesPage  = () => {
 
     const [gameScores, setGameScores] = useState<GameScore[]>([]);
 
+    const [openTeams, setOpenTeams] = useState(false);
+    const [selectedGameSplit, setSelectedGameSplit] = useState<GameSplit | null>(null);
+
     const [page, setPage] = useState<number>(0);
     const [pageSize, setPageSize] = useState<number>(20);
 
@@ -66,6 +72,14 @@ const GamesPage  = () => {
         setSelectedGameId(gameSplitId);
         setGameScores(buildGameScores(gameSplit.teams));
         setOpenScore(true);
+    }
+
+    const onShowTeamsClick = async (gameSplitId: string) => {
+        // The paginated list omits team rosters, so fetch the full split to
+        // render the team cards.
+        const gameSplit = await getGameSplitById(gameSplitId);
+        setSelectedGameSplit(gameSplit);
+        setOpenTeams(true);
     }
 
     const onSaveGameScores = async (gameSplitId: string, gameScores: GameScore[] ) => {
@@ -173,6 +187,11 @@ const GamesPage  = () => {
             filterable: false,
             renderCell: (params: GridRenderCellParams<any, GameSplit>) => (
                 <div>
+                    <Tooltip title="Show Teams">
+                        <IconButton onClick={() => onShowTeamsClick(params.row.id)}>
+                            <GroupsRoundedIcon />
+                        </IconButton>
+                    </Tooltip>
                     <Tooltip title="Poll">
                         <IconButton component={Link} to={`/poll/${params.row.pollId}`}>
                             <PollRoundedIcon />
@@ -222,6 +241,26 @@ const GamesPage  = () => {
                     rowCount={gameSplitsCount}
                 />
             }
+
+            <Dialog
+                open={openTeams}
+                onClose={() => setOpenTeams(false)}
+                fullWidth
+                maxWidth="md"
+                PaperProps={{ sx: { borderRadius: 3 } }}
+            >
+                <DialogTitle sx={{ fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    Game Split
+                    <IconButton onClick={() => setOpenTeams(false)} size="small">
+                        <CloseIcon />
+                    </IconButton>
+                </DialogTitle>
+                <DialogContent>
+                    {selectedGameSplit &&
+                        <GameSplitCard gameSplit={selectedGameSplit} />
+                    }
+                </DialogContent>
+            </Dialog>
 
             {gameSplits &&
                 <ConfirmDialog

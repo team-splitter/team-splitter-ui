@@ -31,6 +31,7 @@ const TeamCard = ({team, gameSplit, onDragStart, onDrop, onTouchMove, onTouchDro
     };
 
     const totalTeamScore = team.players.map(p => p.score).reduce((acc, score) => acc + score, 0);
+    const sortedPlayers = [...team.players].sort((a, b) => b.score - a.score);
 
     const canDrag = !!onDragStart;
     const isDragTarget = isMouseDragOver || isTouchDragTarget;
@@ -81,7 +82,7 @@ const TeamCard = ({team, gameSplit, onDragStart, onDrop, onTouchMove, onTouchDro
             </Stack>
 
             <Stack component="ol" sx={{ listStyle: "none", m: 0, p: 0 }} spacing={0}>
-                {team.players.map((player, index) => {
+                {sortedPlayers.map((player, index) => {
                     const isBeingDragged = draggingPlayer?.id === player.id;
                     return (
                         <Box

@@ -2,7 +2,7 @@ import React, { ReactElement, FC, useState, useEffect } from "react";
 import { Button } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { Player } from "../../api/Player.types";
-import { GridColDef, GridRowId, GridCellEditCommitParams, GridToolbarContainer, GridPagination } from '@mui/x-data-grid';
+import { GridColDef, GridRowId, GridCellEditCommitParams, GridToolbarContainer, GridPagination, GridToolbarQuickFilter } from '@mui/x-data-grid';
 import PlayerActions from "./PlayerActions";
 import { getPlayers } from "../../services/PlayerService";
 import PageLayout from "components/layout/PageLayout";
@@ -10,6 +10,17 @@ import PageHeader from "components/layout/PageHeader";
 import ErrorMessage from "components/layout/ErrorMessage";
 import DataTable from "components/layout/DataTable";
 import InlineLoading from "components/layout/InlineLoading";
+
+const PlayersToolbar = () => (
+    <GridToolbarContainer sx={{ justifyContent: 'space-between', px: 2, pt: 1 }}>
+        <GridToolbarQuickFilter
+            placeholder="Search players…"
+            debounceMs={200}
+            sx={{ width: { xs: '100%', sm: 320 }, pb: 0 }}
+        />
+        <GridPagination />
+    </GridToolbarContainer>
+);
 
 type Props = {
     showEditPage: (player: Player)=> void;
@@ -113,13 +124,7 @@ const PlayersTable: FC<any> = ({showEditPage, showAddPlayerPage}: Props): ReactE
                         setRowId(params.id);
                         }
                     }
-                    components={{
-                        Toolbar: () => (
-                            <GridToolbarContainer sx={{ justifyContent: 'flex-end' }}>
-                                <GridPagination />
-                            </GridToolbarContainer>
-                        ),
-                    }}
+                    components={{ Toolbar: PlayersToolbar }}
                 />
             }
         </PageLayout>

@@ -2,7 +2,7 @@ import React, { ReactElement, FC, useState, useEffect } from "react";
 import { Button } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { Player } from "../../api/Player.types";
-import { GridColDef, GridRowId, GridCellEditCommitParams, GridToolbarContainer, GridPagination, GridToolbarQuickFilter } from '@mui/x-data-grid';
+import { GridColDef, GridRowId, GridCellEditCommitParams, GridToolbarContainer, GridPagination, GridToolbarQuickFilter, GridFilterModel } from '@mui/x-data-grid';
 import PlayerActions from "./PlayerActions";
 import { getPlayers } from "../../services/PlayerService";
 import PageLayout from "components/layout/PageLayout";
@@ -25,8 +25,10 @@ const PlayersToolbar = () => (
 type Props = {
     showEditPage: (player: Player)=> void;
     showAddPlayerPage: (e: any) => void;
+    filterModel: GridFilterModel;
+    onFilterModelChange: (model: GridFilterModel) => void;
 }
-const PlayersTable: FC<any> = ({showEditPage, showAddPlayerPage}: Props): ReactElement => {
+const PlayersTable: FC<any> = ({showEditPage, showAddPlayerPage, filterModel, onFilterModelChange}: Props): ReactElement => {
     const [players, setPlayers] = useState([] as Player[]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -119,6 +121,8 @@ const PlayersTable: FC<any> = ({showEditPage, showAddPlayerPage}: Props): ReactE
                             sortModel: [{field: 'score', sort: 'desc'}]
                         }
                     }}
+                    filterModel={filterModel}
+                    onFilterModelChange={onFilterModelChange}
                     getRowId={(row) => row.id}
                     onCellEditCommit={(params: GridCellEditCommitParams) => {
                         setRowId(params.id);

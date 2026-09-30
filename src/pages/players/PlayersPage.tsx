@@ -1,5 +1,6 @@
 import React, { ReactElement, FC, useState } from "react";
 import { Card } from "@mui/material"
+import { GridFilterModel } from "@mui/x-data-grid";
 import PlayersTable from "./PlayersTable";
 import AddPlayer from "./AddPlayer";
 import { Player } from "../../api/Player.types";
@@ -15,6 +16,8 @@ const PlayersPage: FC<any> = (): ReactElement => {
     } as Player;
     const [shownPage, setShownPage] =  useState('table');
     const [player, setPlayer] = useState<Player>(defaultPlayer);
+    // Lives here so the table's search survives switching to the add/edit form and back
+    const [filterModel, setFilterModel] = useState<GridFilterModel>({ items: [] });
     
     const addPlayerHandler = (e: any) => {
         setPlayer(defaultPlayer);
@@ -34,7 +37,12 @@ const PlayersPage: FC<any> = (): ReactElement => {
         <div className="players-content">
             {shownPage === 'table' && (
                 <>
-                    <PlayersTable showEditPage={editPlayerHandler} showAddPlayerPage={addPlayerHandler}/>
+                    <PlayersTable
+                        showEditPage={editPlayerHandler}
+                        showAddPlayerPage={addPlayerHandler}
+                        filterModel={filterModel}
+                        onFilterModelChange={setFilterModel}
+                    />
                 </>
             )}
 

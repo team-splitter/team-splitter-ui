@@ -2,7 +2,7 @@ import React, { ReactElement, FC, useState, useEffect } from "react";
 import { Button } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { Player } from "../../api/Player.types";
-import { GridColDef, GridRowId, GridCellEditCommitParams, GridToolbarContainer, GridPagination } from '@mui/x-data-grid';
+import { GridColDef, GridRowId, GridCellEditCommitParams, GridToolbarContainer, GridPagination, GridToolbarQuickFilter, GridFilterModel } from '@mui/x-data-grid';
 import PlayerActions from "./PlayerActions";
 import { getPlayers } from "../../services/PlayerService";
 import PageLayout from "components/layout/PageLayout";
@@ -11,11 +11,24 @@ import ErrorMessage from "components/layout/ErrorMessage";
 import DataTable from "components/layout/DataTable";
 import InlineLoading from "components/layout/InlineLoading";
 
+const PlayersToolbar = () => (
+    <GridToolbarContainer sx={{ justifyContent: 'space-between', px: 2, pt: 1 }}>
+        <GridToolbarQuickFilter
+            placeholder="Search players…"
+            debounceMs={200}
+            sx={{ width: { xs: '100%', sm: 320 }, pb: 0 }}
+        />
+        <GridPagination />
+    </GridToolbarContainer>
+);
+
 type Props = {
     showEditPage: (player: Player)=> void;
     showAddPlayerPage: (e: any) => void;
+    filterModel: GridFilterModel;
+    onFilterModelChange: (model: GridFilterModel) => void;
 }
-const PlayersTable: FC<any> = ({showEditPage, showAddPlayerPage}: Props): ReactElement => {
+const PlayersTable: FC<any> = ({showEditPage, showAddPlayerPage, filterModel, onFilterModelChange}: Props): ReactElement => {
     const [players, setPlayers] = useState([] as Player[]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -108,18 +121,14 @@ const PlayersTable: FC<any> = ({showEditPage, showAddPlayerPage}: Props): ReactE
                             sortModel: [{field: 'score', sort: 'desc'}]
                         }
                     }}
+                    filterModel={filterModel}
+                    onFilterModelChange={onFilterModelChange}
                     getRowId={(row) => row.id}
                     onCellEditCommit={(params: GridCellEditCommitParams) => {
                         setRowId(params.id);
                         }
                     }
-                    components={{
-                        Toolbar: () => (
-                            <GridToolbarContainer sx={{ justifyContent: 'flex-end' }}>
-                                <GridPagination />
-                            </GridToolbarContainer>
-                        ),
-                    }}
+                    components={{ Toolbar: PlayersToolbar }}
                 />
             }
         </PageLayout>

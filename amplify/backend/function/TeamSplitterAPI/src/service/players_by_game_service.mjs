@@ -21,9 +21,14 @@ const parseDateParam = (value, name, defaultValue) => {
   return parsed;
 }
 
+// only positive integers can be Telegram ids; anything else (e.g. a player added by hand) is unknown
+const toTelegramId = (id) => {
+  const parsed = typeof id === 'string' && /^\d+$/.test(id) ? Number(id) : id;
+  return Number.isSafeInteger(parsed) && parsed > 0 ? parsed : null;
+}
+
 const toPlayer = (player) => ({
-  // only positive integers can be Telegram ids; anything else (e.g. a player added by hand) is unknown
-  id: Number.isInteger(player.id) && player.id > 0 ? player.id : null,
+  id: toTelegramId(player.id),
   firstName: player.firstName ? player.firstName : '',
   lastName: player.lastName ? player.lastName : ''
 });

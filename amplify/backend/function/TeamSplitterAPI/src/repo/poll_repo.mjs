@@ -121,8 +121,9 @@ export const removeVoteFromPollByPlayer = async (pollId, playerId) => {
     return;
   }
 
-  const filteredAnswers = pollResponse.Item.answers.filter((i) => i.player.id !== playerId);
-  console.log(`[${tableName}] removeVoteFromPollByPlayer pollId=${pollId} answers ${pollResponse.Item.answers.length} -> ${filteredAnswers.length}`);
+  // a vote can lack a player (e.g. added in the app for a player that was then deleted)
+  const filteredAnswers = (pollResponse.Item.answers || []).filter((i) => i.player?.id !== playerId);
+  console.log(`[${tableName}] removeVoteFromPollByPlayer pollId=${pollId} answers ${pollResponse.Item.answers?.length ?? 0} -> ${filteredAnswers.length}`);
 
   const response = await dynamo.send(
     new UpdateCommand({

@@ -4,6 +4,8 @@ const team_colors = ['Red', 'Blue', 'Black', 'White', 'Yellow', 'Green'];
 export const splitTeamsByPoll = async (poll, teamNum, teamNames) => {
     console.log(`splitTeamsByPoll invoked. pollId=${poll.id}, teamNum=${teamNum}, teamNames=${JSON.stringify(teamNames)}, answerCount=${poll.answers?.length}`);
     const players = poll.answers.map((i) => i.player).filter((i) => i !== undefined)
+        //a player can have more than one vote (e.g. a retried webhook); split each player once
+        .filter((player, idx, all) => all.findIndex((p) => p.id === player.id) === idx);
     console.log(`Resolved ${players.length} player(s) from poll answers`);
     const playersMap = {};
     (await getAllPlayers()).Items.forEach((player) => {

@@ -88,3 +88,22 @@ export const updateGameScheduleStatusAndPollId = async (id, pollId, status) => {
           })
     );
 }
+
+export const getSchedulesWithPoll = async () => {
+  console.log(`[${tableName}] getSchedulesWithPoll`);
+  const items = [];
+  let lastKey;
+  do {
+    const page = await dynamo.send(
+      new ScanCommand({ TableName: tableName,
+        ProjectionExpression: "id, #date, #status, pollId",
+        FilterExpression: "attribute_exists(pollId)",
+        ExpressionAttributeNames: { '#date': 'date', '#status': 'status' },
+        ExclusiveStartKey: lastKey
+      })
+    );
+    items.push(...(page.Items || []));
+    lastKey = page.LastEvaluatedKey;
+  } while (lastKey);
+  return items;
+}

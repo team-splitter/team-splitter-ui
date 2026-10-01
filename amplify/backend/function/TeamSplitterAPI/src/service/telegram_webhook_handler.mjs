@@ -36,14 +36,12 @@ async function handlePollAnswer(requestBody, context) {
   console.log(`poll answer: poll_id=${pollAnswer.poll_id}, userId=${pollAnswer.user?.id}, userName=${pollAnswer.user?.first_name}, option_ids=${JSON.stringify(pollAnswer.option_ids)}`);
 
 
-  if (pollAnswer.option_ids.length == 0) {//retract vote
-    console.log(`Retract vote for userId=${pollAnswer.user?.id} on poll_id=${pollAnswer.poll_id}`);
-    await removePollAnswer(pollAnswer);
-  } else if (pollAnswer.option_ids[0] === 0) {//going
+  if (pollAnswer.option_ids[0] === 0) {//going
     console.log(`Add vote for userId=${pollAnswer.user?.id} on poll_id=${pollAnswer.poll_id}`);
     await addPollAnswer(pollAnswer, context);
-  } else {
-    console.log(`Ignore vote for userId=${pollAnswer.user?.id}, option_ids=${JSON.stringify(pollAnswer.option_ids)}`);
+  } else {//retracted or voted "-": make sure the player isn't counted as going
+    console.log(`Remove vote for userId=${pollAnswer.user?.id} on poll_id=${pollAnswer.poll_id}, option_ids=${JSON.stringify(pollAnswer.option_ids)}`);
+    await removePollAnswer(pollAnswer);
   }
 }
 

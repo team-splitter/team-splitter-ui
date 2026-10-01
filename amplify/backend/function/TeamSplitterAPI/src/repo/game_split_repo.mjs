@@ -60,13 +60,22 @@ export const getGameSplitsByPoll = async (pollId) => {
   return response; 
 }
 
+// Follows LastEvaluatedKey, so splits past the first 1MB scan page are included
 export const getAllGameSplits = async () => {
   console.log(`[${tableName}] getAllGameSplits`);
-  return await dynamo.send(
-            new ScanCommand({ TableName: tableName,
-              ProjectionExpression: "id, createdAt, games, pollId, teamSize"
-            })
-          );
+  const items = [];
+  let lastKey;
+  do {
+    const page = await dynamo.send(
+      new ScanCommand({ TableName: tableName,
+        ProjectionExpression: "id, createdAt, games, pollId, teamSize",
+        ExclusiveStartKey: lastKey
+      })
+    );
+    items.push(...(page.Items || []));
+    lastKey = page.LastEvaluatedKey;
+  } while (lastKey);
+  return { Items: items };
 }
 
 export const getAllGameSplitsPaginated = async (page, pageSize) => {

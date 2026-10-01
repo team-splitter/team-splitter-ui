@@ -2,7 +2,7 @@ import {deletePoll, getPoll, getAllPollsPaginated, addVoteToPoll, removeVoteFrom
 import {getPlayer, deletePlayer, getAllPlayers, savePlayer} from './repo/player_repo.mjs';
 import {deleteGameSplit, getGameSplit, getGameSplitsByPoll, getAllGameSplitsPaginated, removePlayerFromSplit, saveGameSplit, movePlayerBetweenTeams, updateGameSplitTelegramMessageId} from './repo/game_split_repo.mjs';
 import {deleteGameSchedule, getGameSchedule, getAllGameSchedules, saveGameSchedule} from './repo/game_schedule_repo.mjs';
-import {handleTelegramUpdate, sendTeamSplitMessage, createTeamSplitMessage} from "./service/telegram_webhook_handler.mjs";
+import {handleTelegramUpdate, sendTeamSplitMessage, createTeamSplitMessage, TEAM_SPLIT_PARSE_MODE} from "./service/telegram_webhook_handler.mjs";
 import {sendPoll, deleteMessage, editMessageText} from "./service/telegram_api.mjs";
 import {splitTeams, splitTeamsByPoll} from "./service/team_splitter_service.mjs";
 import { handleGameSchedule } from './service/game_scheduler_service.mjs';
@@ -164,7 +164,7 @@ export const handler = async (event, context) => {
               chat_id: process.env.CHAT_ID,
               message_id: updatedSplit.telegramMessageId,
               text,
-              parse_mode: 'MarkdownV2'
+              parse_mode: TEAM_SPLIT_PARSE_MODE
             });
           } catch (telegramErr) {
             console.log(`Could not edit Telegram message: ${telegramErr.message}`);

@@ -121,32 +121,50 @@ async function handleSplitCommand(message, context) {
 
 }
 
+// The split message mentions each player (tg://user links) so it carries their Telegram id,
+// e.g. for the payments bot to read from a forwarded message. Mentions ping the players.
+export const TEAM_SPLIT_PARSE_MODE = "HTML";
+
 export const sendTeamSplitMessage = async (teams) => {
   const message = createTeamSplitMessage(teams);
   console.log(`message=${message}`);
-  
+
   const payload = {
     "chat_id": chatId,
     "text": message,
-    "parse_mode": "MarkdownV2"
+    "parse_mode": TEAM_SPLIT_PARSE_MODE
   }
-      
+
 
   return await sendMessage(payload);
+}
+
+const escapeHtml = (text) => String(text)
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;');
+
+const formatPlayer = (player) => {
+  const name = escapeHtml(`${player.firstName ? player.firstName : ''} ${player.lastName ? player.lastName : ''}`.trim());
+  // Telegram renders a mention it can't resolve (e.g. a guest's made-up id) as plain text
+  if (name && Number.isInteger(player.id) && player.id > 0) {
+    return `<a href="tg://user?id=${player.id}">${name}</a>`;
+  }
+  return name;
 }
 
 export const createTeamSplitMessage = (teams) => {
   let message = '';
   for(let team of teams) {
-    message += `*Team ${team.name}*\n`;
-    
+    message += `<b>Team ${escapeHtml(team.name)}</b>\n`;
+
     for(let player of team.players) {
-      message += `${player.firstName ? player.firstName : ''} ${player.lastName ? player.lastName : ''}\n`;
+      message += `${formatPlayer(player)}\n`;
     }
-    
+
     message += '\n';
   }
-  
+
   return message;
 }
 

@@ -116,6 +116,10 @@ export const removeVoteFromPoll = async (pollId, voteId) => {
 export const removeVoteFromPollByPlayer = async (pollId, playerId) => {
   console.log(`[${tableName}] removeVoteFromPollByPlayer pollId=${pollId}, playerId=${playerId}`);
   const pollResponse = await getPoll(pollId);
+  if (!pollResponse.Item) {
+    console.log(`[${tableName}] removeVoteFromPollByPlayer poll ${pollId} not found, nothing to remove`);
+    return;
+  }
 
   const filteredAnswers = pollResponse.Item.answers.filter((i) => i.player.id !== playerId);
   console.log(`[${tableName}] removeVoteFromPollByPlayer pollId=${pollId} answers ${pollResponse.Item.answers.length} -> ${filteredAnswers.length}`);
@@ -161,4 +165,13 @@ export const savePoll = async (pollDocument) => {
       Item: pollDocument,
     })
   );
+}
+
+// One GetItem per poll: the Lambda's IAM role has no BatchGetItem, and a 60-day range is a few dozen polls
+export const getPollQuestionsByIds = async (ids) => {
+  console.log(`[${tableName}] getPollQuestionsByIds count=${ids.length}`);
+  const responses = await Promise.all(ids.map((id) => dynamo.send(
+    new GetCommand({ TableName: tableName, Key: { id }, ProjectionExpression: "id, question" })
+  )));
+  return responses.map((response) => response.Item).filter((poll) => poll);
 }

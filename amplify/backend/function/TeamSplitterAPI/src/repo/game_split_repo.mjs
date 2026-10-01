@@ -197,3 +197,23 @@ export const getSplitsByDates = async (fromDate, toDate) => {
     })
   );
 }
+
+// Follows LastEvaluatedKey, so splits past the 1MB scan page aren't silently dropped
+export const getSplitsCreatedSince = async (fromDate) => {
+  console.log(`[${tableName}] getSplitsCreatedSince fromDate=${fromDate}`);
+  const items = [];
+  let lastKey;
+  do {
+    const page = await dynamo.send(
+      new ScanCommand({ TableName: tableName,
+        ProjectionExpression: "id, createdAt, games, pollId, teams",
+        FilterExpression: "createdAt >= :fromDate",
+        ExpressionAttributeValues: { ':fromDate': fromDate },
+        ExclusiveStartKey: lastKey
+      })
+    );
+    items.push(...(page.Items || []));
+    lastKey = page.LastEvaluatedKey;
+  } while (lastKey);
+  return items;
+}

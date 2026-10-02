@@ -151,10 +151,14 @@ const formatPlayer = (player) => {
   return name;
 }
 
+// Telegram can't color text, so default team colors get a matching circle; custom names get none
+const TEAM_EMOJI = { red: '🔴', blue: '🔵', black: '⚫', white: '⚪', yellow: '🟡', green: '🟢' };
+
 export const createTeamSplitMessage = (teams) => {
   let message = '';
   for(let team of teams) {
-    message += `<b>Team ${escapeHtml(team.name)}</b>\n`;
+    const emoji = TEAM_EMOJI[String(team.name).trim().toLowerCase()];
+    message += `${emoji ? `${emoji} ` : ''}<b>Team ${escapeHtml(team.name)}</b>\n`;
 
     for(let player of team.players) {
       message += `${formatPlayer(player)}\n`;

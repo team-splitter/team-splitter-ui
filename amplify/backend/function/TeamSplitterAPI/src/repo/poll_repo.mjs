@@ -121,8 +121,9 @@ export const removeVoteFromPollByPlayer = async (pollId, playerId) => {
     return;
   }
 
-  const filteredAnswers = pollResponse.Item.answers.filter((i) => i.player.id !== playerId);
-  console.log(`[${tableName}] removeVoteFromPollByPlayer pollId=${pollId} answers ${pollResponse.Item.answers.length} -> ${filteredAnswers.length}`);
+  // a vote can lack a player (e.g. added in the app for a player that was then deleted)
+  const filteredAnswers = (pollResponse.Item.answers || []).filter((i) => i.player?.id !== playerId);
+  console.log(`[${tableName}] removeVoteFromPollByPlayer pollId=${pollId} answers ${pollResponse.Item.answers?.length ?? 0} -> ${filteredAnswers.length}`);
 
   const response = await dynamo.send(
     new UpdateCommand({
@@ -139,7 +140,14 @@ export const removeVoteFromPollByPlayer = async (pollId, playerId) => {
 
 export const updatePlayerInPollVotes = async (playerId, playerData, excludePollIds = []) => {
   console.log(`[${tableName}] updatePlayerInPollVotes playerId=${playerId}, excludePollIds=${JSON.stringify(excludePollIds)}`);
-  const polls = (await dynamo.send(new ScanCommand({ TableName: tableName }))).Items || [];
+  // follows LastEvaluatedKey, so polls past the first 1MB scan page are updated too
+  const polls = [];
+  let lastKey;
+  do {
+    const page = await dynamo.send(new ScanCommand({ TableName: tableName, ExclusiveStartKey: lastKey }));
+    polls.push(...(page.Items || []));
+    lastKey = page.LastEvaluatedKey;
+  } while (lastKey);
   const excludeSet = new Set(excludePollIds);
   const pollsWithPlayer = polls.filter(p => !excludeSet.has(p.id) && p.answers?.some(a => a.player?.id === playerId));
   console.log(`[${tableName}] updatePlayerInPollVotes updating playerId=${playerId} across ${pollsWithPlayer.length} poll(s)`);

@@ -2,7 +2,9 @@ import {getSplitsCreatedSince} from "../repo/game_split_repo.mjs";
 import {getSchedulesWithPoll} from "../repo/game_schedule_repo.mjs";
 import {getPollQuestionsByIds} from "../repo/poll_repo.mjs";
 
-const DEFAULT_RANGE_MS = 60 * 24 * 60 * 60 * 1000;
+// Also the longest range allowed, so a bad or huge range can't scan and fetch every poll ever split
+const MAX_RANGE_DAYS = 31;
+const MAX_RANGE_MS = MAX_RANGE_DAYS * 24 * 60 * 60 * 1000;
 
 // en-CA formats as YYYY-MM-DD
 const nyDateFormat = new Intl.DateTimeFormat('en-CA', {
@@ -14,11 +16,10 @@ const parseDateParam = (value, name, defaultValue) => {
   if (value === undefined || value === null || value === '') {
     return defaultValue;
   }
-  const parsed = Number(value);
-  if (!Number.isInteger(parsed)) {
-    throw new Error(`${name} must be epoch milliseconds`);
+  if (!/^\d{1,15}$/.test(value)) {
+    throw new Error(`${name} must be epoch milliseconds, got "${value}"`);
   }
-  return parsed;
+  return Number(value);
 }
 
 // only positive integers can be Telegram ids; anything else (e.g. a player added by hand) is unknown
@@ -38,9 +39,12 @@ const toPlayer = (player) => ({
 export const getPlayersByGame = async (startDateParam, endDateParam) => {
   const now = Date.now();
   const endDate = parseDateParam(endDateParam, 'endDate', now);
-  const startDate = parseDateParam(startDateParam, 'startDate', now - DEFAULT_RANGE_MS);
+  const startDate = parseDateParam(startDateParam, 'startDate', endDate - MAX_RANGE_MS);
   if (startDate > endDate) {
     throw new Error(`startDate (${startDate}) is after endDate (${endDate})`);
+  }
+  if (endDate - startDate > MAX_RANGE_MS) {
+    throw new Error(`startDate to endDate can't be longer than ${MAX_RANGE_DAYS} days`);
   }
   console.log(`getPlayersByGame invoked. startDate=${startDate}, endDate=${endDate}`);
 
@@ -69,11 +73,16 @@ export const getPlayersByGame = async (startDateParam, endDateParam) => {
 
   const games = splits.map((split) => {
     const schedule = scheduleByPoll[split.pollId];
+    const gameDate = toNyDate(schedule?.date ?? split.createdAt);
     const seenIds = new Set();
     const teams = (split.teams || []).map((team) => ({
       name: team.name,
       players: (team.players || []).map(toPlayer).filter((player) => {
-        if (player.id === null) return true;
+        if (player.id === null) {
+          // guests have no Telegram id; logged so they can be found and sorted out by hand
+          console.log(`Guest player without Telegram id: name="${`${player.firstName} ${player.lastName}`.trim()}", gameDate=${gameDate}, pollId=${split.pollId}`);
+          return true;
+        }
         if (seenIds.has(player.id)) return false;
         seenIds.add(player.id);
         return true;
@@ -83,7 +92,7 @@ export const getPlayersByGame = async (startDateParam, endDateParam) => {
     return {
       pollId: split.pollId,
       pollQuestion: questionByPoll[split.pollId] ?? null,
-      gameDate: toNyDate(schedule?.date ?? split.createdAt),
+      gameDate,
       gameDateApproximate: !schedule?.date,
       status: schedule?.status ?? null,
       splitId: split.id,

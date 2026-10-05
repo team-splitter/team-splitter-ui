@@ -1,4 +1,4 @@
-import { Alert, Box, Button, Stack, TextField, Typography } from "@mui/material";
+import { Alert, Box, Button, CircularProgress, Stack, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import { Player } from "../../api/Player.types";
 import { createPlayer, updatePlayer } from "../../services/PlayerService";
@@ -74,7 +74,12 @@ export const AddPlayer = ({ cancelButtonHandler, player, mode }: AddPlayerProps)
             {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
             <Stack direction="row" justifyContent="flex-end" spacing={1} sx={{ mt: 3 }}>
                 <Button onClick={cancelButtonHandler} color="inherit">Cancel</Button>
-                <Button type="submit" variant="contained" disabled={saving}>
+                <Button
+                    type="submit"
+                    variant="contained"
+                    disabled={saving}
+                    startIcon={saving ? <CircularProgress size={16} color="inherit" /> : undefined}
+                >
                     {saving ? 'Saving…' : mode === 'add' ? 'Add' : 'Update'}
                 </Button>
             </Stack>

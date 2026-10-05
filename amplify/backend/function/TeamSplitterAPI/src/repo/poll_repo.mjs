@@ -139,17 +139,21 @@ export const removeVoteFromPollByPlayer = async (pollId, playerId) => {
 }
 
 export const updatePlayerInPollVotes = async (playerId, playerData, excludePollIds = []) => {
-  console.log(`[${tableName}] updatePlayerInPollVotes playerId=${playerId}, excludePollIds=${JSON.stringify(excludePollIds)}`);
-  // follows LastEvaluatedKey, so polls past the first 1MB scan page are updated too
-  const polls = [];
+  console.log(`[${tableName}] updatePlayerInPollVotes playerId=${playerId}, excluded polls=${excludePollIds.length}`);
+  // Scan only ids (follows LastEvaluatedKey), then read in full just the polls that can still change:
+  // reading every poll with all its votes made a player edit take ~7s
+  const ids = [];
   let lastKey;
   do {
-    const page = await dynamo.send(new ScanCommand({ TableName: tableName, ExclusiveStartKey: lastKey }));
-    polls.push(...(page.Items || []));
+    const page = await dynamo.send(new ScanCommand({ TableName: tableName, ProjectionExpression: "id", ExclusiveStartKey: lastKey }));
+    ids.push(...(page.Items || []).map((poll) => poll.id));
     lastKey = page.LastEvaluatedKey;
   } while (lastKey);
   const excludeSet = new Set(excludePollIds);
-  const pollsWithPlayer = polls.filter(p => !excludeSet.has(p.id) && p.answers?.some(a => a.player?.id === playerId));
+  const candidates = (await Promise.all(ids.filter((id) => !excludeSet.has(id)).map((id) => getPoll(id))))
+    .map((response) => response.Item)
+    .filter((poll) => poll);
+  const pollsWithPlayer = candidates.filter(p => p.answers?.some(a => a.player?.id === playerId));
   console.log(`[${tableName}] updatePlayerInPollVotes updating playerId=${playerId} across ${pollsWithPlayer.length} poll(s)`);
 
   await Promise.all(pollsWithPlayer.map(poll => {

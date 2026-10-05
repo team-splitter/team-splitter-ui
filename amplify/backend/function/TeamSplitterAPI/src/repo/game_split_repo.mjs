@@ -68,7 +68,7 @@ export const getAllGameSplits = async () => {
   do {
     const page = await dynamo.send(
       new ScanCommand({ TableName: tableName,
-        ProjectionExpression: "id, createdAt, games, pollId, teamSize",
+        ProjectionExpression: "id, pollId, createdAt",
         ExclusiveStartKey: lastKey
       })
     );
@@ -148,6 +148,28 @@ export const removePlayerFromSplit = async (id, playerId) => {
       },
       UpdateExpression: 'SET teams = :teams',
       ExpressionAttributeValues: { ":teams": teams }
+    })
+  );
+}
+
+export const updatePlayerInGameSplit = async (id, playerId, playerData) => {
+  console.log(`[${tableName}] updatePlayerInGameSplit id=${id}, playerId=${playerId}`);
+  const gameSplit = (await getGameSplit(id)).Item;
+  if (!gameSplit?.teams?.some((team) => team.players?.some((player) => player.id === playerId))) {
+    return;
+  }
+
+  const teams = gameSplit.teams.map((team) => ({
+    ...team,
+    players: (team.players || []).map((player) => player.id === playerId ? { ...player, ...playerData } : player)
+  }));
+
+  return await dynamo.send(
+    new UpdateCommand({
+      TableName: tableName,
+      Key: { id },
+      UpdateExpression: 'SET teams = :teams',
+      ExpressionAttributeValues: { ':teams': teams }
     })
   );
 }

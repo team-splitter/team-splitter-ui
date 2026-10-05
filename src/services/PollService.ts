@@ -28,19 +28,10 @@ export const getPollById = async (pollId: string): Promise<Poll> => {
     return response;
 }
 
+// The backend has no GET .../vote route (GET /poll/:id would answer it with the whole poll), so read the votes off the poll
 export const getVotesForPoll = async (pollId: string): Promise<PollVote[]> => {
-    // const {body} = await get({
-    //     apiName: 'teamsplitterapi',
-    //     path: `/api/v1/poll/${pollId}/vote`
-    // }).response;
-
-    // return JSON.parse(await body.text()) as PollVote[];
-
-    const response = (await get(
-        `${backendUrl()}/poll/${pollId}/vote`
-    )) as PollVote[] 
-
-    return response;   
+    const poll = await getPollById(pollId);
+    return poll?.answers || [];
 }
 
 export const deletePollVote = async (pollId: string, voteId: string): Promise<boolean> => {

@@ -1,4 +1,4 @@
-import { Box, Button, Stack, TextField, Typography } from "@mui/material";
+import { Alert, Box, Button, Stack, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import { Player } from "../../api/Player.types";
 import { createPlayer, updatePlayer } from "../../services/PlayerService";
@@ -14,6 +14,8 @@ export const AddPlayer = ({ cancelButtonHandler, player, mode }: AddPlayerProps)
     const [firstName, setFirstName] = useState(`${player?.firstName}`);
     const [lastName, setLastName] = useState(`${player?.lastName}`);
     const [score, setScore] = useState(`${player?.score}`);
+    const [saving, setSaving] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
     const onSubmitButtonHandler = async (e: any) => {
         e.preventDefault();
@@ -24,10 +26,18 @@ export const AddPlayer = ({ cancelButtonHandler, player, mode }: AddPlayerProps)
             lastName: lastName,
             score: Number(score)
         }
-        if (mode === 'add') {
-            await createPlayer(data);
-        } else {
-            await updatePlayer(id, data);
+        setSaving(true);
+        setError(null);
+        try {
+            if (mode === 'add') {
+                await createPlayer(data);
+            } else {
+                await updatePlayer(id, data);
+            }
+        } catch (err: any) {
+            setError(err?.message || 'Could not save the player');
+            setSaving(false);
+            return;
         }
 
         cancelButtonHandler(e);
@@ -61,9 +71,12 @@ export const AddPlayer = ({ cancelButtonHandler, player, mode }: AddPlayerProps)
                     fullWidth
                 />
             </Stack>
+            {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
             <Stack direction="row" justifyContent="flex-end" spacing={1} sx={{ mt: 3 }}>
                 <Button onClick={cancelButtonHandler} color="inherit">Cancel</Button>
-                <Button type="submit" variant="contained">{mode === 'add' ? 'Add' : 'Update'}</Button>
+                <Button type="submit" variant="contained" disabled={saving}>
+                    {saving ? 'Saving…' : mode === 'add' ? 'Add' : 'Update'}
+                </Button>
             </Stack>
         </Box>
     )

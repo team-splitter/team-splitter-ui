@@ -1,6 +1,6 @@
 import {deletePoll, getPoll, getAllPollsPaginated, addVoteToPoll, removeVoteFromPoll, savePoll, updatePlayerInPollVotes} from './repo/poll_repo.mjs';
 import {getPlayer, deletePlayer, getAllPlayers, savePlayer} from './repo/player_repo.mjs';
-import {deleteGameSplit, getGameSplit, getGameSplitsByPoll, getAllGameSplits, getAllGameSplitsPaginated, removePlayerFromSplit, saveGameSplit, movePlayerBetweenTeams, updateGameSplitTelegramMessageId} from './repo/game_split_repo.mjs';
+import {deleteGameSplit, getGameSplit, getGameSplitsByPoll, getAllGameSplits, getAllGameSplitsPaginated, removePlayerFromSplit, saveGameSplit, movePlayerBetweenTeams, updateGameSplitTelegramMessageId, updatePlayerInGameSplit} from './repo/game_split_repo.mjs';
 import {deleteGameSchedule, getGameSchedule, getAllGameSchedules, saveGameSchedule} from './repo/game_schedule_repo.mjs';
 import {handleTelegramUpdate, sendTeamSplitMessage, createTeamSplitMessage, TEAM_SPLIT_PARSE_MODE} from "./service/telegram_webhook_handler.mjs";
 import {sendPoll, deleteMessage, editMessageText} from "./service/telegram_api.mjs";
@@ -9,6 +9,7 @@ import { handleGameSchedule } from './service/game_scheduler_service.mjs';
 import {getPlayerStats} from './service/player_stat_service.mjs'
 import { setGameSplitScores } from './service/game_split_service.mjs';
 import { getPlayersByGame } from './service/players_by_game_service.mjs';
+import { toNyDate } from './service/ny_date.mjs';
 
 
 export const handler = async (event, context) => {
@@ -125,8 +126,16 @@ export const handler = async (event, context) => {
         exisinting.score = requestJSON.score;
         
         await savePlayer(exisinting);
-        const completedPollIds = ((await getAllGameSplits()).Items || []).map(s => s.pollId);
-        await updatePlayerInPollVotes(playerId, { firstName: exisinting.firstName, lastName: exisinting.lastName, score: exisinting.score }, completedPollIds);
+        // Polls split before today are finished games and keep the player as they were;
+        // a poll split today (game day) still gets the edit, in its votes and its split
+        const playerData = { firstName: exisinting.firstName, lastName: exisinting.lastName, score: exisinting.score };
+        const today = toNyDate(Date.now());
+        const splits = (await getAllGameSplits()).Items || [];
+        const todaySplits = splits.filter(s => s.createdAt && toNyDate(s.createdAt) === today);
+        const todayPollIds = new Set(todaySplits.map(s => s.pollId));
+        const completedPollIds = splits.map(s => s.pollId).filter(id => !todayPollIds.has(id));
+        await updatePlayerInPollVotes(playerId, playerData, completedPollIds);
+        await Promise.all(todaySplits.map(s => updatePlayerInGameSplit(s.id, playerId, playerData)));
         body = exisinting;
         break;
       }

@@ -150,9 +150,13 @@ export const updatePlayerInPollVotes = async (playerId, playerData, excludePollI
     lastKey = page.LastEvaluatedKey;
   } while (lastKey);
   const excludeSet = new Set(excludePollIds);
-  const candidates = (await Promise.all(ids.filter((id) => !excludeSet.has(id)).map((id) => getPoll(id))))
-    .map((response) => response.Item)
-    .filter((poll) => poll);
+  const candidateIds = ids.filter((id) => !excludeSet.has(id));
+  // a few reads at a time: firing them all at once ran the table out of read capacity
+  const candidates = [];
+  for (let i = 0; i < candidateIds.length; i += 10) {
+    const responses = await Promise.all(candidateIds.slice(i, i + 10).map((id) => getPoll(id)));
+    candidates.push(...responses.map((response) => response.Item).filter((poll) => poll));
+  }
   const pollsWithPlayer = candidates.filter(p => p.answers?.some(a => a.player?.id === playerId));
   console.log(`[${tableName}] updatePlayerInPollVotes updating playerId=${playerId} across ${pollsWithPlayer.length} poll(s)`);
 

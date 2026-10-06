@@ -68,7 +68,7 @@ export const getAllGameSplits = async () => {
   do {
     const page = await dynamo.send(
       new ScanCommand({ TableName: tableName,
-        ProjectionExpression: "id, pollId, createdAt",
+        ProjectionExpression: "id, pollId, createdAt, games",
         ExclusiveStartKey: lastKey
       })
     );

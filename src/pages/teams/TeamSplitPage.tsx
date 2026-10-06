@@ -11,6 +11,8 @@ type TeamSplitPageProps = {
     pollId: string
     refreshKey?: number
     onSplitSuccess?: () => void
+    // when given, the parent refreshes everything (including this page, via refreshKey) after a player edit
+    onPlayerUpdated?: () => void
 }
 
 const ColorSwatch = ({ color }: { color: string }) => (
@@ -27,7 +29,7 @@ const ColorSwatch = ({ color }: { color: string }) => (
     />
 );
 
-const TeamSplitPage = ({ pollId, refreshKey, onSplitSuccess }: TeamSplitPageProps) => {
+const TeamSplitPage = ({ pollId, refreshKey, onSplitSuccess, onPlayerUpdated }: TeamSplitPageProps) => {
     const [teams, setTeams] = useState<Team[] | null>(null);
     const [loading, setLoading] = useState(true);
     const [splitting, setSplitting] = useState(false);
@@ -156,7 +158,7 @@ const TeamSplitPage = ({ pollId, refreshKey, onSplitSuccess }: TeamSplitPageProp
 
             {loading && <InlineLoading />}
             {teams &&
-                <TeamCardList teams={teams} draggable={false} onPlayerUpdated={() => setPlayerUpdateKey(k => k + 1)} />
+                <TeamCardList teams={teams} draggable={false} onPlayerUpdated={onPlayerUpdated ?? (() => setPlayerUpdateKey(k => k + 1))} />
             }
         </Box>
     )

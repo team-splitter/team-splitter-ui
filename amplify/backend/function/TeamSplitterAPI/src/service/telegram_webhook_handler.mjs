@@ -151,13 +151,22 @@ const formatPlayer = (player) => {
   return name;
 }
 
-// Telegram can't color text, so default team colors get a matching circle; custom names get none
+// Telegram can't color text, so default team colors get a matching circle; custom names get none.
+// The key order is also the order teams are listed in, whichever colors were picked for team 1, 2, ...
 const TEAM_EMOJI = { red: '🔴', blue: '🔵', black: '⚫', white: '⚪', yellow: '🟡', green: '🟢' };
+const TEAM_ORDER = Object.keys(TEAM_EMOJI);
+
+const teamColorKey = (team) => String(team.name).trim().toLowerCase();
+// custom names go after the colors, in the order they were given
+const teamRank = (team) => {
+  const idx = TEAM_ORDER.indexOf(teamColorKey(team));
+  return idx === -1 ? TEAM_ORDER.length : idx;
+}
 
 export const createTeamSplitMessage = (teams) => {
   let message = '';
-  for(let team of teams) {
-    const emoji = TEAM_EMOJI[String(team.name).trim().toLowerCase()];
+  for(let team of [...teams].sort((a, b) => teamRank(a) - teamRank(b))) {
+    const emoji = TEAM_EMOJI[teamColorKey(team)];
     message += `${emoji ? `${emoji} ` : ''}<b>Team ${escapeHtml(team.name)}</b>\n`;
 
     for(let player of team.players) {

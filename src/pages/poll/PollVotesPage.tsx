@@ -121,9 +121,14 @@ export const PollVotesPage = ({ pollId, poll, onVoteChange }: Props) => {
                     <AddPlayer
                         mode="edit"
                         player={editPlayer}
+                        onSaved={(saved) => setVotes((current) => current.map((vote) =>
+                            vote.player?.id === saved.id
+                                ? { ...vote, player: { ...vote.player, firstName: saved.firstName, lastName: saved.lastName, score: saved.score } }
+                                : vote))}
                         cancelButtonHandler={() => {
                                 setEditPlayer(null);
-                                getVotesForPoll(pollId).then(setVotes);
+                                // if this reload fails, the list keeps the values just saved instead of going stale
+                                getVotesForPoll(pollId).then(setVotes).catch(() => {});
                             }}
                     />
                 )}

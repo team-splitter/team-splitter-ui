@@ -21,6 +21,9 @@ const PollPage = () => {
     const [error, setError] = useState<string | null>(null);
     const [splitKey, setSplitKey] = useState(0);
     const [voteKey, setVoteKey] = useState(0);
+    // a player edited from any section changes names and scores shown in all of them
+    const [playerEditKey, setPlayerEditKey] = useState(0);
+    const onPlayerUpdated = () => setPlayerEditKey((k) => k + 1);
 
     useEffect(() => {
         getPollById(pollId)
@@ -54,18 +57,21 @@ const PollPage = () => {
                                 pollId={pollId}
                                 poll={poll}
                                 onVoteChange={() => setVoteKey((k) => k + 1)}
+                                refreshKey={playerEditKey}
+                                onPlayerUpdated={onPlayerUpdated}
                             />
                         </SectionCard>
                     )}
                     <SectionCard title="Team Split">
                         <TeamSplitPage
                             pollId={pollId}
-                            refreshKey={voteKey}
+                            refreshKey={voteKey + playerEditKey}
                             onSplitSuccess={() => setSplitKey((k) => k + 1)}
+                            onPlayerUpdated={onPlayerUpdated}
                         />
                     </SectionCard>
                     <SectionCard title="Game Splits">
-                        <PollGamesPage pollId={pollId} refreshKey={splitKey} />
+                        <PollGamesPage pollId={pollId} refreshKey={splitKey + playerEditKey} />
                     </SectionCard>
                 </Stack>
             )}

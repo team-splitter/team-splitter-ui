@@ -7,6 +7,7 @@ import {
   DeleteCommand,
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
+import { scanAll } from "./scan_all.mjs";
 
 const client = new DynamoDBClient({});
 
@@ -42,15 +43,13 @@ export const getGameSplit = async (id) => {
 
 export const getGameSplitsByPoll = async (pollId) => {
   console.log(`[${tableName}] getGameSplitsByPoll pollId=${pollId}`);
-  let response = await dynamo.send(
-            new ScanCommand({ TableName: tableName,
-              ProjectionExpression: "id, createdAt, teams, pollId, teamSize, telegramMessageId",
-              FilterExpression: 'pollId = :pollId',
-              ExpressionAttributeValues: {
-                  ':pollId': pollId,
-              },
-            })
-          ); 
+  let response = await scanAll(dynamo, { TableName: tableName,
+    ProjectionExpression: "id, createdAt, teams, pollId, teamSize, telegramMessageId",
+    FilterExpression: 'pollId = :pollId',
+    ExpressionAttributeValues: {
+      ':pollId': pollId,
+    },
+  });
 
   response.Items.forEach((game) => {
     game.teams.forEach((team) => {
@@ -80,11 +79,9 @@ export const getAllGameSplits = async () => {
 
 export const getAllGameSplitsPaginated = async (page, pageSize) => {
   console.log(`[${tableName}] getAllGameSplitsPaginated page=${page}, pageSize=${pageSize}`);
-  const result = await dynamo.send(
-    new ScanCommand({ TableName: tableName, ProjectionExpression: "id, createdAt, games, pollId, teamSize" })
-  );
+  const result = await scanAll(dynamo, { TableName: tableName, ProjectionExpression: "id, createdAt, games, pollId, teamSize" });
 
-  const items = (result.Items || []).sort((a, b) => b.createdAt - a.createdAt);
+  const items = result.Items.sort((a, b) => b.createdAt - a.createdAt);
   const start = page * pageSize;
 
   return {
@@ -215,18 +212,16 @@ export const movePlayerBetweenTeams = async (id, playerId, fromTeamName, toTeamN
 
 export const getSplitsByDates = async (fromDate, toDate) => {
   console.log(`[${tableName}] getSplitsByDates fromDate=${fromDate}, toDate=${toDate}`);
-  return await dynamo.send(
-    new ScanCommand({ TableName: tableName,
-      FilterExpression: "#date >= :fromDate and #date <= :toDate",
-      ExpressionAttributeNames: {
-        '#date': 'createdAt'
-      },
-      ExpressionAttributeValues: {
-        ':fromDate': fromDate,
-        ':toDate': toDate
-      }
-    })
-  );
+  return await scanAll(dynamo, { TableName: tableName,
+    FilterExpression: "#date >= :fromDate and #date <= :toDate",
+    ExpressionAttributeNames: {
+      '#date': 'createdAt'
+    },
+    ExpressionAttributeValues: {
+      ':fromDate': fromDate,
+      ':toDate': toDate
+    }
+  });
 }
 
 // Follows LastEvaluatedKey, so splits past the 1MB scan page aren't silently dropped

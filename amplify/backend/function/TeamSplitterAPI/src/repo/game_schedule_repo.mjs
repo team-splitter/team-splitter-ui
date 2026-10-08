@@ -7,6 +7,7 @@ import {
   DeleteCommand,
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
+import { scanAll } from "./scan_all.mjs";
 
 const client = new DynamoDBClient({});
 
@@ -41,9 +42,7 @@ export const getGameSchedule = async (id) => {
 
 export const getAllGameSchedules = async () => {
   console.log(`[${tableName}] getAllGameSchedules`);
-  return await dynamo.send(
-    new ScanCommand({ TableName: tableName})
-  );
+  return await scanAll(dynamo, { TableName: tableName });
 }
 
 export const saveGameSchedule = async (gameSchedule) => {
@@ -58,20 +57,18 @@ export const saveGameSchedule = async (gameSchedule) => {
 
 export const getSchedulesByDateRangeAndStatus = async (fromDate, toDate, status) => {
   console.log(`[${tableName}] getSchedulesByDateRangeAndStatus fromDate=${fromDate}, toDate=${toDate}, status=${status}`);
-  return await dynamo.send(
-    new ScanCommand({ TableName: tableName,
-      FilterExpression: "#date >= :fromDate and #date <= :toDate and #status = :status",
-      ExpressionAttributeNames: {
-        '#date': 'date',
-        '#status': 'status'
-      },
-      ExpressionAttributeValues: {
-        ':fromDate': fromDate,
-        ':toDate': toDate,
-        ':status': status
-      }
-    })
-  );
+  return await scanAll(dynamo, { TableName: tableName,
+    FilterExpression: "#date >= :fromDate and #date <= :toDate and #status = :status",
+    ExpressionAttributeNames: {
+      '#date': 'date',
+      '#status': 'status'
+    },
+    ExpressionAttributeValues: {
+      ':fromDate': fromDate,
+      ':toDate': toDate,
+      ':status': status
+    }
+  });
 }
 
 export const updateGameScheduleStatusAndPollId = async (id, pollId, status) => {

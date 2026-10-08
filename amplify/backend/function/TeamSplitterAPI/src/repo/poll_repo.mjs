@@ -7,6 +7,7 @@ import {
   DeleteCommand,
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
+import { scanAll } from "./scan_all.mjs";
 
 const client = new DynamoDBClient({});
 
@@ -42,18 +43,14 @@ export const getPoll = async (id) => {
 
 export const getAllPolls = async () => {
   console.log(`[${tableName}] getAllPolls`);
-  return await dynamo.send(
-    new ScanCommand({ TableName: tableName, ProjectionExpression: "id, createdAt, question" })
-  );
+  return await scanAll(dynamo, { TableName: tableName, ProjectionExpression: "id, createdAt, question" });
 }
 
 export const getAllPollsPaginated = async (page, pageSize) => {
   console.log(`[${tableName}] getAllPollsPaginated page=${page}, pageSize=${pageSize}`);
-  const result = await dynamo.send(
-    new ScanCommand({ TableName: tableName, ProjectionExpression: "id, createdAt, question" })
-  );
+  const result = await scanAll(dynamo, { TableName: tableName, ProjectionExpression: "id, createdAt, question" });
 
-  const items = (result.Items || []).sort((a, b) => b.createdAt - a.createdAt);
+  const items = result.Items.sort((a, b) => b.createdAt - a.createdAt);
   const start = page * pageSize;
 
   return {
@@ -64,18 +61,16 @@ export const getAllPollsPaginated = async (page, pageSize) => {
 
 export const getPollsByDates = async (from, to) => {
   console.log(`[${tableName}] getPollsByDates from=${from}, to=${to}`);
-  return await dynamo.send(
-    new ScanCommand({ TableName: tableName,
-      FilterExpression: "#date >= :fromDate and #date <= :toDate",
-      ExpressionAttributeNames: {
-        '#date': 'createdAt'
-      },
-      ExpressionAttributeValues: {
-        ':fromDate': from,
-        ':toDate': to
-      }
-    })
-  );
+  return await scanAll(dynamo, { TableName: tableName,
+    FilterExpression: "#date >= :fromDate and #date <= :toDate",
+    ExpressionAttributeNames: {
+      '#date': 'createdAt'
+    },
+    ExpressionAttributeValues: {
+      ':fromDate': from,
+      ':toDate': to
+    }
+  });
 }
 
 export const addVoteToPoll = async (id, playerVote) => {

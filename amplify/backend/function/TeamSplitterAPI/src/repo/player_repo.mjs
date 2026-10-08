@@ -7,6 +7,7 @@ import {
   DeleteCommand,
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
+import { scanAll } from "./scan_all.mjs";
 
 
 
@@ -42,9 +43,7 @@ export const getPlayer = async (id) => {
 
 export const getAllPlayers = async () => {
   console.log(`[${tableName}] getAllPlayers`);
-  return await dynamo.send(
-    new ScanCommand({ TableName: tableName})
-  );
+  return await scanAll(dynamo, { TableName: tableName });
 }
 
 export const savePlayer = async (playerDocument) => {

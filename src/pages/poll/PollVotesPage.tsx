@@ -1,4 +1,4 @@
-import { Autocomplete, Box, Button, Dialog, IconButton, Link as MuiLink, List, ListItem, ListItemText, Stack, TextField, Tooltip, Typography } from "@mui/material"
+import { Alert, Autocomplete, Box, Button, Dialog, IconButton, Link as MuiLink, List, ListItem, ListItemText, Stack, TextField, Tooltip, Typography, createFilterOptions } from "@mui/material"
 import { useEffect, useState } from "react"
 import { Player } from "api/Player.types"
 import { Poll, PollVote } from "api/Poll.types"
@@ -7,6 +7,19 @@ import { addPollVote, getVotesForPoll, deletePollVote } from "services/PollServi
 import DeleteIcon from '@mui/icons-material/Delete';
 import ConfirmDialog from 'components/ConfirmDialog';
 import AddPlayer from "pages/players/AddPlayer";
+
+// The first dropdown option: picking it opens the form for a new guest instead of selecting a player
+type PlayerOption = Player & { createGuest?: boolean }
+const filterPlayers = createFilterOptions<PlayerOption>();
+
+// Negative so guests can't clash with a Telegram user id, and are counted as guests
+// (no Telegram id) by the split message and players-by-game
+const newGuest = (firstName: string): Player => ({
+    id: -(Math.floor(Math.random() * 1000000000) + 1),
+    firstName,
+    lastName: '',
+    score: 50
+});
 
 type Props = {
     poll: Poll
@@ -17,13 +30,14 @@ type Props = {
 export const PollVotesPage = ({ pollId, poll, onVoteChange }: Props) => {
     const [votes, setVotes] = useState(poll.answers as PollVote[]);
     const [players, setPlayers] = useState([] as Player[]);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState<string | null>(null);
     const [open, setOpen] = useState(false);
 
     const [selectedPlayer, setSelectedPlayer] = useState<Player | null> (null);
     const [addPlayerEnabled, setAddPlayerButtonEnabled] = useState(false);
     const [selectedVote, setSelectedVote] = useState<PollVote>({} as PollVote);
     const [editPlayer, setEditPlayer] = useState<Player | null>(null);
+    const [guest, setGuest] = useState<Player | null>(null);
 
     const handleAddPlayer = async (e: any) => {
         e.preventDefault();
@@ -31,6 +45,17 @@ export const PollVotesPage = ({ pollId, poll, onVoteChange }: Props) => {
             const vote = await addPollVote(pollId, selectedPlayer.id);
             setVotes([...votes, vote]);
             onVoteChange?.();
+        }
+    }
+
+    const onGuestSaved = async (saved: Player) => {
+        setPlayers((current) => [...current, saved]);
+        try {
+            const vote = await addPollVote(pollId, saved.id);
+            setVotes((current) => [...current, vote]);
+            onVoteChange?.();
+        } catch (err: any) {
+            setError(err?.message || 'The guest was created but could not be added to the poll');
         }
     }
 
@@ -52,10 +77,23 @@ export const PollVotesPage = ({ pollId, poll, onVoteChange }: Props) => {
     return (
         <Box>
             <Stack direction={{ xs: "column", sm: "row" }} spacing={2} alignItems={{ sm: "center" }} sx={{ mb: 2 }}>
-                <Autocomplete
+                <Autocomplete<PlayerOption>
                     options={players}
+                    filterOptions={(options, params) => [
+                        { ...newGuest(params.inputValue.trim()), createGuest: true },
+                        ...filterPlayers(options, params)
+                    ]}
                     getOptionLabel={option=> `${option.firstName || ''} ${option.lastName || ''}`}
                     renderOption={(props, option) => {
+                        if (option.createGuest) {
+                            return (
+                              <li {...props} key="create-guest">
+                                <Typography color="primary" fontWeight={500}>
+                                    {option.firstName ? `+ Create guest "${option.firstName}"` : '+ Create new guest'}
+                                </Typography>
+                              </li>
+                            );
+                        }
                         return (
                           <li {...props} key={option.id}>
                             {`${option.firstName || ''} ${option.lastName || ''}`}
@@ -63,7 +101,14 @@ export const PollVotesPage = ({ pollId, poll, onVoteChange }: Props) => {
                         );
                       }}
                     value={selectedPlayer}
-                    onChange={(event: any, newValue: Player | null) => {
+                    onChange={(event: any, newValue: PlayerOption | null) => {
+                        if (newValue?.createGuest) {
+                            const { createGuest, ...player } = newValue;
+                            setGuest(player);
+                            setAddPlayerButtonEnabled(false);
+                            setSelectedPlayer(null);
+                            return;
+                        }
                         setAddPlayerButtonEnabled(newValue !== null);
                         setSelectedPlayer(newValue);
                       }}
@@ -73,6 +118,8 @@ export const PollVotesPage = ({ pollId, poll, onVoteChange }: Props) => {
                 />
                 <Button disabled={!addPlayerEnabled} onClick={handleAddPlayer} variant="contained">Add Player Vote</Button>
             </Stack>
+
+            {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError(null)}>{error}</Alert>}
 
             <Typography variant="subtitle1" sx={{ mb: 1 }}>
                 Players Going: {votes.length}
@@ -125,6 +172,17 @@ export const PollVotesPage = ({ pollId, poll, onVoteChange }: Props) => {
                                 setEditPlayer(null);
                                 getVotesForPoll(pollId).then(setVotes);
                             }}
+                    />
+                )}
+            </Dialog>
+
+            <Dialog open={!!guest} onClose={() => setGuest(null)}>
+                {guest && (
+                    <AddPlayer
+                        mode="add"
+                        player={guest}
+                        onSaved={onGuestSaved}
+                        cancelButtonHandler={() => setGuest(null)}
                     />
                 )}
             </Dialog>

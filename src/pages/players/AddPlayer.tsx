@@ -8,9 +8,10 @@ type AddPlayerProps = {
     mode: 'add' | 'edit'
     cancelButtonHandler: (e: any) => void
     onSaved?: (player: Player) => void
+    title?: string
 }
 
-export const AddPlayer = ({ cancelButtonHandler, onSaved, player, mode }: AddPlayerProps) => {
+export const AddPlayer = ({ cancelButtonHandler, onSaved, player, mode, title }: AddPlayerProps) => {
     const [id] = useState<string>(`${player?.id}`);
     const [firstName, setFirstName] = useState(`${player?.firstName}`);
     const [lastName, setLastName] = useState(`${player?.lastName}`);
@@ -48,7 +49,7 @@ export const AddPlayer = ({ cancelButtonHandler, onSaved, player, mode }: AddPla
     return (
         <Box component="form" onSubmit={onSubmitButtonHandler} sx={{ p: 3, width: 360, maxWidth: "100%" }}>
             <Typography variant="h6" sx={{ mb: 2 }}>
-                {mode === 'add' ? 'Add Player' : 'Edit Player'}
+                {title ?? (mode === 'add' ? 'Add Player' : 'Edit Player')}
             </Typography>
             <Stack spacing={2}>
                 <TextField label="ID" value={id} disabled fullWidth />

@@ -14,12 +14,15 @@ const filterPlayers = createFilterOptions<PlayerOption>();
 
 // Negative so guests can't clash with a Telegram user id, and are counted as guests
 // (no Telegram id) by the split message and players-by-game
-const newGuest = (firstName: string): Player => ({
-    id: -(Math.floor(Math.random() * 1000000000) + 1),
-    firstName,
-    lastName: '',
-    score: 50
-});
+const newGuest = (name: string): Player => {
+    const [firstName = '', ...lastName] = name.trim().split(/\s+/);
+    return {
+        id: -(Math.floor(Math.random() * 1000000000) + 1),
+        firstName,
+        lastName: lastName.join(' '),
+        score: 50
+    };
+}
 
 type Props = {
     poll: Poll
@@ -80,7 +83,7 @@ export const PollVotesPage = ({ pollId, poll, onVoteChange }: Props) => {
                 <Autocomplete<PlayerOption>
                     options={players}
                     filterOptions={(options, params) => [
-                        { ...newGuest(params.inputValue.trim()), createGuest: true },
+                        { ...newGuest(params.inputValue), createGuest: true },
                         ...filterPlayers(options, params)
                     ]}
                     getOptionLabel={option=> `${option.firstName || ''} ${option.lastName || ''}`}
@@ -89,7 +92,7 @@ export const PollVotesPage = ({ pollId, poll, onVoteChange }: Props) => {
                             return (
                               <li {...props} key="create-guest">
                                 <Typography color="primary" fontWeight={500}>
-                                    {option.firstName ? `+ Create guest "${option.firstName}"` : '+ Create new guest'}
+                                    {option.firstName ? `+ Create guest "${`${option.firstName} ${option.lastName}`.trim()}"` : '+ Create new guest'}
                                 </Typography>
                               </li>
                             );
@@ -104,6 +107,8 @@ export const PollVotesPage = ({ pollId, poll, onVoteChange }: Props) => {
                     onChange={(event: any, newValue: PlayerOption | null) => {
                         if (newValue?.createGuest) {
                             const { createGuest, ...player } = newValue;
+                            // the dialog hides the rest of the page, so don't leave focus in the dropdown behind it
+                            (document.activeElement as HTMLElement | null)?.blur();
                             setGuest(player);
                             setAddPlayerButtonEnabled(false);
                             setSelectedPlayer(null);
@@ -180,6 +185,7 @@ export const PollVotesPage = ({ pollId, poll, onVoteChange }: Props) => {
                 {guest && (
                     <AddPlayer
                         mode="add"
+                        title="Add Guest"
                         player={guest}
                         onSaved={onGuestSaved}
                         cancelButtonHandler={() => setGuest(null)}

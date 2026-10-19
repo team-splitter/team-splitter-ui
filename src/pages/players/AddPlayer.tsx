@@ -1,16 +1,18 @@
 import { Alert, Box, Button, CircularProgress, Stack, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import { Player } from "../../api/Player.types";
-import { createPlayer, updatePlayer } from "../../services/PlayerService";
+import { createPlayer, getPlayerById, updatePlayer } from "../../services/PlayerService";
 
 type AddPlayerProps = {
     player: Player | null
     mode: 'add' | 'edit'
     cancelButtonHandler: (e: any) => void
+    onSaved?: (player: Player) => void
+    title?: string
 }
 
-export const AddPlayer = ({ cancelButtonHandler, player, mode }: AddPlayerProps) => {
-    const [id] = useState<string>(`${player?.id}`);
+export const AddPlayer = ({ cancelButtonHandler, onSaved, player, mode, title }: AddPlayerProps) => {
+    const [id, setId] = useState<string>(`${player?.id}`);
     const [firstName, setFirstName] = useState(`${player?.firstName}`);
     const [lastName, setLastName] = useState(`${player?.lastName}`);
     const [score, setScore] = useState(`${player?.score}`);
@@ -19,7 +21,11 @@ export const AddPlayer = ({ cancelButtonHandler, player, mode }: AddPlayerProps)
 
     const onSubmitButtonHandler = async (e: any) => {
         e.preventDefault();
-        const playerId = Number(id);
+        const playerId = Number(id.trim());
+        if (mode === 'add' && (!/^-?\d+$/.test(id.trim()) || !Number.isSafeInteger(playerId) || playerId === 0)) {
+            setError('ID must be a whole number other than 0');
+            return;
+        }
         const data: Player = {
             id: playerId,
             firstName: firstName,
@@ -30,6 +36,13 @@ export const AddPlayer = ({ cancelButtonHandler, player, mode }: AddPlayerProps)
         setError(null);
         try {
             if (mode === 'add') {
+                // saving over an existing id would silently replace that player
+                const existing = await getPlayerById(playerId);
+                if (existing?.id !== undefined) {
+                    setError(`ID ${playerId} already belongs to ${`${existing.firstName || ''} ${existing.lastName || ''}`.trim() || 'another player'}`);
+                    setSaving(false);
+                    return;
+                }
                 await createPlayer(data);
             } else {
                 await updatePlayer(id, data);
@@ -40,16 +53,24 @@ export const AddPlayer = ({ cancelButtonHandler, player, mode }: AddPlayerProps)
             return;
         }
 
+        onSaved?.(data);
         cancelButtonHandler(e);
     }
 
     return (
         <Box component="form" onSubmit={onSubmitButtonHandler} sx={{ p: 3, width: 360, maxWidth: "100%" }}>
             <Typography variant="h6" sx={{ mb: 2 }}>
-                {mode === 'add' ? 'Add Player' : 'Edit Player'}
+                {title ?? (mode === 'add' ? 'Add Player' : 'Edit Player')}
             </Typography>
             <Stack spacing={2}>
-                <TextField label="ID" value={id} disabled fullWidth />
+                <TextField
+                    label="ID"
+                    value={id}
+                    onChange={(e) => setId(e.target.value)}
+                    disabled={mode !== 'add'}
+                    helperText={mode === 'add' ? "Telegram user id, or keep the generated one" : undefined}
+                    fullWidth
+                />
                 <TextField
                     label="First Name"
                     value={firstName}

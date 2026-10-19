@@ -9,7 +9,6 @@ import { handleGameSchedule } from './service/game_scheduler_service.mjs';
 import {getPlayerStats} from './service/player_stat_service.mjs'
 import { setGameSplitScores } from './service/game_split_service.mjs';
 import { getPlayersByGame } from './service/players_by_game_service.mjs';
-import { toNyDate } from './service/ny_date.mjs';
 
 
 export const handler = async (event, context) => {
@@ -126,16 +125,16 @@ export const handler = async (event, context) => {
         exisinting.score = requestJSON.score;
         
         await savePlayer(exisinting);
-        // Polls split before today are finished games and keep the player as they were;
-        // a poll split today (game day) still gets the edit, in its votes and its split
+        // A poll with a split from the last 48 hours and no game scores yet is still before or on game day,
+        // so it gets the edit in its votes and its splits; other split polls are finished games and stay as they were
         const playerData = { firstName: exisinting.firstName, lastName: exisinting.lastName, score: exisinting.score };
-        const today = toNyDate(Date.now());
+        const recentSince = Date.now() - 48 * 60 * 60 * 1000;
         const splits = (await getAllGameSplits()).Items || [];
-        const todaySplits = splits.filter(s => s.createdAt && toNyDate(s.createdAt) === today);
-        const todayPollIds = new Set(todaySplits.map(s => s.pollId));
-        const completedPollIds = splits.map(s => s.pollId).filter(id => !todayPollIds.has(id));
+        const scoredPollIds = new Set(splits.filter(s => Array.isArray(s.games) && s.games.length > 0).map(s => s.pollId));
+        const openPollIds = new Set(splits.filter(s => s.createdAt >= recentSince && !scoredPollIds.has(s.pollId)).map(s => s.pollId));
+        const completedPollIds = splits.map(s => s.pollId).filter(id => !openPollIds.has(id));
         await updatePlayerInPollVotes(playerId, playerData, completedPollIds);
-        await Promise.all(todaySplits.map(s => updatePlayerInGameSplit(s.id, playerId, playerData)));
+        await Promise.all(splits.filter(s => openPollIds.has(s.pollId)).map(s => updatePlayerInGameSplit(s.id, playerId, playerData)));
         body = exisinting;
         break;
       }

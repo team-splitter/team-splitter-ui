@@ -11,8 +11,13 @@ export const splitTeamsByPoll = async (poll, teamNum, teamNames) => {
     (await getAllPlayers()).Items.forEach((player) => {
         playersMap[player.id] = player;
     });
-    //set current actual (at this moment) player scores
-    players.forEach((player) => player.score = playersMap[player.id].score);
+    //votes hold a copy of the player from when they voted: use the current (at this moment) name and score
+    players.forEach((player) => {
+        const current = playersMap[player.id];
+        player.score = current.score;
+        player.firstName = current.firstName;
+        player.lastName = current.lastName;
+    });
 
     return splitTeams(players, teamNum, teamNames);
 }

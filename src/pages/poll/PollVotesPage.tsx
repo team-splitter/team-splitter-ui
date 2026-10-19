@@ -12,9 +12,12 @@ type Props = {
     poll: Poll
     pollId: string
     onVoteChange?: () => void
+    // bumped by the poll page when a player was edited anywhere on it
+    refreshKey?: number
+    onPlayerUpdated?: () => void
 }
 
-export const PollVotesPage = ({ pollId, poll, onVoteChange }: Props) => {
+export const PollVotesPage = ({ pollId, poll, onVoteChange, refreshKey, onPlayerUpdated }: Props) => {
     const [votes, setVotes] = useState(poll.answers as PollVote[]);
     const [players, setPlayers] = useState([] as Player[]);
     const [error, setError] = useState(null);
@@ -48,6 +51,12 @@ export const PollVotesPage = ({ pollId, poll, onVoteChange }: Props) => {
                 setError(response.message);
             })
     }, []);
+
+    useEffect(() => {
+        if (!refreshKey) return;
+        // if this reload fails, the list keeps what it shows instead of going stale
+        getVotesForPoll(pollId).then(setVotes).catch(() => {});
+    }, [refreshKey, pollId]);
 
     return (
         <Box>
@@ -121,10 +130,14 @@ export const PollVotesPage = ({ pollId, poll, onVoteChange }: Props) => {
                     <AddPlayer
                         mode="edit"
                         player={editPlayer}
-                        cancelButtonHandler={() => {
-                                setEditPlayer(null);
-                                getVotesForPoll(pollId).then(setVotes);
-                            }}
+                        onSaved={(saved) => {
+                            setVotes((current) => current.map((vote) =>
+                                vote.player?.id === saved.id
+                                    ? { ...vote, player: { ...vote.player, firstName: saved.firstName, lastName: saved.lastName, score: saved.score } }
+                                    : vote));
+                            onPlayerUpdated?.();
+                        }}
+                        cancelButtonHandler={() => setEditPlayer(null)}
                     />
                 )}
             </Dialog>

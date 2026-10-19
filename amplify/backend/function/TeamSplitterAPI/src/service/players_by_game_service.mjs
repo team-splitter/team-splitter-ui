@@ -1,11 +1,16 @@
 import {getSplitsCreatedSince} from "../repo/game_split_repo.mjs";
 import {getSchedulesWithPoll} from "../repo/game_schedule_repo.mjs";
 import {getPollQuestionsByIds} from "../repo/poll_repo.mjs";
-import {toNyDate} from "./ny_date.mjs";
 
 // Also the longest range allowed, so a bad or huge range can't scan and fetch every poll ever split
 const MAX_RANGE_DAYS = 31;
 const MAX_RANGE_MS = MAX_RANGE_DAYS * 24 * 60 * 60 * 1000;
+
+// en-CA formats as YYYY-MM-DD
+const nyDateFormat = new Intl.DateTimeFormat('en-CA', {
+  timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit'
+});
+const toNyDate = (epochMs) => nyDateFormat.format(new Date(epochMs));
 
 const parseDateParam = (value, name, defaultValue) => {
   if (value === undefined || value === null || value === '') {

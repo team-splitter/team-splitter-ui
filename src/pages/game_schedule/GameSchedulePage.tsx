@@ -25,6 +25,7 @@ export const GameSchedulePage = () => {
     const [addEditFormVisible, setAddEditFormVisible] = useState(false);
     const [open, setOpen] = useState(false);
     const [selectedSchedule, setSelectedSchedule] = useState<GameSchedule>({} as GameSchedule);
+    const [pageSize, setPageSize] = useState<number>(20);
 
     const onDeleteGameSchedule = async (schedule: GameSchedule) => {
         await deleteScheduleById(schedule.id);
@@ -114,7 +115,8 @@ export const GameSchedulePage = () => {
                 rows={schedules}
                 columns={columns}
                 getRowId={(row) => row.id}
-                pageSize={20}
+                pageSize={pageSize}
+                onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
                 autoHeight
             />
 
